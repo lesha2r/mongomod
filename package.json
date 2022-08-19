@@ -1,0 +1,19 @@
+{
+  "name": "mongomod",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "eslint": "^8.19.0",
+    "jest": "^28.1.2",
+    "lodash": "^4.17.21",
+    "mongodb": "^4.7.0"
+  }
+}

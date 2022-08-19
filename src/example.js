@@ -1,0 +1,54 @@
+import monmodel from './monmodel.js';
+
+// * [1] Create a connection
+// Create an instance
+let db = new monmodel.Connection({
+    link: 'cluster1.uz4a1f2.mongodb.net',
+    login: 'mongoadmin',
+    password: 'gLxqOWUCtlZhBJ39',
+    dbName: 'main',
+    debug: true
+});
+
+// Establish connection
+//db.connect();
+
+// * [2] Create a schema
+let userSchema = new monmodel.Schema({
+    name: 'string',
+}, { debug: true, strict: false });
+
+// * Controller for direct queries
+let controller = new monmodel.Controller(db, 'test');
+
+// * [3] Create a model
+let customMethods = {
+    validate2: async function() { 
+        let result = await this.findOne({ query: { name: 'Barney' } });
+        return result;
+    }
+};
+
+async function fakeRequest(id) {
+    try {
+        await db.connect();
+        
+        let Dog = monmodel.createModel(db, 'dogs', userSchema, customMethods);
+
+        let dog = await new Dog().get({
+            _id: id,
+        });
+
+        await db.close();
+        
+        return dog.dataFiltered(['name', '_id']);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+(async () => { console.log(await fakeRequest('62c973af7997f0f9fed8ab75')); })();
+
+
+
+
