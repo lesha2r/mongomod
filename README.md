@@ -15,7 +15,7 @@ To have an optimal level of control follow these steps:
 ## Create a connection
 Initialize a connection which will allow all other stuff to be in touch with a database.
 
-### monmodel.Connection(options)
+### mongomod.Connection(options)
 * `options` (Object) — connection parameters
 * `options.link` (String) — mongo connection link
 * `options.login` (String) — mongo login
@@ -23,9 +23,9 @@ Initialize a connection which will allow all other stuff to be in touch with a d
 * `options.dbName` (String) — mongo database name
 * `options.debug` (Boolean) — enable/disable debuggin messages in console *[default: false]*
 ```
-import monmodel from 'monmodel';
+import mongomod from 'mongomod';
 
-let db = new monmodel.Connection({
+let db = new mongomod.Connection({
     link: 'your.link.mongodb.net',
     login: 'your_login',
     password: 'your_password',
@@ -46,7 +46,7 @@ db.disconnect()
 ## Create a schema (optional)
 Next up you may create a schema for a model that you are going to work with. This is an optional step so you may skip it if you don't want to validate data of your Model instances.
 
-### monmodel.Schema(schemaObj, options)
+### mongomod.Schema(schemaObj, options)
 * `schemeObj` (Object) — object describing future model schema
 * `options` (Object) — additional parameters
 * `options.strict` (Boolean) — set true if you would like to follow schema in a strict way (all unwanted parameters are removed) *[default: false]*
@@ -55,9 +55,9 @@ Next up you may create a schema for a model that you are going to work with. Thi
 Create it like this:
 
 ```
-import monmodel from 'monmodel';
+import mongomod from 'mongomod';
 
-let userSchema = new monmodel.Schema({
+let userSchema = new mongomod.Schema({
     name: 'string',
     age: ['number', 'null'],
     address: {
@@ -88,7 +88,7 @@ or combine them using an array like *{ city: ['string', 'null'] }*
 ## Create a model
 Now you are ready to create your first Model. Use crateModel function. Let's see how it works.
 
-### monmodel.createModel(db, collection, schema)
+### mongomod.createModel(db, collection, schema)
 Creates an object that will be using for constructing a new instances of a Model.
 
 * `db` (Object) — connection object created by MongoConnection class
@@ -96,30 +96,30 @@ Creates an object that will be using for constructing a new instances of a Model
 * `schema` (Object) — schema object created by MongoScheme class... or nothing *[default: null]*
 
 ```
-import monmodel from 'monmodel';
+import mongomod from 'mongomod';
 
-let UserModel = monmodel.createModel(db, 'users', userSchema)
+let UserModel = mongomod.createModel(db, 'users', userSchema)
 ```
 
 Don't pass schema if you don't really need it:
 ```
 // This will work...
-let UserModel = monmodel.createModel(db, 'users')
+let UserModel = mongomod.createModel(db, 'users')
 // ...but schema is now your responsibility ;)
 ```
 
 So the complete algorithm will be the following:
 ```
-import monmodel from 'monmodel';
+import mongomod from 'mongomod';
 
-let db = new monmodel.Connection({
+let db = new mongomod.Connection({
     link: 'your.link.mongodb.net',
     login: 'your_login',
     password: 'your_password',
     dbName: 'test'
 });
 
-let userSchema = new monmodel.Schema({
+let userSchema = new mongomod.Schema({
     name: 'string',
     lastName: 'string',
     age: ['number', 'null'],

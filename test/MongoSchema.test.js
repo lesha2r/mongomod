@@ -1,4 +1,4 @@
-import monmodel from '../src/monmodel.js';
+import mongomod from '../src/mongomod.js';
 
 let testSchema = {
     name: 'string',
@@ -36,7 +36,7 @@ test('creating schema created with bad argument throws error', () => {
         'null': 'null'
     };
 
-    expect(() => new monmodel.Schema(allTypesSchema)).not.toThrow();
+    expect(() => new mongomod.Schema(allTypesSchema)).not.toThrow();
 });
 
 test('creating schema created with bad argument throws error', () => {
@@ -45,17 +45,17 @@ test('creating schema created with bad argument throws error', () => {
         name: 'WRONG'
     };
 
-    expect(() => new monmodel.Schema(brokenSchema)).toThrow();
+    expect(() => new mongomod.Schema(brokenSchema)).toThrow();
 });
 
 test('validating data with correct schema returns true', () => {
-    let schema = new monmodel.Schema(testSchema);
+    let schema = new mongomod.Schema(testSchema);
 
     expect(schema.validate(testData)).toBe(true);
 });
 
 test('validating data with wrong schema returns false', () => {
-    let schema = new monmodel.Schema(testSchema);
+    let schema = new mongomod.Schema(testSchema);
 
     let brokenData = {
         ...testData,

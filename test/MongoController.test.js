@@ -1,5 +1,5 @@
 import MongoController from "../src/MongoController.js";
-import monmodel from "../src/monmodel.js";
+import mongomod from "../src/mongomod.js";
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -22,7 +22,7 @@ const checkMethods = [
 ];
 
 // Create an instance
-let db = new monmodel.Connection({
+let db = new mongomod.Connection({
     link: process.env.LINK,
     login: process.env.LOGIN,
     password: process.env.PASSWORD,
@@ -31,7 +31,7 @@ let db = new monmodel.Connection({
 
 //db.connect();
 
-let controller = new monmodel.Controller(db, 'test');
+let controller = new mongomod.Controller(db, 'test');
 
 test('new mongo controller has all methods', () => {
     let result = checkMethods.every( key => typeof controller[key] === 'function');

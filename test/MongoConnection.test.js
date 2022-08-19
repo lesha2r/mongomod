@@ -1,4 +1,4 @@
-import monmodel from '../src/monmodel.js';
+import mongomod from '../src/mongomod.js';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -28,7 +28,7 @@ test('connection options missing link throws an error', () => {
 
     delete connectionCredsBroken.link;
 
-    expect(() => monmodel.Connection(connectionCredsBroken)).toThrow();
+    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
 });
 
 test('connection options missing login throws an error', () => {
@@ -38,7 +38,7 @@ test('connection options missing login throws an error', () => {
 
     delete connectionCredsBroken.login;
 
-    expect(() => monmodel.Connection(connectionCredsBroken)).toThrow();
+    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
 });
 
 test('connection options missing password throws an error', () => {
@@ -48,7 +48,7 @@ test('connection options missing password throws an error', () => {
 
     delete connectionCredsBroken.password;
 
-    expect(() => monmodel.Connection(connectionCredsBroken)).toThrow();
+    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
 });
 
 test('connection options missing dbName throws an error', () => {
@@ -58,17 +58,17 @@ test('connection options missing dbName throws an error', () => {
 
     delete connectionCredsBroken.dbName;
 
-    expect(() => monmodel.Connection(connectionCredsBroken)).toThrow();
+    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
 });
 
 test('created instance passes client object', () => {
-    let connection = new monmodel.Connection(connectionCreds);
+    let connection = new mongomod.Connection(connectionCreds);
 
     expect(connection.passClient()).toBe(null);
 });
 
 test('connection with wrong credentials throws an error', async () => {
-    let connection = new monmodel.Connection(connectionCreds);
+    let connection = new mongomod.Connection(connectionCreds);
     //const conntectionResult = await connection.connect();
     try {
         await connection.connect();
@@ -78,7 +78,7 @@ test('connection with wrong credentials throws an error', async () => {
 }, 25000);
 
 test('connection with correct credentials not throws an error', async () => {
-    let connection = new monmodel.Connection(connectionCredsReal);
+    let connection = new mongomod.Connection(connectionCredsReal);
     //const conntectionResult = await connection.connect();
 
     let result = await connection.connect();

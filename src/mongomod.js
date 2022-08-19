@@ -5,7 +5,7 @@ import MongoModel from './MongoModel.js';
 
 const reservedMethodsNames = ['validate', 'clearBySchema', 'init', 'set', 'insert', 'get', 'save', 'delete'];
 
-const monmodel = {
+const mongomod = {
     models: {},  
     Schema: MongoSchema,
     Controller: MongoController,
@@ -70,4 +70,4 @@ const monmodel = {
 
 const randomNumber = () => Math.floor(Math.random() * 100);
 
-export default monmodel;
+export default mongomod;

@@ -1,4 +1,4 @@
-import monmodel from '../src/monmodel.js';
+import mongomod from '../src/mongomod.js';
 
 import dotenv from 'dotenv';
 import path from 'path';
@@ -9,7 +9,7 @@ dotenv.config({
 });
 
 // Create an instance
-let db = new monmodel.Connection({
+let db = new mongomod.Connection({
     link: process.env.LINK,
     login: process.env.LOGIN,
     password: process.env.PASSWORD,
@@ -18,9 +18,9 @@ let db = new monmodel.Connection({
 
 db.connect();
 
-let controller = new monmodel.Controller(db, 'test');
+let controller = new mongomod.Controller(db, 'test');
 
-let userSchema = new monmodel.Schema({
+let userSchema = new mongomod.Schema({
     name: 'string',
     age: 'number',
     address: {
@@ -32,18 +32,18 @@ let userSchema = new monmodel.Schema({
     }
 });
 
-let User = monmodel.createModel(db, 'test', userSchema);
+let User = mongomod.createModel(db, 'test', userSchema);
 
 test('failed schema throws an error', () => {
     let badUserSchema = {
         string: 'something'
     };
 
-    expect(() => monmodel.createModel(db, 'test', badUserSchema)).toThrow();
+    expect(() => mongomod.createModel(db, 'test', badUserSchema)).toThrow();
 });
 
 test('good schema not throws an error', () => {
-    expect(() => monmodel.createModel(db, 'test', userSchema)).not.toThrow();
+    expect(() => mongomod.createModel(db, 'test', userSchema)).not.toThrow();
 });
 
 test('setting data with a wrong type throws an error', async () => {
@@ -141,8 +141,8 @@ test('model clearBySchema returns coorect result #1', () => {
         school: null
     };
 
-    let userSchema = new monmodel.Schema(schema);
-    let TestUserModel = monmodel.createModel(db, 'test', userSchema);
+    let userSchema = new mongomod.Schema(schema);
+    let TestUserModel = mongomod.createModel(db, 'test', userSchema);
     let testUser = new TestUserModel().init({ ...userData, toBeCleared: 'any value' });
     
     testUser.clearBySchema();
@@ -179,9 +179,9 @@ test('model clearBySchema returns coorect result #2', () => {
         school: null
     };
 
-    let userSchema = new monmodel.Schema(schema);
+    let userSchema = new mongomod.Schema(schema);
 
-    let TestUserModel = monmodel.createModel(db, 'test', userSchema);
+    let TestUserModel = mongomod.createModel(db, 'test', userSchema);
 
     let testUser = new TestUserModel().init({ ...userData, toBeCleared: 'any value' });
 
@@ -251,9 +251,9 @@ test('model clearBySchema returns coorect result #2', () => {
         }
     };
 
-    let userSchema = new monmodel.Schema(schema);
+    let userSchema = new mongomod.Schema(schema);
 
-    let TestUserModel = monmodel.createModel(db, 'test', userSchema);
+    let TestUserModel = mongomod.createModel(db, 'test', userSchema);
 
     let modifiedDataObj = { ...userData };
 
@@ -274,7 +274,7 @@ test('custom method with with reserved names throws an error', () => {
     };
 
     expect( () => {
-        let TestUserModel = monmodel.createModel(db, 'test', userSchema, customs);
+        let TestUserModel = mongomod.createModel(db, 'test', userSchema, customs);
     }).toThrow();
 });
 
@@ -283,7 +283,7 @@ test('custom method works as expected', () => {
         test: function() { return 'test done'; }
     };
 
-    let TestUserModel = monmodel.createModel(db, 'test', userSchema, customs);
+    let TestUserModel = mongomod.createModel(db, 'test', userSchema, customs);
     let result = new TestUserModel().test();
 
     expect(result).toBe('test done');

@@ -1,8 +1,8 @@
-import monmodel from './monmodel.js';
+import mongomod from './mongomod.js';
 
 // * [1] Create a connection
 // Create an instance
-let db = new monmodel.Connection({
+let db = new mongomod.Connection({
     link: 'cluster1.uz4a1f2.mongodb.net',
     login: 'mongoadmin',
     password: 'gLxqOWUCtlZhBJ39',
@@ -14,12 +14,12 @@ let db = new monmodel.Connection({
 //db.connect();
 
 // * [2] Create a schema
-let userSchema = new monmodel.Schema({
+let userSchema = new mongomod.Schema({
     name: 'string',
 }, { debug: true, strict: false });
 
 // * Controller for direct queries
-let controller = new monmodel.Controller(db, 'test');
+let controller = new mongomod.Controller(db, 'test');
 
 // * [3] Create a model
 let customMethods = {
@@ -33,7 +33,7 @@ async function fakeRequest(id) {
     try {
         await db.connect();
         
-        let Dog = monmodel.createModel(db, 'dogs', userSchema, customMethods);
+        let Dog = mongomod.createModel(db, 'dogs', userSchema, customMethods);
 
         let dog = await new Dog().get({
             _id: id,
