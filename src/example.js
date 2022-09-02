@@ -32,7 +32,7 @@ let customMethods = {
 async function fakeRequest(id) {
     try {
         await db.connect();
-        
+
         let Dog = mongomod.createModel(db, 'dogs', userSchema, customMethods);
 
         let dog = await new Dog().get({

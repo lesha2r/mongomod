@@ -11,6 +11,7 @@ import deleteManyMethod from './methods/deleteMany.js';
 import insertManyMethod from './methods/insertMany.js';
 import aggregateMethod from './methods/aggregate.js';
 import count from './methods/count.js';
+import distinct from './methods/distinct.js';
 
 class MongoController {
     constructor (db, collection) {
@@ -114,6 +115,15 @@ class MongoController {
     */
     count(options = {}) {
         return count.call(this, options);
+    }
+
+    /**
+    * Returns unique document fields matching the query
+    * @param { Object } options extra options object
+    * @returns { Promise } Promise
+    */
+    distinct(options = {}) {
+        return distinct.call(this, options);
     }
 
 }
