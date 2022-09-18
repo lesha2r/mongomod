@@ -33,6 +33,9 @@ async function fakeRequest(id) {
     try {
         await db.connect();
 
+        let result = await controller.findMany({ query: {}});
+        console.log(result);
+
         let Dog = mongomod.createModel(db, 'dogs', userSchema, customMethods);
 
         let dog = await new Dog().get({

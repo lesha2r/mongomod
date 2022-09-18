@@ -8,6 +8,7 @@ import findOneMethod from './methods/findOne.js';
  * @param { String } options.login mongo login
  * @param { String } options.password mongo password
  * @param { String } options.dbName database name
+ * @param { Boolean } options.srv srv connection [true / false]
  * @param { Boolean } options.debug enables/disables log messages
  * 
  */
@@ -17,6 +18,7 @@ class MongoConnection {
         if (!options.login) throw new Error('options missing parameter: login');
         if (!options.password) throw new Error('options missing parameter: password');
         if (!options.dbName) throw new Error('options missing parameter: dbName');
+        if (typeof options.srv !== 'boolean') options.srv = true;
 
         // Credentials and connection params
         this.link = options.link;
@@ -24,6 +26,9 @@ class MongoConnection {
         this.password = options.password;
         this.dbName = options.dbName;
         this.debug = options.debug || false;
+        this.options = {
+            srv: options.srv
+        };
 
         // Client
         this.client = null;
@@ -40,7 +45,8 @@ class MongoConnection {
     connect(callback) {
         if (callback && typeof callback !== 'function') throw new Error('Callback must be a function');
         
-        const mongoUrl = `mongodb+srv://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=admin`; //&w=majority?retryWrites=true`;
+        const srv = (this.options.srv === true) ? '+srv' : '';
+        const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=admin`; //&w=majority?retryWrites=true`;
         const mongoClient = new mongo.MongoClient(mongoUrl, {
             useUnifiedTopology: true,
             useNewUrlParser: true 
