@@ -21,7 +21,8 @@ Initialize a connection which will allow all other stuff to be in touch with a d
 * `options.login` (String) — mongo login
 * `options.password` (String) — mongo password
 * `options.dbName` (String) — mongo database name
-* `options.debug` (Boolean) — enable/disable debuggin messages in console *[default: false]*
+* `options.debug` (Boolean) — enable/disable debugging messages in console *[default: false]*
+* `options.srv` (Boolean) — enable/disable srv in connection string *[default: true]*
 ```
 import mongomod from 'mongomod';
 
