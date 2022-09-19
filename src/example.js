@@ -5,7 +5,7 @@ import mongomod from './mongomod.js';
 let db = new mongomod.Connection({
     link: 'cluster1.uz4a1f2.mongodb.net',
     login: 'mongoadmin',
-    password: 'gLxqOWUCtlZhBJ39',
+    password: 'e5r1VHjUURc0mTFi',
     dbName: 'main',
     debug: true
 });
