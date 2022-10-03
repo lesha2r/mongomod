@@ -8,20 +8,21 @@ import { ObjectId } from 'mongodb';
 export default function findMany(options) {
     return new Promise(async (resolve, reject) => {
         try {
-            let { query, limit } = options;
+            let { query, limit, skip } = options;
             let collection = this.collection;
 
             // Check and validate
             if (!collection) throw new Error('no collection specified');
             if (!query) query = {};
             if (!limit) limit = 99999999;
+            if (!skip) skip = 0;
 
             if (query._id) query._id = ObjectId(query._id);
 
             const db = this.getClient().db(this.dbName);
             const col = db.collection(collection);
 
-            let result = await col.find(query).limit(limit).toArray();
+            let result = await col.find(query).limit(limit).skip(skip).toArray();
 
             if (!result || Array.isArray(result) && result.length === 0) {
                 resolve({ ok: true, details: 'nothing found', result: [] });
