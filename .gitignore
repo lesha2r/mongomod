@@ -1,3 +1,5 @@
 /node_modules/
 .env
-/src/examples/
+/examples/
+TODOS.md
+TODOS_le.md

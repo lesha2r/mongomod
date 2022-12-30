@@ -1,5 +1,7 @@
 import { getValueType } from "../src/helpers";
 
+// TODO: https://jestjs.io/ru/docs/mongodb
+
 test('getValue type returns correct type for array', () => {
     expect(getValueType( ['1', '2'] )).toBe('array');
 });

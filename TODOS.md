@@ -1,5 +1,6 @@
-1. Add controller methods to tests
-2. Handle _id and ObjectId everywhere expected
-3. new method Model.data()
-4. отправка (инсверт) данных при закрытой дб все равно заканчивается как ОК
-5. При инсерте до подключения дб не вылетает ошибка! См контроллер криэйтСтор
+[] Add controller methods to tests
+[] Handle _id and ObjectId everywhere expected
+[] Default query set to {} (findMany, findOne, others)
+[] [Bug?] Check methods while connection is closed
+[] [Bug?] Ensure insert method throws exception on call before db connects
+[] Add keys failed validation to exception message
