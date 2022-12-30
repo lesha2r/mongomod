@@ -88,7 +88,7 @@ class MongoSchema {
     }
 
     validate(data) {
-        const logOn = false;
+        const logOn = true;
         let checks = [];
 
         function diveIntoObject(data, schema, deepKeys = []) {

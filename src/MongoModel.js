@@ -27,7 +27,7 @@ class MongoModel extends MongoController {
     }
 
     /**
-     * Фильтрация объекта, с сохранением только разрешенных ключей
+     * Filters data by allowedKeys (top-level only)
      * @param { Array } allowedKeys 
      * @returns
      */
@@ -42,8 +42,15 @@ class MongoModel extends MongoController {
     }
 
     /**
-     * Starts validation process and returns its result
-     * 
+     * Returns modelData as stringified JSON
+     * @returns { String } stringified modelData
+     */
+    toString() {
+        return JSON.stringify(this.modelData);
+    }
+
+    /**
+     * Validates modelData by it's schema
      * @returns { Boolean } validation result (true / false)
      */
     validate() {
@@ -55,7 +62,7 @@ class MongoModel extends MongoController {
     }
 
     /**
-     * Force modelData to match schema
+     * Force modelData to have only keys allowed by schema
      * @returns modelData
      */
     clearBySchema() {

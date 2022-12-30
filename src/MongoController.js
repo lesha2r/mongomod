@@ -12,6 +12,7 @@ import insertManyMethod from './methods/insertMany.js';
 import aggregateMethod from './methods/aggregate.js';
 import count from './methods/count.js';
 import distinct from './methods/distinct.js';
+import bulkWrite from './methods/bulkWrite.js';
 
 class MongoController {
     constructor (db, collection) {
@@ -124,6 +125,15 @@ class MongoController {
     */
     distinct(options = {}) {
         return distinct.call(this, options);
+    }
+
+    /**
+    * Sends bulk write operations
+    * @param { Array } operations list of operations to be done
+    * @returns { Promise } Promise
+    */
+    bulkWrite(operations = []) {
+        return bulkWrite.call(this, operations);
     }
 
 }

@@ -2,7 +2,7 @@
   "name": "mongomod",
   "version": "1.0.4",
   "description": "",
-  "main": "src/mongomod.js",
+  "main": "src/mongomod",
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
