@@ -8,17 +8,24 @@ import { ObjectId } from 'mongodb';
 export default function updateMany(options)  {
     return new Promise(async (resolve, reject) => {
         try {
-            let { query, data, upsert } = options;
+            let { query, data, upsert, unset } = options;
             
             let collection = this.collection;
 
             const db = this.getClient().db(this.dbName);
             const col = db.collection(collection);
-            
+        
             // Checks, validations
             if (!collection) throw new Error('no collection specified');
             if (!upsert) upsert = true;
             if (!query) query = {};
+
+            let set = (unset === true) ? { $unset: data } : { $set: data};
+
+            // In case if 'set' operator is not needed
+            if (data.$addToSet) set = data;
+            else if (data.$pull) set = data;
+            else if (data.$inc) set = data;
 
             let result = await col.updateMany(
                 query,
