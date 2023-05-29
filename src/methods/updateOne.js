@@ -29,6 +29,7 @@ export default function updateOne(options) {
         // In case if 'set' operator is not needed
         if (data.$addToSet) set = data;
         else if (data.$pull) set = data;
+        else if (data.$inc) set = data;
         
         try {
             const db = this.getClient().db(this.dbName);

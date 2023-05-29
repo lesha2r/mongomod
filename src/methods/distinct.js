@@ -8,7 +8,7 @@ import { ObjectId } from 'mongodb';
 export default function count(options = {}) {
     return new Promise(async (resolve, reject) => {
         try {
-            let { field, query } = options;
+            let { field, query, limit } = options;
             let collection = this.collection;
 
             // Checks, validations
