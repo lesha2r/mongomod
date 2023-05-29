@@ -1,6 +1,6 @@
 {
   "name": "mongomod",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "",
   "main": "src/mongomod.js",
   "type": "module",

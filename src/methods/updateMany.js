@@ -17,7 +17,7 @@ export default function updateMany(options)  {
         
             // Checks, validations
             if (!collection) throw new Error('no collection specified');
-            if (!upsert) upsert = true;
+            let upsertParam = (!upsert) ? { upsert: false } : { upsert: upsert };
             if (!query) query = {};
 
             let set = (unset === true) ? { $unset: data } : { $set: data};
@@ -27,17 +27,16 @@ export default function updateMany(options)  {
             else if (data.$pull) set = data;
             else if (data.$inc) set = data;
 
-            let result = await col.updateMany(
+            const result = await col.updateMany(
                 query,
-                { $set: data },
-                { upsert: upsert }
+                set,
+                upsertParam
             );
             
             resolve({
                 ok: true,
                 result: result
             });
-
         } catch (err) {
             reject({ ok: false, details: 'error catched', error: err });
         }

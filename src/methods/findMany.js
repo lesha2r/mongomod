@@ -8,11 +8,12 @@ import { ObjectId } from 'mongodb';
 export default function findMany(options) {
     return new Promise(async (resolve, reject) => {
         try {
-            let { query, limit, skip } = options;
+            let { query, limit, skip, sort } = options;
             let collection = this.collection;
 
             // Check and validate
             if (!collection) throw new Error('no collection specified');
+
             if (!query) query = {};
             if (!limit) limit = 99999999;
             if (!skip) skip = 0;
