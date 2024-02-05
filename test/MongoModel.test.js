@@ -3,24 +3,21 @@ import mongomod from '../src/mongomod.js';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Init dotenv module
 dotenv.config({
     path: path.join(path.resolve(path.dirname('')), "/.env")
 });
 
-// Create an instance
-let db = new mongomod.Connection({
-    link: process.env.LINK,
-    login: process.env.LOGIN,
-    password: process.env.PASSWORD,
-    dbName: process.env.DBNAME
+const db = new mongomod.Connection({
+    link: process.env.MONGO_LINK,
+    login: process.env.MONGO_USER,
+    password: process.env.MONGO_PASSWORD,
+    dbName: process.env.MONGO_DBNAME,
+    srv: false
 });
 
-db.connect();
+const controller = new mongomod.Controller(db, 'test');
 
-let controller = new mongomod.Controller(db, 'test');
-
-let userSchema = new mongomod.Schema({
+const userSchema = new mongomod.Schema({
     name: 'string',
     age: 'number',
     address: {
@@ -32,10 +29,10 @@ let userSchema = new mongomod.Schema({
     }
 });
 
-let User = mongomod.createModel(db, 'test', userSchema);
+const User = mongomod.createModel(db, 'test', userSchema);
 
 test('failed schema throws an error', () => {
-    let badUserSchema = {
+    const badUserSchema = {
         string: 'something'
     };
 
@@ -46,37 +43,58 @@ test('good schema not throws an error', () => {
     expect(() => mongomod.createModel(db, 'test', userSchema)).not.toThrow();
 });
 
-test('setting data with a wrong type throws an error', async () => {
-    await db.connect();
+test('good schema item inserted', async () => {
+    if (!db.isConnected) await db.connect()
 
-    let ksenia = await new User().get({ name: 'Ksenia' });
+    const newUser = await new User().init({
+        name: "Ksenia",
+        age: 5,
+        address: {
+            city: "Moscow",
+            coordinates: {
+                x: 111,
+                y: 222
+            }
+        }
+    })
+
+    await newUser.save(true)
+
+    expect(newUser.modelData).toHaveProperty('_id');
+}, 25000);
+
+test('setting data with a wrong type throws an error', async () => {
+    if (!db.isConnected) await db.connect();
+
+    const ksenia = await new User().get({ name: 'Ksenia' });
 
     expect(() => ksenia.set({ age: 'string' })).toThrow();
 }, 30000);
 
 test('bad request trows an error', async () => {
     await db.connect();
+
     try {
 
-        let result = await new User().get({ name: new Date() });
+        const result = await new User().get({ name: new Date() });
     } catch (err) {
         expect(err).toHaveProperty('message');
     }
 }, 30000);
 
 test('real request returns data', async () => {
-    await db.connect();
+    if (!db.isConnected) await db.connect();
 
-    let result = await new User().get({ name: 'Ksenia' });
+    const result = await new User().get({ name: 'Ksenia' });
     expect(result.modelData).toHaveProperty('age');
 }, 30000);
 
 const newName = 'record2:' + new Date();
 
 test('creating user, inserting it, getting again returns correct user data', async () => {
-    const newAge = 1024;
+    if (!db.isConnected) await db.connect();
 
-    await db.connect();
+    const newAge = 1024;
 
     const newbie = new User().init({
         name: newName,
@@ -98,10 +116,9 @@ test('creating user, inserting it, getting again returns correct user data', asy
 }, 30000);
 
 test('getting user, changing it, saving it, getting again returns coorect user data', async () => {
+    if (!db.isConnected) await db.connect();
+
     const newAge = 2048;
-
-    await db.connect();
-
     const existingUser = await new User().get({ name: newName});
     existingUser.set({ age: newAge });
     await existingUser.save();
@@ -112,7 +129,7 @@ test('getting user, changing it, saving it, getting again returns coorect user d
 }, 60000);
 
 test('deleting user that was created earlier removes it from db', async () => {
-    await db.connect();
+    if (!db.isConnected) await db.connect();
 
     const existingUser = await new User().get({ name: newName});
     await existingUser.delete();
@@ -122,28 +139,26 @@ test('deleting user that was created earlier removes it from db', async () => {
     } catch (e) {
         expect(e).toHaveProperty('error');
     }
-
-    
 }, 40000);
 
 test('model clearBySchema returns coorect result #1', () => {
-    let schema = {
+    const schema = {
         name: 'string',
         age: ['number', 'null'],
         friends: 'array',
         school: ['object', 'null']
     };
 
-    let userData = {
+    const userData = {
         name: 'Barney',
         age: 6,
         friends: ['Buddy'],
         school: null
     };
 
-    let userSchema = new mongomod.Schema(schema);
-    let TestUserModel = mongomod.createModel(db, 'test', userSchema);
-    let testUser = new TestUserModel().init({ ...userData, toBeCleared: 'any value' });
+    const userSchema = new mongomod.Schema(schema);
+    const TestUserModel = mongomod.createModel(db, 'test', userSchema);
+    const testUser = new TestUserModel().init({ ...userData, toBeCleared: 'any value' });
     
     testUser.clearBySchema();
 
@@ -151,7 +166,7 @@ test('model clearBySchema returns coorect result #1', () => {
 });
 
 test('model clearBySchema returns coorect result #2', () => {
-    let schema = {
+    const schema = {
         name: 'string',
         age: ['number', 'null'],
         address: {
@@ -165,7 +180,7 @@ test('model clearBySchema returns coorect result #2', () => {
         school: ['object', 'null']
     };
 
-    let userData = {
+    const userData = {
         name: 'Barney',
         age: 6,
         address: {
@@ -179,11 +194,11 @@ test('model clearBySchema returns coorect result #2', () => {
         school: null
     };
 
-    let userSchema = new mongomod.Schema(schema);
+    const userSchema = new mongomod.Schema(schema);
 
-    let TestUserModel = mongomod.createModel(db, 'test', userSchema);
+    const TestUserModel = mongomod.createModel(db, 'test', userSchema);
 
-    let testUser = new TestUserModel().init({ ...userData, toBeCleared: 'any value' });
+    const testUser = new TestUserModel().init({ ...userData, toBeCleared: 'any value' });
 
     testUser.clearBySchema();
 
@@ -191,7 +206,7 @@ test('model clearBySchema returns coorect result #2', () => {
 });
 
 test('model clearBySchema returns coorect result #2', () => {
-    let schema = {
+    const schema = {
         name: 'string',
         age: ['number', 'null'],
         address: {
@@ -221,7 +236,7 @@ test('model clearBySchema returns coorect result #2', () => {
         }
     };
 
-    let userData = {
+    const userData = {
         name: 'Barney',
         age: 6,
         address: {
@@ -251,17 +266,14 @@ test('model clearBySchema returns coorect result #2', () => {
         }
     };
 
-    let userSchema = new mongomod.Schema(schema);
-
-    let TestUserModel = mongomod.createModel(db, 'test', userSchema);
-
-    let modifiedDataObj = { ...userData };
-
-    let expectedValue = JSON.stringify(modifiedDataObj);
+    const userSchema = new mongomod.Schema(schema);
+    const TestUserModel = mongomod.createModel(db, 'test', userSchema);
+    const modifiedDataObj = { ...userData };
+    const expectedValue = JSON.stringify(modifiedDataObj);
 
     modifiedDataObj.test.deep1.deep2_3.toBeDeleted = 'ok2';
 
-    let testUser = new TestUserModel().init(modifiedDataObj);
+    const testUser = new TestUserModel().init(modifiedDataObj);
 
     testUser.clearBySchema();
 
@@ -269,22 +281,22 @@ test('model clearBySchema returns coorect result #2', () => {
 });
 
 test('custom method with with reserved names throws an error', () => {
-    let customs = {
+    const customs = {
         get() { return; }
     };
 
     expect( () => {
-        let TestUserModel = mongomod.createModel(db, 'test', userSchema, customs);
+        const TestUserModel = mongomod.createModel(db, 'test', userSchema, customs);
     }).toThrow();
 });
 
 test('custom method works as expected', () => {
-    let customs = {
+    const customs = {
         test: function() { return 'test done'; }
     };
 
-    let TestUserModel = mongomod.createModel(db, 'test', userSchema, customs);
-    let result = new TestUserModel().test();
+    const TestUserModel = mongomod.createModel(db, 'test', userSchema, customs);
+    const result = new TestUserModel().test();
 
     expect(result).toBe('test done');
 });

@@ -19,11 +19,10 @@ export default function count(options = {}) {
             const db = this.getClient().db(this.dbName);
             const col = db.collection(collection);
 
-            let result = await col.distinct(field, query);
+            const result = await col.distinct(field, query);
             
             resolve({ ok: true, result: result });
         } catch (err) {
-            console.log(err);
             reject({ ok: false, details: 'error catched', error: err});
         }
     });

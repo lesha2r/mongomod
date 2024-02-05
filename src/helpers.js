@@ -1,3 +1,8 @@
+/**
+ * Returns value type
+ * @param {any} value value to check
+ * @returns {string | undefined} type
+ */
 export const getValueType = (value) => {
     let output = undefined;
 
@@ -20,3 +25,19 @@ export const getValueType = (value) => {
 
     return output;
 };
+
+/**
+ * Generates unique string id
+ * @param {number} [length] expected key length
+ * @returns {string} unique id
+ */
+export const keyGenerate = (length = 16) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let secretPhrase = '';
+  
+    for (let i = 0; i < length; i++) {
+      secretPhrase += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+  
+    return secretPhrase;
+  };

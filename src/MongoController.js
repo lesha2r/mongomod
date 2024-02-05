@@ -22,7 +22,7 @@ class MongoController {
 
     /**
      * Returns database client object
-     * @returns db.client
+     * @returns {object} db.client
      */
     getClient() {
         return this.db.client;
@@ -30,8 +30,8 @@ class MongoController {
 
     /**
      * Finds one document matching the query
-     * @param { Object } options extra options object
-     * @returns { Promise } Promise
+     * @param {object} options extra options object
+     * @returns {Promise} Promise
      */
     findOne(options) {
         return findOneMethod.call(this, options);
@@ -39,8 +39,8 @@ class MongoController {
     
     /**
      * Finds many documents matching the query
-     * @param { Object } options extra options object
-     * @returns { Promise } Promise
+     * @param {object} options extra options object
+     * @returns {Promise} Promise
      */
     findMany(options) {
         return findManyMethod.call(this, options);
@@ -48,8 +48,8 @@ class MongoController {
 
     /**
      * Inserts a document into a database
-     * @param { Object } options extra options object
-     * @returns { Promise } Promise
+     * @param {object} options extra options object
+     * @returns {Promise} Promise
      */
     insertOne(options) {
         return insertOneMethod.call(this, options);
@@ -57,8 +57,8 @@ class MongoController {
     
     /**
      * Updates one document matching the query
-     * @param { object } options
-     * @returns { Promise } Promise
+     * @param {object} options
+     * @returns {Promise} Promise
      */
     updateOne(options) {
         return updateOneMethod.call(this, options);
@@ -66,8 +66,8 @@ class MongoController {
     
     /**
      * Deletes one document mathcing the query
-     * @param { Object } options extra options object
-     * @returns { Promise } Promise
+     * @param {object} options extra options object
+     * @returns {Promise} Promise
      */
     deleteOne(options) {
         return deleteOneMethod.call(this, options);
@@ -75,8 +75,8 @@ class MongoController {
 
     /**
      * Updates many documents matching the query
-     * @param { Object } options extra options object
-     * @returns { Promise } Promise
+     * @param {object} options extra options object
+     * @returns {Promise} Promise
      */
     updateMany(options)  {
         return updateManyMethod.call(this, options);
@@ -84,8 +84,8 @@ class MongoController {
     
     /**
      * Deletes all documents matching the query
-     * @param { Object } options extra options object
-     * @returns { Promise } Promise
+     * @param {object} options extra options object
+     * @returns {Promise} Promise
      */
     deleteMany(options) {
         return deleteManyMethod.call(this, options);
@@ -93,8 +93,8 @@ class MongoController {
     
     /**
      * Inserts many documents into the database
-     * @param { Object } options extra options object
-     * @returns { Promise } Promise
+     * @param {object} options extra options object
+     * @returns {Promise} Promise
      */
     insertMany(options) {
         return insertManyMethod.call(this, options);
@@ -102,8 +102,8 @@ class MongoController {
     
     /**
      * Returns aggregation pipeline result
-     * @param { Object } query aggregation object
-     * @returns { Promise } Promise
+     * @param {object} query aggregation object
+     * @returns {Promise} Promise
      */
     aggregate(query) {
         return aggregateMethod.call(this, query);
@@ -111,8 +111,8 @@ class MongoController {
     
     /**
     * Counts documents matching the query
-    * @param { Object } options extra options object
-    * @returns { Promise } Promise
+    * @param {object} options extra options object
+    * @returns {Promise} Promise
     */
     count(options = {}) {
         return count.call(this, options);
@@ -120,8 +120,8 @@ class MongoController {
 
     /**
     * Returns unique document fields matching the query
-    * @param { Object } options extra options object
-    * @returns { Promise } Promise
+    * @param {object} options extra options object
+    * @returns {Promise} Promise
     */
     distinct(options = {}) {
         return distinct.call(this, options);
@@ -130,7 +130,7 @@ class MongoController {
     /**
     * Sends bulk write operations
     * @param { Array } operations list of operations to be done
-    * @returns { Promise } Promise
+    * @returns {Promise} Promise
     */
     bulkWrite(operations = []) {
         return bulkWrite.call(this, operations);

@@ -1,23 +1,28 @@
 import mongo from 'mongodb';
-import MongoController from './MongoController.js';
-import findOneMethod from './methods/findOne.js';
 
 /**
- * @param { Object } options link, dbName and credentials
- * @param { String } options.link URL for connection
- * @param { String } options.login mongo login
- * @param { String } options.password mongo password
- * @param { String } options.dbName database name
- * @param { Boolean } options.srv srv connection [true / false]
- * @param { Boolean } options.debug enables/disables log messages
  * 
+ * @param {object} options link, dbName and credentials
+ * @param {string} options.link URL for connection
+ * @param {string} options.login mongo login
+ * @param {string} options.password mongo password
+ * @param {string} options.dbName database name
+ * @param {boolean} options.srv srv connection
+ * @param {boolean} [options.debug] enables/disables log messages
  */
 class MongoConnection {
     constructor(options) {
-        if (!options.link) throw new Error('options missing parameter: link');
-        if (!options.login) throw new Error('options missing parameter: login');
-        if (!options.password) throw new Error('options missing parameter: password');
-        if (!options.dbName) throw new Error('options missing parameter: dbName');
+        const missingParams = []
+
+        if (!options.link) missingParams.push('link');
+        if (!options.login) missingParams.push('login');
+        if (!options.password) missingParams.push('password');
+        if (!options.dbName) missingParams.push('dbName');
+
+        if (missingParams.length > 0) {
+            throw new Error(`Missing required parameters: ${missingParams.join(', ')}`)
+        }
+
         if (typeof options.srv !== 'boolean') options.srv = true;
 
         // Credentials and connection params
@@ -39,8 +44,8 @@ class MongoConnection {
 
     /**
      * Opens a connection to Mongo database
-     * @param { Function } callback to be invoked on success
-     * @returns Promise
+     * @param {function} [callback] to be invoked on success
+     * @returns {Promise<{ok: boolean, details?: string, result?: object}>} result
      */
     connect(callback) {
         if (callback && typeof callback !== 'function') throw new Error('Callback must be a function');
@@ -48,6 +53,7 @@ class MongoConnection {
         const srv = (this.options.srv === true) ? '+srv' : '';
         const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=admin`; //&w=majority?retryWrites=true`;
         const mongoClient = new mongo.MongoClient(mongoUrl, {
+            // @ts-ignore
             useUnifiedTopology: true,
             useNewUrlParser: true 
         });
@@ -62,7 +68,9 @@ class MongoConnection {
                 let result = await mongoClient.connect();
                 
                 if (result) {
-                    if (this.debug) console.log('[MongoConnection] Connection opened');
+                    if (this.debug) {
+                        console.log(`[MongoConnection] Db connection opened: ${this.dbName}`);
+                    }
                     
                     this.isConnected = true;
                     this.client = result;
@@ -72,7 +80,7 @@ class MongoConnection {
                     if (callback && typeof callback === 'function') callback();
                 }
             } catch (err) {
-                if (this.debug) console.log('[MongoConnection] Error:');
+                if (this.debug) console.log(`[MongoConnection] Error connecting to ${this.dbName}:`);
                 if (this.debug) console.log(err);
 
                 this.isConnected = false;
@@ -84,19 +92,19 @@ class MongoConnection {
 
     /**
     * Closes a connection to Mongo database
-    * @param { Function } callback to be invoked on success
+    * @param {function} [callback] to be invoked on success
     */
     async disconnect(callback) {
         await this.client.close();
 
-        if (this.debug) console.log('[MongoConnection] Connection closed');
+        if (this.debug) console.log(`[MongoConnection] Connection closed: ${this.dbName}`);
 
         if (callback && typeof callback === 'function') callback();
     };
 
     /**
      * Passes client object
-     * @returns client object
+     * @returns {object} client object
      */
     passClient() {
         return this.client;
