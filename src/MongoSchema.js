@@ -88,64 +88,56 @@ class MongoSchema {
     }
 
     validate(data) {
-        const logOn = false;
         let checks = [];
 
-        function diveIntoObject(data, schema, deepKeys = []) {
+        function diveIntoObject(data, schema, deepKeys = [], prevKey = null) {
             for (let [key, value] of Object.entries(schema)) {
+
                 if (typeof value === 'object' && !Array.isArray(value)) {
-                    diveIntoObject.call(this, data, schema[key], [ ...deepKeys, key]);
+                    diveIntoObject.call(this, data, schema[key], [ ...deepKeys, key], key);
                 }
 
                 let isValidated = checkType.call(this, data, value, [ ...deepKeys, key]);
-                checks.push(isValidated);
+
+                const keyPath = prevKey ? prevKey + '.' + key : key;
+                checks.push({key: keyPath, checked: isValidated});
             }
         }
 
         function checkType(data, value, deepKeys) {
-            if (logOn) {
-                console.log('--');
-                console.log(value);
-                console.log(deepKeys);
-            }
-
             const lastKey = deepKeys.pop();
             const nestedObj = deepKeys.reduce((a, prop) => a[prop], data);
 
             let isValidated = null;
 
             if (!nestedObj) {
-                if (logOn) console.log(1);
                 isValidated = false;
             } else if (value === 'any') {
                 isValidated = true;
             } else if (typeof value === 'object' && !Array.isArray(value)) {
-                if (logOn) console.log(2);
                 isValidated = true;
             } else if (
                 typeof value === 'object'
                 && Array.isArray(value)
                 && value.includes(getValueType(nestedObj[lastKey]))
             ) {
-                if (logOn) console.log(3);
                 isValidated = true;
             } else if (lastKey in nestedObj && value === getValueType(nestedObj[lastKey])) {
-                if (logOn) console.log(4);
                 isValidated = true;
             } else {
-                if (logOn) console.log(99);
                 isValidated = false;
             }
 
-            if (logOn) console.log(isValidated);
             return isValidated;
         }
         
         diveIntoObject.call(this, data, this.schema);
 
-        if (this.settings.debug) console.log('[MongoSchema] Validation result:', checks.every(el => el === true));
+        if (this.settings.debug) console.log('[MongoSchema] Validation result:', checks.every(el => el.checked === true));
 
-        return checks.every(el => el === true);
+        const failed = checks.filter(el => el.checked !== true).map(el => el.key)
+
+        return {failed, result: failed.length === 0}
     }
 }
 

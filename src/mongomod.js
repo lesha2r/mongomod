@@ -2,8 +2,18 @@ import MongoSchema from './MongoSchema.js';
 import MongoController from './MongoController.js';
 import MongoConnection from './MongoConnection.js';
 import MongoModel from './MongoModel.js';
+import {keyGenerate} from './helpers.js';
 
-const reservedMethodsNames = ['validate', 'clearBySchema', 'init', 'set', 'insert', 'get', 'save', 'delete'];
+const reservedMethodsNames = [
+    'validate',
+    'clearBySchema',
+    'init',
+    'set',
+    'insert',
+    'get',
+    'save',
+    'delete'
+];
 
 const mongomod = {
     models: {},  
@@ -12,7 +22,6 @@ const mongomod = {
     Connection: MongoConnection,
     Model: MongoModel,
     createModel(db, collection, schema, customFns = {}) {
-
         if (db instanceof MongoConnection === false) {
             throw new Error('Provided db is not an instance of MongoConnection');
         }
@@ -31,8 +40,7 @@ const mongomod = {
             } else throw new Error('Custom method must be a function');
         }
 
-        // TODO: replace by id
-        let uniqueId = '' + randomNumber() + randomNumber() + randomNumber() + randomNumber();
+        let uniqueId = keyGenerate(8)
 
         this.models[uniqueId] = function() {
             function InstanceModelCreator(db, collection, schema) {
@@ -67,7 +75,5 @@ const mongomod = {
         return this.models[uniqueId];
     }
 };
-
-const randomNumber = () => Math.floor(Math.random() * 100);
 
 export default mongomod;

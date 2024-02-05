@@ -22,7 +22,6 @@ export default function count(options = {}) {
             
             resolve({ ok: true, result: result });
         } catch (err) {
-            console.log(err);
             reject({ ok: false, details: 'error catched', error: err});
         }
     });

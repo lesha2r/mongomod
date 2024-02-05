@@ -1,37 +1,29 @@
-import { getValueType } from "../src/helpers";
+import { getValueType, keyGenerate } from "../src/helpers";
 
-// TODO: https://jestjs.io/ru/docs/mongodb
-
-test('getValue type returns correct type for array', () => {
+test('getValue correctly determines types', () => {
     expect(getValueType( ['1', '2'] )).toBe('array');
-});
 
-test('getValue type returns correct type for object', () => {
     expect(getValueType( { a: true } ))
-        .toBe('object');
-});
+    .toBe('object');
 
-test('getValue type returns correct type for date', () => {
     expect(getValueType( new Date() ))
-        .toBe('date');
-});
+    .toBe('date');
 
-test('getValue type returns correct type for string', () => {
     expect(getValueType( 'text' ))
-        .toBe('string');
-});
+    .toBe('string');
 
-test('getValue type returns correct type for null', () => {
     expect(getValueType( null ))
-        .toBe('null');
-});
+    .toBe('null');
 
-test('getValue type returns correct type for number', () => {
     expect(getValueType( 100 ))
-        .toBe('number');
+    .toBe('number');
+
+    expect(getValueType( undefined ))
+    .toBe('undefined');
 });
 
-test('getValue type returns correct type for undefined', () => {
-    expect(getValueType( undefined ))
-        .toBe('undefined');
+test('keyGenerate generates unique strings with expected length', () => {
+    const expectedLength = 5
+    const uid = keyGenerate(expectedLength) 
+    expect(typeof uid === 'string' && uid.length === expectedLength).toBe(true)
 });

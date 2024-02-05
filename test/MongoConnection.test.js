@@ -7,6 +7,19 @@ dotenv.config({
     path: path.join(path.resolve(path.dirname('')), "/.env")
 });
 
+/**
+ * @typedef TCreds 
+ * @type {object}
+ * @property {string} [link]
+ * @property {string} [login]
+ * @property {string} [password]
+ * @property {string} [dbName]
+ * @property {boolean} [srv]
+ */
+
+/**
+ * @type {TCreds}
+ */
 let connectionCreds = {
     link: 'test.mongodb.net',
     login: 'login',
@@ -14,63 +27,62 @@ let connectionCreds = {
     dbName: 'dbName'
 };
 
+/**
+ * @type {TCreds}
+ */
 let connectionCredsReal = {
-    link: process.env.LINK,
-    login: process.env.LOGIN,
-    password: process.env.PASSWORD,
-    dbName: process.env.DBNAME
+    link: process.env.MONGO_LINK,
+    login: process.env.MONGO_USER,
+    password: process.env.MONGO_PASSWORD,
+    dbName: process.env.MONGO_DBNAME,
+    srv: process.env.MONGO_SRV === 'true' ? true : false
 };
 
-test('connection options missing link throws an error', () => {
-    let connectionCredsBroken = { 
-        ...connectionCreds
-    };
+test('connection options missing params throws an error', () => {
+    expect(() => {
+        const connectionCredsBroken = Object.assign({}, connectionCreds)
+        delete connectionCredsBroken.link
 
-    delete connectionCredsBroken.link;
+        new mongomod.Connection(connectionCredsBroken)
+    }).toThrow();
 
-    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
-});
+    expect(() => {
+        const connectionCredsBroken = { 
+            ...connectionCreds
+        };
+        delete connectionCredsBroken.login;
+        
+        new mongomod.Connection(connectionCredsBroken)
+    }).toThrow();
 
-test('connection options missing login throws an error', () => {
-    let connectionCredsBroken = { 
-        ...connectionCreds
-    };
+    expect(() => {
+        const connectionCredsBroken = { 
+            ...connectionCreds
+        };
+        delete connectionCredsBroken.password;
 
-    delete connectionCredsBroken.login;
+        new mongomod.Connection(connectionCredsBroken)
+    }).toThrow();
 
-    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
-});
+    expect(() => {
+        const connectionCredsBroken = { 
+            ...connectionCreds
+        };
+        delete connectionCredsBroken.dbName;
 
-test('connection options missing password throws an error', () => {
-    let connectionCredsBroken = { 
-        ...connectionCreds
-    };
-
-    delete connectionCredsBroken.password;
-
-    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
-});
-
-test('connection options missing dbName throws an error', () => {
-    let connectionCredsBroken = { 
-        ...connectionCreds
-    };
-
-    delete connectionCredsBroken.dbName;
-
-    expect(() => mongomod.Connection(connectionCredsBroken)).toThrow();
+        new mongomod.Connection(connectionCredsBroken)
+    }).toThrow();
 });
 
 test('created instance passes client object', () => {
-    let connection = new mongomod.Connection(connectionCreds);
+    const connection = new mongomod.Connection(connectionCreds);
 
     expect(connection.passClient()).toBe(null);
 });
 
 test('connection with wrong credentials throws an error', async () => {
-    let connection = new mongomod.Connection(connectionCreds);
-    //const conntectionResult = await connection.connect();
     try {
+        const connection = new mongomod.Connection(connectionCreds);
         await connection.connect();
     } catch (e) {
         expect(e).toHaveProperty('error');
@@ -78,10 +90,12 @@ test('connection with wrong credentials throws an error', async () => {
 }, 25000);
 
 test('connection with correct credentials not throws an error', async () => {
-    let connection = new mongomod.Connection(connectionCredsReal);
-    //const conntectionResult = await connection.connect();
+    const connection = new mongomod.Connection(connectionCredsReal);
 
-    let result = await connection.connect();
+    expect(connection.isConnected).toBe(false)
+
+    const result = await connection.connect();
+
     expect(result).toHaveProperty('result');
-
+    expect(connection.isConnected).toBe(true)
 }, 25000);

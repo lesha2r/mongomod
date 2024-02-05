@@ -1,6 +1,6 @@
 import mongomod from '../src/mongomod.js';
 
-let testSchema = {
+const testSchema = {
     name: 'string',
     age: 'number',
     address: {
@@ -12,7 +12,7 @@ let testSchema = {
     }
 };
 
-let testData = {
+const testData = {
     name: 'Bob',
     age: 12,
     address: {
@@ -25,7 +25,7 @@ let testData = {
 };
 
 test('creating schema created with bad argument throws error', () => {
-    let allTypesSchema = {
+    const allTypesSchema = {
         'any': 'any',
         'string': 'string',
         'number': 'number',
@@ -40,28 +40,28 @@ test('creating schema created with bad argument throws error', () => {
 });
 
 test('creating schema created with bad argument throws error', () => {
-    let brokenSchema = {
+    const badSchema = {
         ...testSchema,
         name: 'WRONG'
     };
 
-    expect(() => new mongomod.Schema(brokenSchema)).toThrow();
+    expect(() => new mongomod.Schema(badSchema)).toThrow();
 });
 
 test('validating data with correct schema returns true', () => {
-    let schema = new mongomod.Schema(testSchema);
+    const schema = new mongomod.Schema(testSchema);
 
-    expect(schema.validate(testData)).toBe(true);
+    expect(schema.validate(testData)).toMatchObject({result: true});
 });
 
 test('validating data with wrong schema returns false', () => {
-    let schema = new mongomod.Schema(testSchema);
+    const schema = new mongomod.Schema(testSchema);
 
-    let brokenData = {
+    const badData = {
         ...testData,
         age: '12'
     };
 
-    expect(schema.validate(brokenData)).toBe(false);
+    expect(schema.validate(badData)).toMatchObject({result: false});
 });
 

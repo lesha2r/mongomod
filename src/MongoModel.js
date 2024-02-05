@@ -1,19 +1,9 @@
 import MongoController from "./MongoController.js";
 import _ from 'lodash';
 
-// function Model(db, collection, schema = null) {
-//     this.db = db;
-//     this.collection = collection;
-//     this.schema = schema;
-
-//     this.inst = function() { 
-//         return new MongoModel(this.db, this.collection, this.schema);
-//     };
-// };
-
 class MongoModel extends MongoController {
     constructor (db, collection, schema) {
-        super(db, collection, schema);
+        super(db, collection);
 
         this.collection = collection;
         this.schema = schema;
@@ -28,8 +18,8 @@ class MongoModel extends MongoController {
 
     /**
      * Filters data by allowedKeys (top-level only)
-     * @param { Array } allowedKeys 
-     * @returns
+     * @param {string[]} allowedKeys list of allowed keys
+     * @returns {object} filtered object
      */
     dataFiltered(allowedKeys) {
         let output = {};
@@ -43,7 +33,7 @@ class MongoModel extends MongoController {
 
     /**
      * Returns modelData as stringified JSON
-     * @returns { String } stringified modelData
+     * @returns {string} stringified modelData
      */
     toString() {
         return JSON.stringify(this.modelData);
@@ -51,7 +41,7 @@ class MongoModel extends MongoController {
 
     /**
      * Validates modelData by it's schema
-     * @returns { Boolean } validation result (true / false)
+     * @returns {boolean} validation result
      */
     validate() {
         const isValidated = this.schema.validate(this.modelData);
@@ -63,7 +53,7 @@ class MongoModel extends MongoController {
 
     /**
      * Force modelData to have only keys allowed by schema
-     * @returns modelData
+     * @returns {object} the model instance
      */
     clearBySchema() {
         let schema = this.schema.schema;
@@ -159,13 +149,14 @@ class MongoModel extends MongoController {
 
     /**
      * Creates item without saving it to db
-     * @param { Object } data to be stored as modelData
+     * @param {object} data to be stored as modelData
      * @returns the model instance
      */
     init(data) {
-        const isValidated = this.schema.validate(data);
-
-        if (isValidated === false) throw new Error('Scheme validation failed');
+        const validation = this.schema.validate(data);
+        if (validation.result === false) {
+            throw new Error(`Scheme validation failed: ${validation.failed.join(', ')}`);
+        }
 
         this.modelData = data;
 
@@ -174,14 +165,16 @@ class MongoModel extends MongoController {
 
     /**
      * Change item's data
-     * @param { Object } data to be added/modified. Uses spread combining { ...current, ...new }
-     * @returns updated modelData
+     * @param {object} data to be added/modified. Uses spread combining { ...current, ...new }
+     * @returns the model instance
      */
     set(data) {
         let newData = { ...this.modelData, ...data };
 
-        const isValidated = this.schema.validate(newData);
-        if (isValidated === false) throw new Error('Scheme validation failed');
+        const validation = this.schema.validate(newData);
+        if (validation.result === false) {
+            throw new Error(`Scheme validation failed: ${validation.failed.join(', ')}`);
+        }
 
         this.modelData = newData;
 
@@ -190,7 +183,7 @@ class MongoModel extends MongoController {
 
     /**
      * Inserts model to db
-     * @returns Promise
+     * @returns {object} 
      */
     insert() {
         return new Promise(async (resolve, reject) => {
@@ -209,7 +202,7 @@ class MongoModel extends MongoController {
     /**
      * Pulls data for the model by the specified query and stores it 
      * @param  { Object } query regular MongoDB query object
-     * @returns Promise
+     * @returns {Promise<object>} the model instance
      */
     get(query = {}) {
         return new Promise(async (resolve, reject) => {
@@ -229,8 +222,8 @@ class MongoModel extends MongoController {
     // 
     /**
      * Saves current model data into the db
-     * @param { Boolean } insertNew should be inserted as new document (true/false)
-     * @returns Promise
+     * @param {boolean} insertNew should be inserted as new document
+     * @returns {Promise<object>} the model instance
      */
     save(insertNew = false) {
         if (insertNew === true) return this.insert();
@@ -253,7 +246,7 @@ class MongoModel extends MongoController {
 
     /**
      * Deletes current item from db
-     * @returns Promise
+     * @returns {Promise<object>} the model instance
      */
     delete() {
         if (!this.modelData._id) throw new Error('this.modelData._id is required');
