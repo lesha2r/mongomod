@@ -1,4 +1,4 @@
-import { getValueType } from './helpers.js';
+import { getValueType } from './utils/index.js';
 
 const allowedTypes = [
     'any',
@@ -88,7 +88,7 @@ class MongoSchema {
     }
 
     validate(data) {
-        let checks = [];
+        const checks = [];
 
         function diveIntoObject(data, schema, deepKeys = [], prevKey = null) {
             for (let [key, value] of Object.entries(schema)) {
@@ -97,7 +97,7 @@ class MongoSchema {
                     diveIntoObject.call(this, data, schema[key], [ ...deepKeys, key], key);
                 }
 
-                let isValidated = checkType.call(this, data, value, [ ...deepKeys, key]);
+                const isValidated = checkType.call(this, data, value, [ ...deepKeys, key]);
 
                 const keyPath = prevKey ? prevKey + '.' + key : key;
                 checks.push({key: keyPath, checked: isValidated});

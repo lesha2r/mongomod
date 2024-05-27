@@ -13,6 +13,7 @@ import aggregateMethod from './methods/aggregate.js';
 import count from './methods/count.js';
 import distinct from './methods/distinct.js';
 import bulkWrite from './methods/bulkWrite.js';
+import ensureIndex from './methods/ensureIndex.js';
 
 class MongoController {
     constructor (db, collection) {
@@ -136,6 +137,14 @@ class MongoController {
         return bulkWrite.call(this, operations);
     }
 
+    /**
+     * Checks that index for required keys exists
+     * @param {{keys: string[]}[]} checkKeys 
+     * @returns {{isChecked: boolean, byKeys: {[key: string]: boolean}, passed: string[], failed: string[]}},
+     */
+    ensureIndex(checkKeys) {
+        return ensureIndex.call(this, checkKeys)
+    }
 }
 
 export default MongoController;

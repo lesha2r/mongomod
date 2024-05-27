@@ -2,7 +2,7 @@ import MongoSchema from './MongoSchema.js';
 import MongoController from './MongoController.js';
 import MongoConnection from './MongoConnection.js';
 import MongoModel from './MongoModel.js';
-import {keyGenerate} from './helpers.js';
+import {keyGenerate} from './utils/index.js';
 
 const reservedMethodsNames = [
     'validate',

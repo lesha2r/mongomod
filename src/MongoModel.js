@@ -22,7 +22,7 @@ class MongoModel extends MongoController {
      * @returns {object} filtered object
      */
     dataFiltered(allowedKeys) {
-        let output = {};
+        const output = {};
 
         Object.keys(this.modelData).forEach( key => {
             if (allowedKeys.includes(key)) output[key] = this.modelData[key];
@@ -56,11 +56,11 @@ class MongoModel extends MongoController {
      * @returns {object} the model instance
      */
     clearBySchema() {
-        let schema = this.schema.schema;
+        const schema = this.schema.schema;
 
         if (Object.keys(schema).length === 0) throw new Error('Can\'t clear data since scheme is empty');
 
-        let currentModelData = { ...this.modelData };
+        const currentModelData = { ...this.modelData };
         let newModelData = {};
         const _id = currentModelData._id;
         
@@ -110,7 +110,7 @@ class MongoModel extends MongoController {
         }
 
         function dynamicSave(dataObj, key, deepKey) {
-            let saveObj = {};
+            const saveObj = {};
             let value = dataObj[key];
             
             // If there is a deep key
@@ -169,7 +169,7 @@ class MongoModel extends MongoController {
      * @returns the model instance
      */
     set(data) {
-        let newData = { ...this.modelData, ...data };
+        const newData = { ...this.modelData, ...data };
 
         const validation = this.schema.validate(newData);
         if (validation.result === false) {
