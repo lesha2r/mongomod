@@ -32,10 +32,8 @@ export default function ensureIndex(checkIndexesArr) {
             const indexCheck = [];
     
             el.keys.forEach((k) => indexCheck.push(k in ind.key === true));
-    
             const hasMatches = indexCheck.every((el) => el === true);
-            const sameQty = el.keys.length === Object.keys(ind.key).length;
-    
+            const sameQty = el.keys.length <= Object.keys(ind.key).length;
             checksRules.push(hasMatches === true && sameQty === true);
         });
     
