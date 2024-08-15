@@ -1,4 +1,4 @@
-import mongomod from '../src/mongomod.js';
+import mongomod from '../dist/mongomod.js';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -7,30 +7,16 @@ dotenv.config({
     path: path.join(path.resolve(path.dirname('')), "/.env")
 });
 
-/**
- * @typedef TCreds 
- * @type {object}
- * @property {string} [link]
- * @property {string} [login]
- * @property {string} [password]
- * @property {string} [dbName]
- * @property {boolean} [srv]
- */
+const TIMEOUT_MS = 25000
 
-/**
- * @type {TCreds}
- */
-let connectionCreds = {
+const connectionCreds = {
     link: 'test.mongodb.net',
     login: 'login',
     password: 'pass',
     dbName: 'dbName'
 };
 
-/**
- * @type {TCreds}
- */
-let connectionCredsReal = {
+const connectionCredsReal = {
     link: process.env.MONGO_LINK,
     login: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD,
@@ -41,6 +27,7 @@ let connectionCredsReal = {
 test('connection options missing params throws an error', () => {
     expect(() => {
         const connectionCredsBroken = Object.assign({}, connectionCreds)
+        // @ts-ignore
         delete connectionCredsBroken.link
 
         new mongomod.Connection(connectionCredsBroken)
@@ -50,6 +37,7 @@ test('connection options missing params throws an error', () => {
         const connectionCredsBroken = { 
             ...connectionCreds
         };
+        // @ts-ignore
         delete connectionCredsBroken.login;
         
         new mongomod.Connection(connectionCredsBroken)
@@ -59,6 +47,7 @@ test('connection options missing params throws an error', () => {
         const connectionCredsBroken = { 
             ...connectionCreds
         };
+        // @ts-ignore
         delete connectionCredsBroken.password;
 
         new mongomod.Connection(connectionCredsBroken)
@@ -68,6 +57,7 @@ test('connection options missing params throws an error', () => {
         const connectionCredsBroken = { 
             ...connectionCreds
         };
+        // @ts-ignore
         delete connectionCredsBroken.dbName;
 
         new mongomod.Connection(connectionCredsBroken)
@@ -87,7 +77,7 @@ test('connection with wrong credentials throws an error', async () => {
     } catch (e) {
         expect(e).toHaveProperty('error');
     }
-}, 25000);
+}, TIMEOUT_MS);
 
 test('connection with correct credentials not throws an error', async () => {
     const connection = new mongomod.Connection(connectionCredsReal);
@@ -98,4 +88,4 @@ test('connection with correct credentials not throws an error', async () => {
 
     expect(result).toHaveProperty('result');
     expect(connection.isConnected).toBe(true)
-}, 25000);
+}, TIMEOUT_MS);

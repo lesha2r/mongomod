@@ -1,4 +1,4 @@
-import mongomod from '../src/mongomod.js';
+import mongomod from '../dist/mongomod.js';
 
 const testSchema = {
     name: 'string',

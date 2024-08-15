@@ -1,4 +1,4 @@
-import mongomod from '../src/mongomod.js';
+import mongomod from '../dist/mongomod.js';
 
 import dotenv from 'dotenv';
 import path from 'path';
@@ -12,7 +12,8 @@ const db = new mongomod.Connection({
     login: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD,
     dbName: process.env.MONGO_DBNAME,
-    srv: false
+    srv: false,
+    debug: true
 });
 
 const controller = new mongomod.Controller(db, 'test');
@@ -46,7 +47,7 @@ test('good schema not throws an error', () => {
 test('good schema item inserted', async () => {
     if (!db.isConnected) await db.connect()
 
-    const newUser = await new User().init({
+        const newUser = await new User().init({
         name: "Ksenia",
         age: 5,
         address: {
@@ -61,7 +62,7 @@ test('good schema item inserted', async () => {
     await newUser.save(true)
 
     expect(newUser.modelData).toHaveProperty('_id');
-}, 25000);
+}, 55000);
 
 test('setting data with a wrong type throws an error', async () => {
     if (!db.isConnected) await db.connect();

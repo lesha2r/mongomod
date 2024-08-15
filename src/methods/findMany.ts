@@ -1,15 +1,19 @@
 import { ObjectId } from 'mongodb';
+import { TMethodResult } from '../types/methods.js';
+import MongoController from '../MongoController.js';
 
-/**
- * Finds many documents matching the query
- * @param { Object } options extra options object
- * @returns { Promise } Promise
- */
-export default function findMany(options) {
+export type TFindManyInput = {
+    query: {[key: string]: any}
+    limit?: number
+    skip?: number
+}
+
+// Finds many documents matching the query
+export default function findMany(this: MongoController, options: TFindManyInput): Promise<TMethodResult> {
     return new Promise(async (resolve, reject) => {
         try {
-            let { query, limit, skip, sort } = options;
-            let collection = this.collection;
+            let { query, limit, skip } = options;
+            const collection = this.collection;
 
             // Check and validate
             if (!collection) throw new Error('no collection specified');
@@ -18,12 +22,15 @@ export default function findMany(options) {
             if (!limit) limit = 99999999;
             if (!skip) skip = 0;
 
-            if (query._id) query._id = ObjectId(query._id);
+            if (query._id) query._id = new ObjectId(query._id);
 
-            const db = this.getClient().db(this.dbName);
+            const client = this.getClient()
+            if (!client) throw new Error('client is null')
+
+            const db = client.db(this.db.dbName);
             const col = db.collection(collection);
 
-            let result = await col.find(query).limit(limit).skip(skip).toArray();
+            const result = await col.find(query).limit(limit).skip(skip).toArray();
 
             if (!result || Array.isArray(result) && result.length === 0) {
                 resolve({ ok: true, details: 'nothing found', result: [] });

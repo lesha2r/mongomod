@@ -1,8 +1,14 @@
-import MongoController from "./MongoController.js";
 import _ from 'lodash';
+import MongoSchema from "./MongoSchema.js";
+import MongoController from "./MongoController.js";
+import MongoConnection from "./MongoConnection.js";
 
 class MongoModel extends MongoController {
-    constructor (db, collection, schema) {
+    schema: MongoSchema
+    modelData: null | {[key: string]: any}
+    db: MongoConnection
+
+    constructor (db: MongoConnection, collection: string, schema: MongoSchema) {
         super(db, collection);
 
         this.collection = collection;
@@ -16,34 +22,28 @@ class MongoModel extends MongoController {
         return this.modelData;
     }
 
-    /**
-     * Filters data by allowedKeys (top-level only)
-     * @param {string[]} allowedKeys list of allowed keys
-     * @returns {object} filtered object
-     */
-    dataFiltered(allowedKeys) {
-        const output = {};
+    // Filters data by allowedKeys (top-level only)
+    dataFiltered(allowedKeys: string[]): {[key: string]: any} | null {
+        if (this.modelData === null) return null
+        
+        const output: {[key: string]: any} = {};
 
-        Object.keys(this.modelData).forEach( key => {
-            if (allowedKeys.includes(key)) output[key] = this.modelData[key];
+        Object.keys(this.modelData).forEach(key => {
+            if (this.modelData && allowedKeys.includes(key)) output[key] = this.modelData[key];
         });
 
         return output;
     }
 
-    /**
-     * Returns modelData as stringified JSON
-     * @returns {string} stringified modelData
-     */
-    toString() {
+    // Returns modelData as stringified JSON
+    toString(): string {
         return JSON.stringify(this.modelData);
     }
 
-    /**
-     * Validates modelData by it's schema
-     * @returns {boolean} validation result
-     */
+    // Validates modelData by it's schema
     validate() {
+        if (!this.modelData) return false;
+
         const isValidated = this.schema.validate(this.modelData);
 
         if (this.schema.settings.strict === true) this.clearBySchema();
@@ -51,14 +51,13 @@ class MongoModel extends MongoController {
         return isValidated;
     }
 
-    /**
-     * Force modelData to have only keys allowed by schema
-     * @returns {object} the model instance
-     */
+    // Force modelData to have only keys allowed by schema
     clearBySchema() {
         const schema = this.schema.schema;
 
-        if (Object.keys(schema).length === 0) throw new Error('Can\'t clear data since scheme is empty');
+        if (Object.keys(schema).length === 0) {
+            throw new Error('Can\'t clear data since scheme is empty');
+        }
 
         const currentModelData = { ...this.modelData };
         let newModelData = {};
@@ -81,24 +80,31 @@ class MongoModel extends MongoController {
         if (_id) this.modelData._id = _id;
     
         // Function needed for recursive calls
-        function filterDataBySchema(key, value, deepKeys = [], prevResult = {}) {
+        function filterDataBySchema(key: string, value: any, deepKeys: string[] = [], prevResult = {}): {[key:string]: any} {
             let result;
             let handleType = null;
 
-            if (typeof value === 'string') handleType = 'final';
-            else if (typeof value === 'object' && !Array.isArray(value)) handleType = 'object';
-            else if (typeof value === 'object' && Array.isArray(value)) handleType = 'final';
+            if (typeof value === 'string') {
+                handleType = 'final';
+            } else if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+                handleType = 'object';
+            } else if (value !== null && typeof value === 'object' && Array.isArray(value)) {
+                handleType = 'final';
+            }
 
             switch (handleType) {
             case 'final':
-                let caseResult = dynamicSave(currentModelData, key, deepKeys);
-                
+                const caseResult = dynamicSave(currentModelData, key, deepKeys);
                 result = _.merge(prevResult, caseResult);
-                
                 break;
             case 'object':
                 for (let [objKey, objValue] of Object.entries(value)) {
-                    let caseResult = filterDataBySchema(objKey, objValue, [...deepKeys, key ], result);
+                    const caseResult = filterDataBySchema(
+                        objKey,
+                        objValue, 
+                        [...deepKeys, key ],
+                        result
+                    );
                     
                     result = _.merge(prevResult, caseResult);
                 }
@@ -109,8 +115,8 @@ class MongoModel extends MongoController {
             return result;
         }
 
-        function dynamicSave(dataObj, key, deepKey) {
-            const saveObj = {};
+        function dynamicSave(dataObj: {[key: string]: any}, key: string, deepKey: string[]) {
+            const saveObj: {[key: string]: any} = {};
             let value = dataObj[key];
             
             // If there is a deep key
@@ -128,7 +134,7 @@ class MongoModel extends MongoController {
                     saveObj[deepKey[0]][deepKey[1]] = {};
                 }
     
-                const lastKey = deepKey.pop();
+                const lastKey: string = deepKey.pop()!;
                 const nestedDataObj = deepKey.reduce((a, prop) => a[prop], dataObj);
                 const nestedObj = deepKey.reduce((a, prop) => a[prop], saveObj);
     
@@ -147,13 +153,10 @@ class MongoModel extends MongoController {
         return this;
     }
 
-    /**
-     * Creates item without saving it to db
-     * @param {object} data to be stored as modelData
-     * @returns the model instance
-     */
-    init(data) {
+    // Creates item without saving it to db
+    init(data: {[key: string] : any}) {
         const validation = this.schema.validate(data);
+
         if (validation.result === false) {
             throw new Error(`Scheme validation failed: ${validation.failed.join(', ')}`);
         }
@@ -163,12 +166,8 @@ class MongoModel extends MongoController {
         return this;
     }
 
-    /**
-     * Change item's data
-     * @param {object} data to be added/modified. Uses spread combining { ...current, ...new }
-     * @returns the model instance
-     */
-    set(data) {
+    // Change item's data
+    set(data: {[key: string]: any}) {
         const newData = { ...this.modelData, ...data };
 
         const validation = this.schema.validate(newData);
@@ -181,16 +180,21 @@ class MongoModel extends MongoController {
         return this;
     }
 
-    /**
-     * Inserts model to db
-     * @returns {object} 
-     */
+    // Inserts model to db
     insert() {
         return new Promise(async (resolve, reject) => {
             try {
-                let result = await this.insertOne({
-                    data: this.modelData
+                if (!this.modelData) throw new Error('modelData is empty')
+
+                const result = await this.insertOne({
+                    'data': this.modelData
                 });
+
+                if (!result.ok) {
+                    throw new Error('failed to insert model')
+                } else if (result.ok && 'insertedId' in result.result) {
+                    this.modelData._id = result.result.insertedId
+                }
 
                 resolve(this);
             } catch (err) {
@@ -199,12 +203,8 @@ class MongoModel extends MongoController {
         });
     }
 
-    /**
-     * Pulls data for the model by the specified query and stores it 
-     * @param  { Object } query regular MongoDB query object
-     * @returns {Promise<object>} the model instance
-     */
-    get(query = {}) {
+    // Pulls data for the model by the specified query and stores it 
+    get(query: {[key: string]: any} = {}) {
         return new Promise(async (resolve, reject) => {
             try {
                 let found = await this.findOne({ query: query });
@@ -219,23 +219,22 @@ class MongoModel extends MongoController {
         });
     }
 
-    // 
-    /**
-     * Saves current model data into the db
-     * @param {boolean} insertNew should be inserted as new document
-     * @returns {Promise<object>} the model instance
-     */
-    save(insertNew = false) {
-        if (insertNew === true) return this.insert();
-
-        if (!this.modelData._id) throw new Error('this.modelData._id is required');
-        
+    // Saves current model data into the db
+    save(insertNew: boolean = false) {
         return new Promise(async (resolve, reject) => {
             try {
-                let result = await this.updateOne({
-                    query: { _id: this.modelData._id },
-                    data: this.modelData
-                });
+                if (!this.modelData) throw new Error('modelData is empty')
+
+                if (insertNew === true) {
+                    await this.insert();
+                } else {
+                    if (!this.modelData._id) throw new Error('modelData._id is required');
+
+                    await this.updateOne({
+                        query: { _id: this.modelData._id },
+                        data: this.modelData
+                    });
+                }
 
                 resolve(this);
             } catch (err) {
@@ -244,16 +243,14 @@ class MongoModel extends MongoController {
         });
     }
 
-    /**
-     * Deletes current item from db
-     * @returns {Promise<object>} the model instance
-     */
+    // Deletes current item from db
     delete() {
-        if (!this.modelData._id) throw new Error('this.modelData._id is required');
-
         return new Promise(async (resolve, reject) => {
             try {
-                let result = await this.deleteOne({
+                if (!this.modelData) throw new Error('modelData is empty')
+                else if (!this.modelData._id) throw new Error('modelData._id is required');
+
+                await this.deleteOne({
                     query: { _id: this.modelData._id },
                 });
 

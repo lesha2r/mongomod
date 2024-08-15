@@ -1,24 +1,21 @@
-/**
- * Returns value type
- * @param {any} value value to check
- * @returns {string | undefined} type
- */
-export const getValueType = (value) => {
-    let output = undefined;
+import { EBsonType, TSchemaType } from "../types/schema.js";
 
-    if (value instanceof Object) {
-        if (Array.isArray(value)) return 'array';
-        if (value instanceof Date) return 'date';
+export const getValueType = (value: any): TSchemaType | 'undefined' | undefined => {
+    let output: TSchemaType | 'undefined' | undefined = undefined;
 
-        output = 'object';
+    if (value instanceof Object && value !== null) {
+        if (Array.isArray(value)) return EBsonType.Array;
+        if (value instanceof Date) return EBsonType.Date;
+
+        output = EBsonType.Object;
     } else if (typeof(value) === 'string' || value instanceof String) {
-        output = 'string';
+        output = EBsonType.String;
     } else if (typeof(value) === 'number') {
-        output = 'number';
+        output = EBsonType.Number;
     } else if (value === null) {
-        output = 'null';
+        output = EBsonType.Null;
     } else if (typeof value === 'boolean') {
-        output = 'boolean';
+        output = EBsonType.Boolean;
     } else if (value === undefined) {
         output = 'undefined';
     }
@@ -26,11 +23,6 @@ export const getValueType = (value) => {
     return output;
 };
 
-/**
- * Generates unique string id
- * @param {number} [length] expected key length
- * @returns {string} unique id
- */
 export const keyGenerate = (length = 16) => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let secretPhrase = '';
@@ -40,4 +32,4 @@ export const keyGenerate = (length = 16) => {
     }
   
     return secretPhrase;
-  };
+};

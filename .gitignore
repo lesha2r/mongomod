@@ -1,6 +1,10 @@
-/node_modules/
 .env
-/examples/
+
+node_modules
+dist
+
+examples
+testapp.js
+
 TODOS.md
 TODOS_le.md
-testapp.js

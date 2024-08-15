@@ -1,35 +1,38 @@
-/**
- * @typedef TCheckResult
- * @property {boolean} isChecked final result
- * @property {{[key: string]: boolean}} byKeys each check result
- * @property {string[]} passed keys passed the test
- * @property {string[]} failed keys failed the test
- */
+import MongoController from "../MongoController.js";
 
-/**
- * Ensures index is created in collection
- * @param {{keys: string[]}[]} checkIndexesArr 
- * @returns {Promise<TCheckResult>} check result
- */
-export default function ensureIndex(checkIndexesArr) {
+export type TEnsureIndexInput = {keys: string[]}[]
+
+export type TEnsureIndexResult = {
+    isChecked: boolean,
+    byKeys: {[key: string]: boolean},
+    passed: string[],
+    failed: string[]
+}
+
+// Ensures index is created in collection
+export default function ensureIndex(this: MongoController, checkIndexesArr: TEnsureIndexInput): Promise<TEnsureIndexResult> {
     return new Promise(async (resolve, reject) => {
-        const db = this.getClient().db(this.dbName);
+        const client = this.getClient()
+        if (!client) throw new Error('client is null')
+
+        const db = client.db(this.db.dbName);
         const col = db.collection(this.collection);
 
         const indexes = await col.indexes();
     
-        const output = {
-        isChecked: false,
-        byKeys: {},
-        passed: [],
-        failed: [],
+        const output: TEnsureIndexResult = {
+            isChecked: false,
+            byKeys: {},
+            passed: [],
+            failed: [],
         };
     
         checkIndexesArr.forEach((el, i) => {
-        const checksRules = [];
+        const checksRules: boolean[] = [];
 
-        indexes.forEach((ind) => {
-            const indexCheck = [];
+        // @ts-ignore
+        indexes.forEach((ind: {key: {[key: string]: any}}) => {
+            const indexCheck: boolean[] = [];
     
             el.keys.forEach((k) => indexCheck.push(k in ind.key === true));
             const hasMatches = indexCheck.every((el) => el === true);

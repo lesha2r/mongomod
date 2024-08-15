@@ -1,4 +1,4 @@
-import { getValueType, keyGenerate } from "../src/helpers";
+import { getValueType, keyGenerate } from "../dist/utils";
 
 test('getValue correctly determines types', () => {
     expect(getValueType( ['1', '2'] )).toBe('array');

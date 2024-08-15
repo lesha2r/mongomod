@@ -5,6 +5,9 @@
   "main": "src/mongomod.js",
   "type": "module",
   "scripts": {
+    "tsc": "tsc -b src/",
+    "tsc-watch": "tsc --b --watch src/",
+    "dev": "nodemon dist/app.js -e js,scss --ignore 'uploads/*'",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "author": "",
@@ -13,7 +16,8 @@
     "dotenv": "^16.0.1",
     "eslint": "^8.19.0",
     "lodash": "^4.17.21",
-    "mongodb": "^4.7.0"
+    "mongodb": "^4.7.0",
+    "typescript": "^5.5.4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
