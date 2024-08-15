@@ -54,8 +54,14 @@ class MongoConnection {
     }
 
     // Opens a connection to Mongo database
-    connect(callback?: Function): Promise<{ok: boolean, details: string, result: mongo.MongoClient}> {
-        if (callback && typeof callback !== 'function') throw new Error('Callback must be a function');
+    async connect(callback?: Function): Promise<{
+        ok: boolean,
+        details: string,
+        result: mongo.MongoClient
+    }> {    
+        if (callback && typeof callback !== 'function') {
+            throw new Error('callback must be a function');
+        }
         
         const srv = (this.options.srv === true) ? '+srv' : '';
         const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=admin`; //&w=majority?retryWrites=true`;
@@ -64,48 +70,58 @@ class MongoConnection {
             useUnifiedTopology: true,
             useNewUrlParser: true 
         });
+
+        if (this.client) {
+            return {
+                ok: true,
+                details: 'connection already established',
+                result: this.client
+            };
+        }
+
+        try {
+            let result = await mongoClient.connect();
+            if (!result) throw new Error(`failed to establish connection to ${this.dbName}`)
+
+            if (this.debug) {
+                console.log(`[MongoConnection] Db connection opened: ${this.dbName}`);
+            }
             
-        return new Promise(async (resolve, reject) => {
-            if (this.client) {
-                resolve({ ok: true, details: 'connection already established', result: this.client });
-                return;
-            }
+            this.isConnected = true;
+            this.client = result;
+            
+            if (callback && typeof callback === 'function') callback();
 
-            try {
-                let result = await mongoClient.connect();
-                
-                if (result) {
-                    if (this.debug) {
-                        console.log(`[MongoConnection] Db connection opened: ${this.dbName}`);
-                    }
-                    
-                    this.isConnected = true;
-                    this.client = result;
-                    
-                    resolve({ ok: true, details: 'connection established', result: result });
+            return {
+                ok: true,
+                details: 'connection established',
+                result: result
+            };
+        } catch (err) {
+            if (this.debug) console.log(`[MongoConnection] Error connecting to ${this.dbName}:`);
+            if (this.debug) console.log(err);
 
-                    if (callback && typeof callback === 'function') callback();
-                }
-            } catch (err) {
-                if (this.debug) console.log(`[MongoConnection] Error connecting to ${this.dbName}:`);
-                if (this.debug) console.log(err);
+            this.isConnected = false;
 
-                this.isConnected = false;
-
-                reject({ ok: false, details: 'error catched', error: err });
-            }
-        });
+            throw new Error(`failed to establish connection to ${this.dbName}`);
+        }
     }
 
     // Closes a connection to Mongo database
     async disconnect(callback?: Function) {
-        if (this.client) {
-            await this.client.close();
+        try {
+            if (this.client) {
+                await this.client.close();
+            }
+
+            if (this.debug) console.log(`[MongoConnection] Connection closed: ${this.dbName}`);
+            if (callback && typeof callback === 'function') callback();
+            if (this.isConnected) this.isConnected = false
+
+            return true
+        } catch (err) {
+            throw new Error('failed to close the connection')
         }
-
-        if (this.debug) console.log(`[MongoConnection] Connection closed: ${this.dbName}`);
-
-        if (callback && typeof callback === 'function') callback();
     };
 
     // Passes client object

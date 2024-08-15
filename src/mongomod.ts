@@ -38,8 +38,6 @@ const reservedMethodsNames: TReservedMethods[] = [
     EReservedMethods.Delete,
 ];
 
-type TNotReserved<T> = T extends TReservedMethods ? never : T
-
 type TMongomod = {
     models: {[key: string]: Function}
     Schema: typeof MongoSchema,
@@ -102,15 +100,6 @@ const mongomod: {[key: string]: any} & TMongomod= {
                             }
                         }
                     }
-
-                    // /**
-                    //  * Adds custom method to a model.
-                    //  * @param { String } methodName name of the method. Could be invoked later by Model.custom.methodName 
-                    //  * @param { Function } func function to be executed on call
-                    //  */
-                    // addCustomMethod(methodName, func) {
-                    //     this.custom[methodName] = func.bind(this);
-                    // }
                 };
 
                 return new this.constr(db, collection, schema);

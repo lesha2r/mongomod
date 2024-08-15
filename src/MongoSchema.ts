@@ -1,5 +1,5 @@
-import { EBsonType, TSchemaObj, TSchemaType } from './types/schema.js';
 import { getValueType } from './utils/index.js';
+import { EBsonType, TSchemaObj, TSchemaType } from './types/schema.js';
 
 const allowedTypes: TSchemaType[] = [
     EBsonType.Any,
@@ -16,6 +16,61 @@ type TMongoSchemaOptions = { debug: boolean, strict: boolean }
 type TMongoSchemaSettings = {debug: boolean, strict: boolean }
 type TMongoSchemaValidationResult = {key: string, checked: boolean}
 
+function checkType(data: {[key: string]: any}, value: any, deepKeys: string[]) {
+    const lastKey: string = deepKeys.pop()!;
+    const nestedObj: {[key: string]: any} = deepKeys.reduce((a, prop) => a[prop], data);
+
+    let isValidated = null;
+
+    if (!nestedObj) {
+        isValidated = false;
+    } else if (value === 'any') {
+        isValidated = true;
+    } else if (typeof value === 'object' && !Array.isArray(value)) {
+        isValidated = true;
+    } else if (
+        typeof value === 'object'
+        && Array.isArray(value)
+        && value.includes(getValueType(nestedObj[lastKey]))
+    ) {
+        isValidated = true;
+    } else if (lastKey in nestedObj && value === getValueType(nestedObj[lastKey])) {
+        isValidated = true;
+    } else {
+        isValidated = false;
+    }
+
+    return isValidated;
+}
+
+function diveIntoObject(
+    this: MongoSchema,
+    checks: {key: string, checked: boolean}[],
+    data: {},
+    schema: TSchemaObj,
+    deepKeys: string[] = [],
+    prevKey = null
+) {
+    for (let [key, value] of Object.entries(schema)) {
+        if (typeof value === 'object' && !Array.isArray(value)) {
+            diveIntoObject.call(
+                this,
+                checks,
+                data,
+                // @ts-ignore
+                schema[key],
+                [ ...deepKeys, key],
+                [ ...deepKeys, key].join('.')
+            );
+        }
+
+        const isValidated = checkType.call(this, data, value, [ ...deepKeys, key]);
+        const keyPath = prevKey ? prevKey + '.' + key : key;
+
+        checks.push({key: keyPath, checked: isValidated});
+    }
+}
+
 class MongoSchema {
     settings: TMongoSchemaSettings
     schema: TSchemaObj
@@ -26,8 +81,8 @@ class MongoSchema {
     ) {
         
         this.settings = {
-            debug: options.debug,
-            strict: options.strict
+            debug: options.debug || false,
+            strict: options.strict || true
         };
 
         this.schema = {};
@@ -105,56 +160,8 @@ class MongoSchema {
 
     validate(data: {[key: string]: any}) {
         const checks: TMongoSchemaValidationResult[] = [];
-
-        function diveIntoObject(
-            this: MongoSchema,
-            data: {},
-            schema: TSchemaObj,
-            deepKeys: string[] = [],
-            prevKey = null
-        ) {
-            for (let [key, value] of Object.entries(schema)) {
-
-                if (typeof value === 'object' && !Array.isArray(value)) {
-                    // @ts-ignore
-                    diveIntoObject.call(this, data, schema[key], [ ...deepKeys, key], key);
-                }
-
-                const isValidated = checkType.call(this, data, value, [ ...deepKeys, key]);
-
-                const keyPath = prevKey ? prevKey + '.' + key : key;
-                checks.push({key: keyPath, checked: isValidated});
-            }
-        }
-
-        function checkType(data: {[key: string]: any}, value: any, deepKeys: string[]) {
-            const lastKey: string = deepKeys.pop()!;
-            const nestedObj: {[key: string]: any} = deepKeys.reduce((a, prop) => a[prop], data);
-
-            let isValidated = null;
-
-            if (!nestedObj) {
-                isValidated = false;
-            } else if (value === 'any') {
-                isValidated = true;
-            } else if (typeof value === 'object' && !Array.isArray(value)) {
-                isValidated = true;
-            } else if (
-                typeof value === 'object'
-                && Array.isArray(value)
-                && value.includes(getValueType(nestedObj[lastKey]))
-            ) {
-                isValidated = true;
-            } else if (lastKey in nestedObj && value === getValueType(nestedObj[lastKey])) {
-                isValidated = true;
-            } else {
-                isValidated = false;
-            }
-
-            return isValidated;
-        }
         
-        diveIntoObject.call(this, data, this.schema);
+        diveIntoObject.call(this, checks, data, this.schema);
 
         if (this.settings.debug) {
             const validationResult = checks.every(el => el.checked === true)
@@ -166,5 +173,36 @@ class MongoSchema {
         return {failed, result: failed.length === 0}
     }
 }
+
+const test = () => {
+    const testSchema = {
+        name: 'string',
+        address: {
+            city: 'string',
+            coordinates: {
+                x: 'number',
+                y: 'number'
+            }
+        }
+    };
+
+    // @ts-ignore
+    const schema = new MongoSchema(testSchema);
+
+    const badData = {
+        name: "John",
+        address: {
+            city: 'Moscow',
+            coordinates: {
+                x: 1,
+                y: '2'
+            }
+        }
+    };
+
+    schema.validate(badData)
+}
+
+test()
 
 export default MongoSchema;

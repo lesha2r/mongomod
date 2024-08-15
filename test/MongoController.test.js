@@ -17,7 +17,9 @@ const checkMethods = [
     'insertMany',
     'insertOne',
     'updateMany',
-    'updateOne'
+    'updateOne',
+    'ensureIndex',
+    'distinct'
 ];
 
 // Create an instance

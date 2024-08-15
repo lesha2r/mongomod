@@ -29,7 +29,9 @@ class MongoModel extends MongoController {
         const output: {[key: string]: any} = {};
 
         Object.keys(this.modelData).forEach(key => {
-            if (this.modelData && allowedKeys.includes(key)) output[key] = this.modelData[key];
+            if (this.modelData && allowedKeys.includes(key)) {
+                output[key] = this.modelData[key];
+            }
         });
 
         return output;
@@ -37,6 +39,7 @@ class MongoModel extends MongoController {
 
     // Returns modelData as stringified JSON
     toString(): string {
+        if (!this.modelData) return ""
         return JSON.stringify(this.modelData);
     }
 
@@ -181,86 +184,78 @@ class MongoModel extends MongoController {
     }
 
     // Inserts model to db
-    insert() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (!this.modelData) throw new Error('modelData is empty')
+    async insert() {
+        try {
+            if (!this.modelData) throw new Error('modelData is empty')
 
-                const result = await this.insertOne({
-                    'data': this.modelData
-                });
+            const result = await this.insertOne({
+                'data': this.modelData
+            });
 
-                if (!result.ok) {
-                    throw new Error('failed to insert model')
-                } else if (result.ok && 'insertedId' in result.result) {
-                    this.modelData._id = result.result.insertedId
-                }
-
-                resolve(this);
-            } catch (err) {
-                reject(err);
+            if (!result.ok) {
+                throw new Error('failed to insert model')
+            } else if (result.ok && 'insertedId' in result.result) {
+                this.modelData._id = result.result.insertedId
             }
-        });
+
+            return this;
+        } catch (err) {
+            throw new Error('failed to insert model')
+        }
     }
 
     // Pulls data for the model by the specified query and stores it 
-    get(query: {[key: string]: any} = {}) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                let found = await this.findOne({ query: query });
-                
-                if (found.ok) this.modelData = found.result;
-                if (found.result === null) throw new Error('Nothing found');
-                
-                resolve(this);
-            } catch (err) {
-                reject(err);
-            }
-        });
+    async get(query: {[key: string]: any} = {}) {
+        try {
+            let found = await this.findOne({ query: query });
+            
+            if (found.ok) this.modelData = found.result;
+            if (found.result === null) throw new Error('Nothing found');
+            
+            return this;
+        } catch (err) {
+            throw err
+        }
     }
 
     // Saves current model data into the db
-    save(insertNew: boolean = false) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (!this.modelData) throw new Error('modelData is empty')
+    async save(insertNew: boolean = false) {
+        try {
+            if (!this.modelData) throw new Error('modelData is empty')
 
-                if (insertNew === true) {
-                    await this.insert();
-                } else {
-                    if (!this.modelData._id) throw new Error('modelData._id is required');
+            if (insertNew === true) {
+                await this.insert();
+            } else {
+                if (!this.modelData._id) throw new Error('modelData._id is required');
 
-                    await this.updateOne({
-                        query: { _id: this.modelData._id },
-                        data: this.modelData
-                    });
-                }
-
-                resolve(this);
-            } catch (err) {
-                reject(err);
+                await this.updateOne({
+                    query: { _id: this.modelData._id },
+                    data: this.modelData
+                });
             }
-        });
+
+            return this;
+        } catch (err) {
+            throw err;
+        }
     }
 
     // Deletes current item from db
-    delete() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (!this.modelData) throw new Error('modelData is empty')
-                else if (!this.modelData._id) throw new Error('modelData._id is required');
+    async delete() {
+        try {
+            if (!this.modelData) throw new Error('modelData is empty')
+            else if (!this.modelData._id) throw new Error('modelData._id is required');
 
-                await this.deleteOne({
-                    query: { _id: this.modelData._id },
-                });
+            await this.deleteOne({
+                query: { _id: this.modelData._id },
+            });
 
-                this.modelData = null;
+            this.modelData = null;
 
-                resolve(this);
-            } catch (err) {
-                reject(err);
-            }
-        });
+            return this;
+        } catch (err) {
+            throw err;
+        }
     }
 }
 
