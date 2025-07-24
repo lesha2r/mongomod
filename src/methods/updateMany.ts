@@ -1,7 +1,7 @@
 import MongoController from "../MongoController.js"
-import { TMethodResult } from "../types/methods.js"
+import { MethodResult } from "../types/methods.js"
 
-export type TUpdateManyInput = {
+export type MethodUpdateManyOptions = {
     query: {[key: string]: any}
     data: {[key: string]: any}
     upsert?: boolean
@@ -9,7 +9,7 @@ export type TUpdateManyInput = {
 }
 
 // Updates many documents matching the query
-export default function updateMany(this: MongoController, options: TUpdateManyInput): Promise<TMethodResult>  {
+export default function updateMany(this: MongoController, options: MethodUpdateManyOptions): Promise<MethodResult>  {
     return new Promise(async (resolve, reject) => {
         try {
             let { query, data, upsert, unset } = options;
@@ -17,8 +17,6 @@ export default function updateMany(this: MongoController, options: TUpdateManyIn
             const collection = this.collection;
 
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
-
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);
         

@@ -1,4 +1,5 @@
 .env
+dev.js
 
 node_modules
 dist
@@ -6,5 +7,6 @@ dist
 examples
 testapp.js
 
+TODO.md
 TODOS.md
 TODOS_le.md

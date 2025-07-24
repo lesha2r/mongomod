@@ -1,12 +1,11 @@
-import { ObjectId } from 'mongodb';
 import MongoController from '../MongoController.js';
 
-export type TCountInput = {
+export type MethodCountOptions = {
     query?: {[key: string]: any},
 }
 
 // Counts documents matching the query
-export default function count(this: MongoController, options: TCountInput = {}) {
+export default function count(this: MongoController, options: MethodCountOptions = {}) {
     return new Promise(async (resolve, reject) => {
         try {
             let { query } = options;
@@ -14,8 +13,6 @@ export default function count(this: MongoController, options: TCountInput = {}) 
             const client = this.getClient()
             
             if (!collection) throw new Error('no collection specified');
-            if (!client) throw new Error('client is null')
-            
             if (!query) query = {};
 
             const db = client.db(this.db.dbName);

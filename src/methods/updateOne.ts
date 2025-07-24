@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
-import { TMethodResult } from '../types/methods.js';
+import { MethodResult } from '../types/methods.js';
 import MongoController from '../MongoController.js';
 
-export type TUpdateOneInput = {
+export type MethodUpdateOneOptions = {
     query: {[key: string]: any}
     data: {[key: string]: any}
     upsert?: boolean
@@ -10,7 +10,7 @@ export type TUpdateOneInput = {
 }
 
 // Updates one document matching the query
-export default function updateOne(this: MongoController, options: TUpdateOneInput): Promise<TMethodResult> {
+export default function updateOne(this: MongoController, options: MethodUpdateOneOptions): Promise<MethodResult> {
     return new Promise(async (resolve, reject) => {
         let { 
             query,
@@ -41,8 +41,6 @@ export default function updateOne(this: MongoController, options: TUpdateOneInpu
         
         try {
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
-        
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);
             

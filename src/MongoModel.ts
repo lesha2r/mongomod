@@ -1,14 +1,18 @@
+// ! IN PROCCESS !
+
 import _ from 'lodash';
 import MongoSchema from "./MongoSchema.js";
 import MongoController from "./MongoController.js";
 import MongoConnection from "./MongoConnection.js";
+import { ModelErrCodes, ModelErrMsgs } from './constants/model.js';
+import { MmValidationError, MmOperationError } from './errors/index.js';
 
 class MongoModel extends MongoController {
     schema: MongoSchema
     modelData: null | {[key: string]: any}
     db: MongoConnection
 
-    constructor (db: MongoConnection, collection: string, schema: MongoSchema) {
+    constructor(db: MongoConnection, collection: string, schema: MongoSchema) {
         super(db, collection);
 
         this.collection = collection;
@@ -22,19 +26,40 @@ class MongoModel extends MongoController {
         return this.modelData;
     }
 
+    // Helper method to ensure model has data
+    private ensureModelData(): void {
+        if (!this.modelData) {
+            throw new MmOperationError(
+                ModelErrCodes.ModelDataEmpty,
+                ModelErrMsgs.ModelDataEmpty,
+                this.db.dbName,
+                'ensureModelData'
+            );
+        }
+    }
+
+    // Helper method to ensure model has _id
+    private ensureModelId(): void {
+        this.ensureModelData();
+
+        if (!this.modelData!._id) {
+            throw new MmOperationError(
+                ModelErrCodes.MissingId,
+                ModelErrMsgs.MissingId,
+                this.db.dbName,
+                'ensureModelId'
+            );
+        }
+    }
+
     // Filters data by allowedKeys (top-level only)
-    dataFiltered(allowedKeys: string[]): {[key: string]: any} | null {
-        if (this.modelData === null) return null
-        
-        const output: {[key: string]: any} = {};
+    dataFiltered(allowedKeys: string[]): { [key: string]: any } | null {
+        if (!this.modelData) return null;
 
-        Object.keys(this.modelData).forEach(key => {
-            if (this.modelData && allowedKeys.includes(key)) {
-                output[key] = this.modelData[key];
-            }
-        });
-
-        return output;
+        return Object.fromEntries(
+            Object.entries(this.modelData)
+                .filter(([key]) => allowedKeys.includes(key))
+        );
     }
 
     // Returns modelData as stringified JSON
@@ -44,23 +69,27 @@ class MongoModel extends MongoController {
     }
 
     // Validates modelData by it's schema
-    validate() {
-        if (!this.modelData) return false;
+    validate(data: {[key: string]: any} | null = this.modelData) {
+        const validationResult = this.schema.validate(data);
 
-        const isValidated = this.schema.validate(this.modelData);
+        if (validationResult.ok === false) {
+            throw new MmValidationError(
+                ModelErrCodes.InvalidModelData,
+                `${ModelErrMsgs.InvalidModelData}: ${validationResult.failed.join(', ')}`,
+                this.db.dbName || null
+            )
+        }
 
-        if (this.schema.settings.strict === true) this.clearBySchema();
+        // if (this.schema.settings.strict === true) this.clearBySchema();
 
-        return isValidated;
+        return validationResult;
     }
 
     // Force modelData to have only keys allowed by schema
-    clearBySchema() {
+    clearBySchema(): MongoModel {
         const schema = this.schema.schema;
 
-        if (Object.keys(schema).length === 0) {
-            throw new Error('Can\'t clear data since scheme is empty');
-        }
+        if (Object.keys(schema).length === 0) return this;
 
         const currentModelData = { ...this.modelData };
         let newModelData = {};
@@ -158,105 +187,182 @@ class MongoModel extends MongoController {
 
     // Creates item without saving it to db
     init(data: {[key: string] : any}) {
-        const validation = this.schema.validate(data);
-
-        if (validation.result === false) {
-            throw new Error(`Scheme validation failed: ${validation.failed.join(', ')}`);
-        }
-
+        this.validate(data);
         this.modelData = data;
-
         return this;
     }
 
     // Change item's data
     set(data: {[key: string]: any}) {
+        if (!this.modelData) this.modelData = {};
+
         const newData = { ...this.modelData, ...data };
 
-        const validation = this.schema.validate(newData);
-        if (validation.result === false) {
-            throw new Error(`Scheme validation failed: ${validation.failed.join(', ')}`);
-        }
-
+        this.validate(newData);
         this.modelData = newData;
 
         return this;
     }
 
     // Inserts model to db
-    async insert() {
-        try {
-            if (!this.modelData) throw new Error('modelData is empty')
+    async insert(): Promise<MongoModel> {
+        this.ensureModelData();
 
-            const result = await this.insertOne({
-                'data': this.modelData
-            });
+        try {
+            const result = await this.insertOne({ data: this.modelData! });
 
             if (!result.ok) {
-                throw new Error('failed to insert model')
-            } else if (result.ok && 'insertedId' in result.result) {
-                this.modelData._id = result.result.insertedId
+                throw new MmOperationError(
+                    ModelErrCodes.InsertFailed,
+                    ModelErrMsgs.InsertFailed,
+                    this.db.dbName,
+                    'insert'
+                );
+            }
+
+            if ('insertedId' in result.result) {
+                this.modelData!._id = result.result.insertedId;
             }
 
             return this;
         } catch (err) {
-            throw new Error('failed to insert model')
+            // Re-throw our custom errors
+            if (err instanceof MmOperationError || err instanceof MmValidationError) {
+                throw err;
+            }
+
+            // Wrap other errors
+            throw new MmOperationError(
+                ModelErrCodes.SaveFailed,
+                `Failed to insert model to database: ${err instanceof Error ? err.message : 'Unknown error'}`,
+                this.db.dbName,
+                'insert'
+            );
         }
     }
 
     // Pulls data for the model by the specified query and stores it 
-    async get(query: {[key: string]: any} = {}) {
+    async get(query: {[key: string]: any} = {}): Promise<MongoModel> {
         try {
-            let found = await this.findOne({ query: query });
+            const found = await this.findOne({ query });
             
-            if (found.ok) this.modelData = found.result;
-            if (found.result === null) throw new Error('Nothing found');
+            if (!found.ok) {
+                throw new MmOperationError(
+                    ModelErrCodes.GetFailed,
+                    ModelErrMsgs.GetFailed,
+                    this.db.dbName,
+                    'get'
+                );
+            }
+
+            if (found.result === null || Object.keys(found.result).length === 0) {
+                throw new MmOperationError(
+                    ModelErrCodes.GetFailed,
+                    'No document found matching the provided query',
+                    this.db.dbName,
+                    'get'
+                );
+            }
             
+            console.log(1, found.result)
+            this.modelData = found.result;
+            console.log(2, this.modelData) 
+            this.validate(this.modelData);
+            console.log(3, this.modelData)
             return this;
         } catch (err) {
-            throw err
+            // Re-throw our custom errors
+            if (err instanceof MmOperationError || err instanceof MmValidationError) {
+                throw err;
+            }
+
+            // Wrap other errors
+            throw new MmOperationError(
+                ModelErrCodes.GetFailed,
+                `${ModelErrMsgs.GetFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+                this.db.dbName,
+                'get'
+            );
         }
     }
 
     // Saves current model data into the db
-    async save(insertNew: boolean = false) {
-        try {
-            if (!this.modelData) throw new Error('modelData is empty')
+    async save(insertNew: boolean = false): Promise<MongoModel> {
+        this.ensureModelData();
 
+        try {
             if (insertNew === true) {
                 await this.insert();
             } else {
-                if (!this.modelData._id) throw new Error('modelData._id is required');
+                this.ensureModelId();
 
-                await this.updateOne({
-                    query: { _id: this.modelData._id },
-                    data: this.modelData
+                const result = await this.updateOne({
+                    query: { _id: this.modelData!._id },
+                    data: this.modelData!
                 });
+
+                if (!result.ok) {
+                    throw new MmOperationError(
+                        ModelErrCodes.SaveFailed,
+                        ModelErrMsgs.SaveFailed,
+                        this.db.dbName,
+                        'save'
+                    );
+                }
             }
 
             return this;
         } catch (err) {
-            throw err;
+            // Re-throw our custom errors
+            if (err instanceof MmOperationError || err instanceof MmValidationError) {
+                throw err;
+            }
+
+            // Wrap other errors
+            throw new MmOperationError(
+                ModelErrCodes.SaveFailed,
+                `${ModelErrMsgs.SaveFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+                this.db.dbName,
+                'save'
+            );
         }
     }
 
     // Deletes current item from db
-    async delete() {
+    async delete(): Promise<MongoModel> {
+        this.ensureModelId();
+
         try {
-            if (!this.modelData) throw new Error('modelData is empty')
-            else if (!this.modelData._id) throw new Error('modelData._id is required');
+            const query = { _id: this.modelData!._id };
+            const result = await this.deleteOne({ query });
 
-            await this.deleteOne({
-                query: { _id: this.modelData._id },
-            });
+            // Check if deletion was successful
+            if (!result.ok) {
+                throw new MmOperationError(
+                    ModelErrCodes.DeleteFailed,
+                    ModelErrMsgs.DeleteFailed,
+                    this.db.dbName,
+                    'delete'
+                );
+            }
 
+            // Clear model data after successful deletion
             this.modelData = null;
 
             return this;
         } catch (err) {
-            throw err;
+            // Re-throw custom errors
+            if (err instanceof MmOperationError) throw err;
+
+            // Wrap other errors
+            throw new MmOperationError(
+                ModelErrCodes.DeleteFailed,
+                `${ModelErrMsgs.DeleteFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+                this.db.dbName,
+                'delete'
+            );
         }
     }
-}
+}   
 
 export default MongoModel;

@@ -1,8 +1,8 @@
 import MongoController from "../MongoController.js";
 
-export type TEnsureIndexInput = {keys: string[]}[]
+export type MethodEnsureIndexOptions = {keys: string[]}[]
 
-export type TEnsureIndexResult = {
+export type MethodEnsureIndexResult = {
     isChecked: boolean,
     byKeys: {[key: string]: boolean},
     passed: string[],
@@ -10,17 +10,15 @@ export type TEnsureIndexResult = {
 }
 
 // Ensures index is created in collection
-export default function ensureIndex(this: MongoController, checkIndexesArr: TEnsureIndexInput): Promise<TEnsureIndexResult> {
+export default function ensureIndex(this: MongoController, checkIndexesArr: MethodEnsureIndexOptions): Promise<MethodEnsureIndexResult> {
     return new Promise(async (resolve, reject) => {
         const client = this.getClient()
-        if (!client) throw new Error('client is null')
-
         const db = client.db(this.db.dbName);
         const col = db.collection(this.collection);
 
         const indexes = await col.indexes();
     
-        const output: TEnsureIndexResult = {
+        const output: MethodEnsureIndexResult = {
             isChecked: false,
             byKeys: {},
             passed: [],

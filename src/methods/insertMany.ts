@@ -1,14 +1,13 @@
-import { ObjectId } from 'mongodb';
-import { TMethodResult } from '../types/methods.js';
+import { MethodResult } from '../types/methods.js';
 import MongoController from '../MongoController.js';
 
-export type TInsertManyInput = {
+export type MethodInsertManyOptions = {
     data: {[key: string]: any}
     ordered?: boolean
 }
 
 // Inserts many documents into the database
-export default function insertMany(this: MongoController, options: TInsertManyInput): Promise<TMethodResult> {
+export default function insertMany(this: MongoController, options: MethodInsertManyOptions): Promise<MethodResult> {
     return new Promise(async (resolve, reject) => {
         try {
             let { data, ordered } = options;
@@ -16,8 +15,6 @@ export default function insertMany(this: MongoController, options: TInsertManyIn
             const collection = this.collection;
 
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
-
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);
             

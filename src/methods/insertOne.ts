@@ -1,12 +1,12 @@
 import MongoController from '../MongoController.js';
-import { TMethodResult } from '../types/methods.js';
+import { MethodResult } from '../types/methods.js';
 
-export type TInsertOneInput = {
+export type MethodInsertOneOptions = {
     data: {[key: string]: any}
 }
 
 // Inserts a document into a database
-export default function insertOne(this: MongoController, options: TInsertOneInput): Promise<TMethodResult> {
+export default function insertOne(this: MongoController, options: MethodInsertOneOptions): Promise<MethodResult> {
     return new Promise(async (resolve, reject) => {
         try {
             const { data } = options;
@@ -20,8 +20,6 @@ export default function insertOne(this: MongoController, options: TInsertOneInpu
             }
 
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
-
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);
 

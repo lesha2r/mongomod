@@ -1,12 +1,14 @@
 import mongo from 'mongodb';
+import { MmConnectionError } from './errors/index.js';
+import { ConnectErrCodes, ConnectErrMsgs } from './constants/connection.js';
+import { validateConnectCallback, validateOptions } from './utils/connection.js';
 
-type TMongoConnectionOptions = {
+export interface MongomodConnectionOptions {
     link: string
     login: string
     password: string
     dbName: string
     srv: boolean
-    debug?: boolean
 }
 
 class MongoConnection {
@@ -14,119 +16,121 @@ class MongoConnection {
     login: string
     password: string
     dbName: string
-    debug: boolean
     options: {
         srv: boolean
     }
-
     isConnected: boolean
     client: null | mongo.MongoClient
 
-    constructor(options: TMongoConnectionOptions) {
-        const missingParams = []
+    constructor(options: MongomodConnectionOptions) {
+        validateOptions(options);
 
-        if (!options.link) missingParams.push('link');
-        if (!options.login) missingParams.push('login');
-        if (!options.password) missingParams.push('password');
-        if (!options.dbName) missingParams.push('dbName');
+        const optionsHandled = {...options};
 
-        if (missingParams.length > 0) {
-            throw new Error(`Missing required parameters: ${missingParams.join(', ')}`)
+        // Set defaults
+        if (options.srv === undefined) {
+            optionsHandled.srv = false;
         }
-
-        if (typeof options.srv !== 'boolean') options.srv = true;
 
         // Credentials and connection params
         this.link = options.link;
         this.login = options.login;
         this.password = options.password;
-        this.dbName = options.dbName;
-        this.debug = options.debug || false;
+        this.dbName = options?.dbName || '';
         this.options = {
             srv: options.srv
         };
 
-        // Client
         this.client = null;
-
-        // Connection status
         this.isConnected = false;
     }
 
-    // Opens a connection to Mongo database
-    async connect(callback?: Function): Promise<{
-        ok: boolean,
-        details: string,
-        result: mongo.MongoClient
-    }> {    
-        if (callback && typeof callback !== 'function') {
-            throw new Error('callback must be a function');
-        }
+    // Opens a connection
+    async connect(callback?: Function, timeout?: number): Promise<mongo.MongoClient | null> {    
+        validateConnectCallback(callback)
         
         const srv = (this.options.srv === true) ? '+srv' : '';
         const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=admin`; //&w=majority?retryWrites=true`;
-        const mongoClient = new mongo.MongoClient(mongoUrl, {
-            // @ts-ignore
-            useUnifiedTopology: true,
-            useNewUrlParser: true 
-        });
+        const mongoClient = new mongo.MongoClient(mongoUrl);
 
-        if (this.client) {
-            return {
-                ok: true,
-                details: 'connection already established',
-                result: this.client
-            };
-        }
+        if (this.client) return this.client;
+
+        let timeoutId: NodeJS.Timeout | null = null;
 
         try {
-            let result = await mongoClient.connect();
-            if (!result) throw new Error(`failed to establish connection to ${this.dbName}`)
+            timeoutId = setTimeout(() => {
+                if (this.isConnected) return;
+                
+                throw new MmConnectionError(
+                    ConnectErrCodes.ConnectionTimeout,
+                    ConnectErrMsgs.ConnectionTimeout,
+                    this.dbName || null
+                );
+            }, timeout || 30000);
 
-            if (this.debug) {
-                console.log(`[MongoConnection] Db connection opened: ${this.dbName}`);
-            }
+            const result = await mongoClient.connect();
             
             this.isConnected = true;
             this.client = result;
-            
+
+            if (timeoutId) clearTimeout(timeoutId);
             if (callback && typeof callback === 'function') callback();
 
-            return {
-                ok: true,
-                details: 'connection established',
-                result: result
-            };
-        } catch (err) {
-            if (this.debug) console.log(`[MongoConnection] Error connecting to ${this.dbName}:`);
-            if (this.debug) console.log(err);
+            return this.client
+        } catch (err: any) {
+            if (timeoutId) clearTimeout(timeoutId);
 
             this.isConnected = false;
+            this.client = null;
 
-            throw new Error(`failed to establish connection to ${this.dbName}`);
+            throw new MmConnectionError(
+                ConnectErrCodes.ConnectionFailed,
+                ConnectErrMsgs.ConnectionFailed,
+                this.dbName || null,
+                err
+            );
         }
     }
 
-    // Closes a connection to Mongo database
+    // Closes a connection
     async disconnect(callback?: Function) {
-        try {
-            if (this.client) {
-                await this.client.close();
-            }
+        validateConnectCallback(callback)
 
-            if (this.debug) console.log(`[MongoConnection] Connection closed: ${this.dbName}`);
+        try {
+            if (this.client) await this.client.close();
             if (callback && typeof callback === 'function') callback();
-            if (this.isConnected) this.isConnected = false
+            
+            this.isConnected = false
+            this.client = null;
 
             return true
         } catch (err) {
-            throw new Error('failed to close the connection')
+            throw new MmConnectionError(
+                ConnectErrCodes.CloseConnectionFailed,
+                ConnectErrMsgs.CloseConnectionFailed,
+                this.dbName || null,
+                err
+            );
         }
     };
 
     // Passes client object
     passClient() {
         return this.client;
+    }
+
+    // Returns database instance
+    getDatabase() {
+        return this.client!.db(this.dbName);
+    }
+
+    // Aliases:
+    // getDatabase alias
+    getDb() {
+        return this.getDatabase();
+    }
+    db() {
+        return this.getDatabase();
     }
 }
 

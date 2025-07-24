@@ -1,44 +1,15 @@
+// ** DONE **
+
 import MongoSchema from './MongoSchema.js';
 import MongoController from './MongoController.js';
 import MongoConnection from './MongoConnection.js';
 import MongoModel from './MongoModel.js';
-import {keyGenerate} from './utils/index.js';
+import {keyGenerate} from './utils/index.js'
+import { MmValidationError } from './errors/validation.js';
+import { MongomodErrorCodes, MongomodErrorMessages } from './constants/mongomod.js';
+import { ensureMethodNameIsNotReserved, validateDbInstance, validateSchema } from './utils/mongomod.js';
 
-const enum EReservedMethods {
-    Validate = 'validate',
-    ClearBySchema = 'clearBySchema',
-    Init = 'init',
-    Set = 'set',
-    Insert = 'insert',
-    Get = 'get',
-    Save = 'save',
-    Delete = 'delete'
-}
-
-type TReservedMethods = 
-    EReservedMethods.Validate |
-    EReservedMethods.ClearBySchema |
-    EReservedMethods.Init |
-    EReservedMethods.Set |
-    EReservedMethods.Insert |
-    EReservedMethods.Get |
-    EReservedMethods.Save |
-    EReservedMethods.Delete |
-    'models'
-
-
-const reservedMethodsNames: TReservedMethods[] = [
-    EReservedMethods.Validate,
-    EReservedMethods.ClearBySchema,
-    EReservedMethods.Init,
-    EReservedMethods.Set,
-    EReservedMethods.Insert,
-    EReservedMethods.Get,
-    EReservedMethods.Save,
-    EReservedMethods.Delete,
-];
-
-type TMongomod = {
+interface Mongomod {
     models: {[key: string]: Function}
     Schema: typeof MongoSchema,
     Controller: typeof MongoController
@@ -47,7 +18,29 @@ type TMongomod = {
     createModel: Function
 }
 
-const mongomod: {[key: string]: any} & TMongomod= {
+class InstanceModel extends MongoModel {
+    [key: string]: any
+    constructor (db: MongoConnection, collection: string, schema: MongoSchema) {
+        super(db, collection, schema);
+
+        for (let [key, value] of Object.entries(this.customFns || {})) {
+            if (typeof value === 'function') {
+                this[key] = value.bind(this);
+            } else {
+                throw new MmValidationError(
+                    MongomodErrorCodes.CustomMethodNotFunction,
+                    MongomodErrorMessages.CustomMethodNotFunction,
+                );
+            }
+        }
+    }
+
+    static test() {
+        console.log('TESTING INSTANCE MODEL');
+    }
+};
+
+const mongomod: {[key: string]: any} & Mongomod= {
     models: {},  
     get: Function,
     Schema: MongoSchema,
@@ -60,54 +53,27 @@ const mongomod: {[key: string]: any} & TMongomod= {
         schema: MongoSchema,
         customFns: {[key: string]: Function} = {}
     ) {
-        if (db instanceof MongoConnection === false) {
-            throw new Error('Provided db is not an instance of MongoConnection');
-        }
+        validateDbInstance(db);
+        validateSchema(schema);
 
-        if (schema !== null && schema instanceof MongoSchema === false) {
-            throw new Error('Provided schema is not an instance of MongoSchema');
-        } else if (schema === null) {
-            schema = new MongoSchema();
-        }
+        const schemaHandled = !schema ? new MongoSchema() : schema;
+        const uniqueId = keyGenerate(12)
 
         const entries = Object.entries(customFns)
         for (const [key, value] of entries) {
-            if ((reservedMethodsNames as ReadonlyArray<string>).includes(key)) {
-                throw new Error(`Method name '${key}' is reserved for built-in methods`);
-            }
+            ensureMethodNameIsNotReserved(key);
 
             if (typeof value === 'function') {
                 this[key] = value.bind(this);
             } else {
-                throw new Error('Custom method must be a function');
+                throw new MmValidationError(MongomodErrorCodes.CustomMethodNotFunction, MongomodErrorMessages.CustomMethodNotFunction);
             }
         }
 
-        const uniqueId = keyGenerate(8)
-
         this.models[uniqueId] = function() {
-            function InstanceModelCreator(this: any, db: MongoConnection, collection: string, schema: MongoSchema) {
-                this.constr = class InstanceModel extends MongoModel {
-                    [key: string]: any
-                    constructor (db: MongoConnection, collection: string, schema: MongoSchema) {
-                        super(db, collection, schema);
-
-                        for (let [key, value] of Object.entries(customFns)) {
-                            if (typeof value === 'function') {
-                                this[key] = value.bind(this);
-                            } else {
-                                throw new Error('Custom method must be a function');
-                            }
-                        }
-                    }
-                };
-
-                return new this.constr(db, collection, schema);
-            };
-
-            // @ts-ignore
-            if (new.target) return new InstanceModelCreator(db, collection, schema);
-            else throw new Error('Class constructor cannot be invoked without "new"');
+            if (new.target) return new InstanceModel(db, collection, schemaHandled);
+            else throw new MmValidationError(MongomodErrorCodes.CannotUsedWithoutNew, MongomodErrorMessages.CannotUsedWithoutNew);
+            //else return InstanceModel(db, collection, schemaHandled);
         };
         
         return this.models[uniqueId];

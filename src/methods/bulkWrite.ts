@@ -1,9 +1,9 @@
 import MongoController from '../MongoController.js';
-import { TMethodResult } from '../types/methods.js';
+import { MethodResult } from '../types/methods.js';
 
-export type TBulkWriteInput = {}[]
+export type MethodBulkWriteOptions = {}[]
 
-export default function bulkWrite(this: MongoController, operations: TBulkWriteInput): Promise<TMethodResult> {
+export default function bulkWrite(this: MongoController, operations: MethodBulkWriteOptions): Promise<MethodResult> {
     return new Promise(async (resolve, reject) => {
         try {
             if (Array.isArray(operations) !== true) {
@@ -13,8 +13,6 @@ export default function bulkWrite(this: MongoController, operations: TBulkWriteI
             const collection = this.collection;
 
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
-
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);
             

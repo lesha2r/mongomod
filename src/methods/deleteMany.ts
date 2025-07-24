@@ -1,18 +1,17 @@
 import MongoController from "../MongoController.js";
 
-export type TDeleteManyInput = {
+export type MethodDeleteOptions = {
     query: {[key: string]: any}
 }
 
 // Deletes all documents matching the query
-export default function deleteMany(this: MongoController, options: TDeleteManyInput) {
+export default function deleteMany(this: MongoController, options: MethodDeleteOptions) {
     return new Promise(async (resolve, reject) => {
         try {
             let { query } = options;
             const collection = this.collection;
             const client = this.getClient()
 
-            if (!client) throw new Error('client is null')
             if (!collection) throw new Error('no collection specified');
 
             const db = client.db(this.db.dbName);

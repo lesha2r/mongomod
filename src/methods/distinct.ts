@@ -1,14 +1,13 @@
-import { ObjectId } from 'mongodb';
-import { TMethodResult } from '../types/methods.js';
+import { MethodResult } from '../types/methods.js';
 import MongoController from '../MongoController.js';
 
-export type TDistinctInput = {
+export type MethodDistinctOptions = {
     field: string
     query: {[key: string]: any},
 }
 
 // Counts documents matching the query
-export default function distinct(this: MongoController, options: TDistinctInput): Promise<TMethodResult> {
+export default function distinct(this: MongoController, options: MethodDistinctOptions): Promise<MethodResult> {
     return new Promise(async (resolve, reject) => {
         try {
             let { field, query  } = options;
@@ -20,7 +19,6 @@ export default function distinct(this: MongoController, options: TDistinctInput)
             if (!query) query = {};
                 
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
 
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);

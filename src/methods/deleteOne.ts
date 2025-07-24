@@ -1,12 +1,12 @@
 import MongoController from "../MongoController.js";
-import { TMethodResult } from "../types/methods.js";
+import { MethodResult } from "../types/methods.js";
 
-export type TDeleteOneInput = {
+export type MethodDeleteOneOptions = {
     query: {[key: string]: any}
 }
 
 // Deletes one document mathcing the query
-export default function deleteOne(this: MongoController, options: TDeleteOneInput): Promise<TMethodResult> {
+export default function deleteOne(this: MongoController, options: MethodDeleteOneOptions): Promise<MethodResult> {
     return new Promise(async (resolve, reject) => {
         try {
             let { query } = options;
@@ -18,7 +18,6 @@ export default function deleteOne(this: MongoController, options: TDeleteOneInpu
             }
 
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
 
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);

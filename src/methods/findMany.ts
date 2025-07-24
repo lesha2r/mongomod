@@ -1,15 +1,15 @@
 import { ObjectId } from 'mongodb';
-import { TMethodResult } from '../types/methods.js';
+import { MethodResult } from '../types/methods.js';
 import MongoController from '../MongoController.js';
 
-export type TFindManyInput = {
+export type MethodFindManyOptions = {
     query: {[key: string]: any}
     limit?: number
     skip?: number
 }
 
 // Finds many documents matching the query
-export default function findMany(this: MongoController, options: TFindManyInput): Promise<TMethodResult> {
+export default function findMany(this: MongoController, options: MethodFindManyOptions): Promise<MethodResult> {
     return new Promise(async (resolve, reject) => {
         try {
             let { query, limit, skip } = options;
@@ -25,7 +25,6 @@ export default function findMany(this: MongoController, options: TFindManyInput)
             if (query._id) query._id = new ObjectId(query._id);
 
             const client = this.getClient()
-            if (!client) throw new Error('client is null')
 
             const db = client.db(this.db.dbName);
             const col = db.collection(collection);
