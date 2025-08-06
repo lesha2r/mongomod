@@ -1,7 +1,0 @@
-[x] Describe Model custom methods
-[] Add controller methods to tests
-[] Handle _id and ObjectId everywhere expected
-[] Default query set to {} (findMany, findOne, others)
-[] [Bug?] Check methods while connection is closed
-[] [Bug?] Ensure insert method throws exception on call before db connects
-[x] Add keys failed validation to exception message
