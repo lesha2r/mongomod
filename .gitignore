@@ -2,7 +2,6 @@
 examples
 /*/dev.*
 node_modules
-dist
 TODO.md
 TODOS.md
 TODOS_le.md

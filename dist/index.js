@@ -1,0 +1,7 @@
+import mongomod from "./mongomod.js";
+import { MmValidationError } from './errors/validationError.js';
+import { MmOperationError } from './errors/operationError.js';
+import { MmControllerError } from "./errors/controllerError.js";
+import { MmConnectionError } from "./errors/connectionError.js";
+export { MmValidationError, MmOperationError, MmControllerError, MmConnectionError };
+export default mongomod;

@@ -1,0 +1,35 @@
+import MongoConnection from '../MongoConnection/index.js';
+import { MethodCountOptions } from './operations/count.js';
+import { MethodDistinctOptions } from './operations/distinct.js';
+import { MethodBulkWriteOptions } from './operations/bulkWrite.js';
+import { MethodFindOneOptions } from './operations/findOne.js';
+import { AggregationPipeline } from './operations/aggregate.js';
+import { MethodFindManyOptions } from './operations/findMany.js';
+import { MethodDeleteOptions } from './operations/deleteMany.js';
+import { MethodInsertOneOptions } from './operations/insertOne.js';
+import { MethodUpdateOneOptions } from './operations/updateOne.js';
+import { MethodDeleteOneOptions } from './operations/deleteOne.js';
+import { MethodEnsureIndexOptions } from './operations/ensureIndex.js';
+import { MethodUpdateManyOptions } from './operations/updateMany.js';
+import { MethodInsertManyOptions } from './operations/insertMany.js';
+declare class MongoController {
+    db: MongoConnection;
+    collection: string;
+    constructor(db: MongoConnection, collection: string);
+    getClient(): import("mongodb").MongoClient;
+    getCollectionCtrl(): import("mongodb").Collection<import("bson").Document>;
+    findOne(options: MethodFindOneOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").WithId<import("bson").Document>>>;
+    findMany(options: MethodFindManyOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").WithId<import("bson").Document>>>;
+    insertOne(options: MethodInsertOneOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").WithId<import("bson").Document>>>;
+    updateOne(options: MethodUpdateOneOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").WithId<import("bson").Document>>>;
+    deleteOne(options: MethodDeleteOneOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").ModifyResult<import("bson").Document>>>;
+    updateMany(options: MethodUpdateManyOptions): Promise<import("../QueryResult.js").default<any>>;
+    deleteMany(options: MethodDeleteOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").DeleteResult>>;
+    insertMany(options: MethodInsertManyOptions): Promise<import("../QueryResult.js").default<any>>;
+    aggregate(pipeline: AggregationPipeline): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("bson").Document>>;
+    count(options: MethodCountOptions): Promise<import("../QueryResult.js").default<number> | import("../QueryResult.js").default<null>>;
+    distinct(options: MethodDistinctOptions): Promise<import("../QueryResult.js").default<any>>;
+    bulkWrite(operations?: MethodBulkWriteOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").BulkWriteResult>>;
+    ensureIndex(checkKeys: MethodEnsureIndexOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("./operations/ensureIndex.js").MethodEnsureIndexResult>>;
+}
+export default MongoController;
