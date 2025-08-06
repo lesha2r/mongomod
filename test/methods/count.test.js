@@ -1,10 +1,10 @@
-import { MongoMethods } from '../../dist/constants/methods.js';
+import { MongoOperations } from '../../dist/constants/methods.js';
 import mongomod, {MmValidationError} from '../../dist/index.js';
 import { mongoCreds } from '../env.js';
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoMethods.Count;
+const collectionName = 'autotests-methods-' + MongoOperations.Count;
 const ctrl = new mongomod.Controller(db, collectionName);
 
 describe('Count. Adding fake data for testing', () => {

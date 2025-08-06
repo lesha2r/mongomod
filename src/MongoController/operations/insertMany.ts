@@ -1,11 +1,11 @@
 import Schema from 'validno';
-import QueryResult from '../QueryResult.js';
+import QueryResult from '../../QueryResult.js';
 import MongoController from '../MongoController.js';
-import { MongoMethods } from '../constants/methods.js';
-import { MmOperationError } from '../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../constants/operations.js';
-import { MmValidationError } from '../errors/validationError.js';
+import { MmOperationError } from '../../errors/operationError.js';
+import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
+import { MmValidationError } from '../../errors/validationError.js';
 import { ObjectId } from 'mongodb';
+import { MmControllerOperations } from '../../constants/controller.js';
 
 export interface MethodInsertManyOptions {
     data: {[key: string]: any}[]
@@ -17,7 +17,7 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
         code: MmOperationErrCodes.OperationFailed,
         message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
         dbName: dbName || null,
-        operation: MongoMethods.InsertMany,
+        operation: MmControllerOperations.InsertMany,
         originalError: err
     });
 }
@@ -27,7 +27,7 @@ const throwPartiallyFailedError = (err: any, dbName?: string): MmOperationError 
         code: MmOperationErrCodes.OperationPartiallyFailed,
         message: MmOperationErrMsgs.OperationPartiallyFailed,
         dbName: dbName || null,
-        operation: MongoMethods.InsertMany
+        operation: MmControllerOperations.InsertMany
     });
 }
 
@@ -56,7 +56,7 @@ const validateOptions = (options: MethodInsertManyOptions, dbName?: string): boo
             code: MmOperationErrCodes.InvalidOptions,
             message: MmOperationErrMsgs.InvalidOptions + '. ' + validationResult.joinErrors(),
             dbName: dbName || null,
-            operation: MongoMethods.InsertMany
+            operation: MmControllerOperations.InsertMany
         });
     }
 

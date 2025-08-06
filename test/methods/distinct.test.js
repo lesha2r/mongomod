@@ -1,4 +1,4 @@
-import { MongoMethods } from '../../dist/constants/methods.js';
+import { MongoOperations } from '../../dist/constants/methods.js';
 import mongomod from '../../dist/mongomod.js';
 import { mongoCreds } from '../env.js';
 
@@ -19,7 +19,7 @@ const testObj3 = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoMethods.Distinct;
+const collectionName = 'autotests-methods-' + MongoOperations.Distinct;
 const ctrl = new mongomod.Controller(db, collectionName);
 await ctrl.insertMany({data: [testObj, testObj2, testObj3]});
 

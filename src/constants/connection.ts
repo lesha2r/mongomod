@@ -1,4 +1,4 @@
-export const ConnectErrCodes = {
+export const MmConnectionErrCodes = {
     InvalidOptions: 'InvalidOptions',
     NotConnected: 'NotConnected',
     ConnectCallbackFunction: 'ConnectCallbackFunction',
@@ -7,7 +7,7 @@ export const ConnectErrCodes = {
     ConnectionTimeout: 'ConnectionTimeout'
 }
 
-export const ConnectErrMsgs = {
+export const MmConnectionErrMsgs = {
     InvalidOptions: 'Invalid connection options',
     NotConnected: 'MongoDB client is not connected',
     ConnectCallbackFunction: 'Connect callback must be a function',

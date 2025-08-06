@@ -1,9 +1,9 @@
-import { MongoMethods } from "../constants/methods.js";
-import { MmOperationErrCodes, MmOperationErrMsgs } from "../constants/operations.js";
-import { MmOperationError } from "../errors/operationError.js";
-import { MmValidationError } from "../errors/validationError.js";
+import { MmOperationErrCodes, MmOperationErrMsgs } from "../../constants/operations.js";
+import { MmOperationError } from "../../errors/operationError.js";
+import { MmValidationError } from "../../errors/validationError.js";
 import MongoController from "../MongoController.js";
-import QueryResult from "../QueryResult.js";
+import QueryResult from "../../QueryResult.js";
+import { MmControllerOperations } from "../../constants/controller.js";
 
 export type MethodEnsureIndexOptions = {keys: string[]}[]
 
@@ -60,7 +60,7 @@ async function ensureIndex(this: MongoController, checkIndexesArr: MethodEnsureI
             code: MmOperationErrCodes.OperationFailed,
             message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
             dbName: this.db.dbName || null,
-            operation: MongoMethods.EnsureIndex,
+            operation: MmControllerOperations.EnsureIndex,
             originalError: err
         });
 

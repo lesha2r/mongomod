@@ -1,4 +1,4 @@
-import { MmMethods, MmMethodsNames, MongoMethods } from '../../dist/constants/methods.js';
+import { MmOperations, MongoOperations } from '../../dist/constants/methods.js';
 import mongomod from '../../dist/mongomod.js';
 import { mongoCreds } from '../env.js';
 
@@ -9,7 +9,7 @@ const findOneTestObj = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoMethods.FindOne;
+const collectionName = 'autotests-methods-' + MongoOperations.FindOne;
 const ctrl = new mongomod.Controller(db, collectionName);
 await ctrl.insertOne(findOneTestObj);
 

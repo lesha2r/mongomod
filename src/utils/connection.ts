@@ -1,7 +1,7 @@
 import Schema from 'validno'
-import { MongomodConnectionOptions } from '../MongoConnection.js';
+import { MongomodConnectionOptions } from '../MongoConnection/index.js';
 import { MmValidationError } from '../errors/validationError.js';
-import { ConnectErrCodes, ConnectErrMsgs } from '../constants/connection.js';
+import { MmConnectionErrCodes, MmConnectionErrMsgs } from '../constants/connection.js';
 
 const connectionOptionsSchema = new Schema({
     link: {type: String},
@@ -18,8 +18,8 @@ export const validateOptions = (options: MongomodConnectionOptions) => {
         validationResult = connectionOptionsSchema.validate(options || {})
     } catch (err: any) {
         throw new MmValidationError({
-            code: ConnectErrCodes.InvalidOptions,
-            message: `${ConnectErrMsgs.InvalidOptions}: ${err.message}`,
+            code: MmConnectionErrCodes.InvalidOptions,
+            message: `${MmConnectionErrMsgs.InvalidOptions}: ${err.message}`,
             dbName: options?.dbName || null
         })
     }
@@ -27,8 +27,8 @@ export const validateOptions = (options: MongomodConnectionOptions) => {
     if (validationResult.ok === true) return true;
 
     throw new MmValidationError({
-        code: ConnectErrCodes.InvalidOptions,
-        message: `${ConnectErrMsgs.InvalidOptions}: ${validationResult.joinErrors()}`,
+        code: MmConnectionErrCodes.InvalidOptions,
+        message: `${MmConnectionErrMsgs.InvalidOptions}: ${validationResult.joinErrors()}`,
         dbName: options?.dbName || null
     })
 }
@@ -38,8 +38,8 @@ export const validateConnectCallback = (callback?: Function) => {
     if (typeof callback === 'function') return true;
 
     throw new MmValidationError({
-        code: ConnectErrCodes.ConnectCallbackFunction,
-        message: ConnectErrMsgs.ConnectCallbackFunction,
+        code: MmConnectionErrCodes.ConnectCallbackFunction,
+        message: MmConnectionErrMsgs.ConnectCallbackFunction,
         dbName: null
     });
 }

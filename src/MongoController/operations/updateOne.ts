@@ -1,11 +1,11 @@
 import { ObjectId, ReturnDocument } from 'mongodb';
 import MongoController from '../MongoController.js';
-import { MmOperationError } from '../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../constants/operations.js';
-import { MongoMethods } from '../constants/methods.js';
-import QueryResult from '../QueryResult.js';
-import { MmValidationError } from '../errors/validationError.js';
+import { MmOperationError } from '../../errors/operationError.js';
+import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
+import QueryResult from '../../QueryResult.js';
+import { MmValidationError } from '../../errors/validationError.js';
 import Schema from 'validno';
+import { MmControllerOperations } from '../../constants/controller.js';
 
 export type MethodUpdateOneOptions = {
     filter: {[key: string]: any}
@@ -26,7 +26,7 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
         code: MmOperationErrCodes.OperationFailed,
         message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
         dbName: dbName || null,
-        operation: MongoMethods.UpdateOne,
+        operation: MmControllerOperations.UpdateOne,
         originalError: err
     });
 }
@@ -47,7 +47,7 @@ const validateOptions = (options: MethodUpdateOneOptions, dbName?: string): bool
             code: MmOperationErrCodes.InvalidOptions,
             message: `${MmOperationErrMsgs.InvalidOptions}. ${validationResult.joinErrors()}`,
             dbName: dbName || null,
-            operation: MongoMethods.UpdateOne
+            operation: MmControllerOperations.UpdateOne
         });
     }
 
@@ -56,7 +56,7 @@ const validateOptions = (options: MethodUpdateOneOptions, dbName?: string): bool
             code: MmOperationErrCodes.NoData,
             message: `${MmOperationErrMsgs.NoData}. Data to update cannot be empty.`,
             dbName: dbName || null,
-            operation: MongoMethods.UpdateOne
+            operation: MmControllerOperations.UpdateOne
         });
     }
 

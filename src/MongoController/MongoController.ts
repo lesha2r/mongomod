@@ -1,21 +1,21 @@
-import MongoConnection from './MongoConnection.js';
-import { MmControllerError } from './errors/controllerError.js';
-import { validateControllerCollection, validateControllerDb } from './utils/controller.js';
+import MongoConnection from '../MongoConnection/index.js';
+import { MmControllerError } from '../errors/controllerError.js';
+import { validateControllerCollection, validateControllerDb } from '../utils/controller.js';
 // Methods
-import count, { MethodCountOptions } from './methods/count.js';
-import distinct, { MethodDistinctOptions } from './methods/distinct.js';
-import bulkWrite, { MethodBulkWriteOptions } from './methods/bulkWrite.js';
-import findOneMethod, { MethodFindOneOptions } from './methods/findOne.js';
-import aggregateMethod, { AggregationPipeline } from './methods/aggregate.js';
-import findManyMethod, { MethodFindManyOptions } from './methods/findMany.js';
-import deleteManyMethod, { MethodDeleteOptions } from './methods/deleteMany.js';
-import insertOneMethod, { MethodInsertOneOptions } from './methods/insertOne.js';
-import updateOneMethod, { MethodUpdateOneOptions } from './methods/updateOne.js';
-import deleteOneMethod, { MethodDeleteOneOptions } from './methods/deleteOne.js';
-import ensureIndex, { MethodEnsureIndexOptions } from './methods/ensureIndex.js';
-import updateManyMethod, { MethodUpdateManyOptions } from './methods/updateMany.js';
-import insertManyMethod, { MethodInsertManyOptions } from './methods/insertMany.js';
-import { ControllerErrCodes, ControllerErrMsgs } from './constants/controller.js';
+import count, { MethodCountOptions } from './operations/count.js';
+import distinct, { MethodDistinctOptions } from './operations/distinct.js';
+import bulkWrite, { MethodBulkWriteOptions } from './operations/bulkWrite.js';
+import findOneMethod, { MethodFindOneOptions } from './operations/findOne.js';
+import aggregateMethod, { AggregationPipeline } from './operations/aggregate.js';
+import findManyMethod, { MethodFindManyOptions } from './operations/findMany.js';
+import deleteManyMethod, { MethodDeleteOptions } from './operations/deleteMany.js';
+import insertOneMethod, { MethodInsertOneOptions } from './operations/insertOne.js';
+import updateOneMethod, { MethodUpdateOneOptions } from './operations/updateOne.js';
+import deleteOneMethod, { MethodDeleteOneOptions } from './operations/deleteOne.js';
+import ensureIndex, { MethodEnsureIndexOptions } from './operations/ensureIndex.js';
+import updateManyMethod, { MethodUpdateManyOptions } from './operations/updateMany.js';
+import insertManyMethod, { MethodInsertManyOptions } from './operations/insertMany.js';
+import { MmControllerErrCodes, MmControllerErrMsgs } from '../constants/controller.js';
 
 class MongoController {
     db: MongoConnection
@@ -29,12 +29,12 @@ class MongoController {
         this.collection = collection
     }
 
-    // Returns database client object
+    // Returns database client instance
     getClient() {
         if (!this.db || !this.db.client) {
             throw new MmControllerError({
-                code: ControllerErrCodes.NotConnected,
-                message: ControllerErrMsgs.NotConnected,
+                code: MmControllerErrCodes.NotConnected,
+                message: MmControllerErrMsgs.NotConnected,
                 dbName: this.db?.dbName || null
             });
         }
@@ -42,6 +42,7 @@ class MongoController {
         return this.db.client;
     }
 
+    // Returns collection controller instance
     getCollectionCtrl() {
         const client = this.getClient();
         const db = client.db(this.db.dbName);

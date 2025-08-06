@@ -1,3 +1,5 @@
+// Last stages check: 06 August 2025
+
 interface StageAddFields {
     $addFields: {[key: string]: any}
 }

@@ -1,4 +1,4 @@
-import { MmMethods } from "../constants/methods.js"
+import { MmMethods } from "../constants/model.js"
 
 export type ReservedMethod = 
     typeof MmMethods.Validate |

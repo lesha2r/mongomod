@@ -1,10 +1,10 @@
 import Schema from "validno";
-import { MongoMethods } from "../constants/methods.js"
-import { MmOperationErrCodes, MmOperationErrMsgs } from "../constants/operations.js"
-import { MmOperationError } from "../errors/operationError.js"
-import { MmValidationError } from "../errors/validationError.js"
+import { MmOperationErrCodes, MmOperationErrMsgs } from "../../constants/operations.js"
+import { MmOperationError } from "../../errors/operationError.js"
+import { MmValidationError } from "../../errors/validationError.js"
 import MongoController from "../MongoController.js"
-import QueryResult from "../QueryResult.js"
+import QueryResult from "../../QueryResult.js"
+import { MmControllerOperations } from "../../constants/controller.js";
 
 export interface MethodUpdateManyOptions {
     filter: {[key: string]: any}
@@ -19,7 +19,7 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
         code: MmOperationErrCodes.OperationFailed,
         message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
         dbName: dbName || null,
-        operation: MongoMethods.UpdateMany,
+        operation: MmControllerOperations.UpdateMany,
         originalError: err
     });
 }
@@ -82,7 +82,7 @@ const validateOptions = (options: MethodUpdateManyOptions, dbName?: string): boo
             code: MmOperationErrCodes.InvalidOptions,
             message: MmOperationErrMsgs.InvalidOptions + '. ' + validationResult.joinErrors(),
             dbName: dbName || null,
-            operation: MongoMethods.UpdateMany
+            operation: MmControllerOperations.UpdateMany
         });
     }
 
@@ -102,7 +102,7 @@ async function updateMany(this: MongoController, options: MethodUpdateManyOption
                 code: MmOperationErrCodes.OperationFailed,
                 message: MmOperationErrMsgs.OperationFailed,
                 dbName: this.db.dbName,
-                operation: MongoMethods.UpdateMany
+                operation: MmControllerOperations.UpdateMany
             });
         }
 

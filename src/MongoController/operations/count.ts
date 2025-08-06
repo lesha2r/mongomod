@@ -1,10 +1,10 @@
-import { MongoMethods } from '../constants/methods.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../constants/operations.js';
-import { MmOperationError } from '../errors/operationError.js';
-import { MmValidationError } from '../errors/validationError.js';
+import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
+import { MmOperationError } from '../../errors/operationError.js';
+import { MmValidationError } from '../../errors/validationError.js';
 import MongoController from '../MongoController.js';
-import QueryResult from '../QueryResult.js';
+import QueryResult from '../../QueryResult.js';
 import Schema, {validations} from 'validno'
+import { MmControllerOperations } from '../../constants/controller.js';
 
 export interface MethodCountOptions {
     filter?: {[key: string]: any},
@@ -15,7 +15,7 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
         code: MmOperationErrCodes.OperationFailed,
         message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
         dbName: dbName || null,
-        operation: MongoMethods.Count,
+        operation: MmControllerOperations.Count,
         originalError: err
     }); 
 }
@@ -24,7 +24,7 @@ const throwValidationError = (value: any, message: string) => {
     throw new MmValidationError({
         code: MmOperationErrCodes.InvalidOptions,
         message: `${MmOperationErrMsgs.InvalidOptions} (${JSON.stringify(value)}). ${message}`,
-        operation: MongoMethods.Count,
+        operation: MmControllerOperations.Count,
         value
     });
 }

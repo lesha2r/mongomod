@@ -3,6 +3,7 @@ export const MongomodErrCodes = {
     WrongSchema: 'WrongSchema',
     ReservedMethodName: 'ReservedMethodName',
     CustomMethodNotFunction: 'CustomMethodNotFunction',
+    CustomMethodInvalidated: 'CustomMethodInvalidated',
     CannotUsedWithoutNew: 'CannotUsedWithoutNew'
 }
 export const MongomodErrMsgs = {
@@ -10,5 +11,6 @@ export const MongomodErrMsgs = {
     WrongSchema: 'Provided schema is not an instance of MongoSchema',
     ReservedMethodName: `Method name is reserved for built-in methods`,
     CustomMethodNotFunction: 'Custom method is not a function',
+    CustomMethodInvalidated: 'Custom methods validation failed',
     CannotUsedWithoutNew: 'Class constructor cannot be invoked without "new"'
 }

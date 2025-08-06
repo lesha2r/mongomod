@@ -1,10 +1,10 @@
-import { MongoMethods } from '../../dist/constants/methods.js';
+import { MongoOperations } from '../../dist/constants/methods.js';
 import mongomod from '../../dist/mongomod.js';
 import { mongoCreds } from '../env.js';
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoMethods.InsertMany;
+const collectionName = 'autotests-methods-' + MongoOperations.InsertMany;
 const ctrl = new mongomod.Controller(db, collectionName);
 
 describe('InsertMany. Input validation: wrong cases', () => {

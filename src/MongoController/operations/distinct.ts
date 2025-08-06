@@ -1,9 +1,9 @@
 import MongoController from '../MongoController.js';
-import { MmOperationError } from '../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../constants/operations.js';
-import { MongoMethods } from '../constants/methods.js';
-import QueryResult from '../QueryResult.js';
-import { MmValidationError } from '../errors/validationError.js';
+import { MmOperationError } from '../../errors/operationError.js';
+import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
+import QueryResult from '../../QueryResult.js';
+import { MmValidationError } from '../../errors/validationError.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 
 export interface MethodDistinctOptions {
     field: string
@@ -16,7 +16,7 @@ const validateDistinctOptions = (options: MethodDistinctOptions, dbName?: string
             code: MmOperationErrCodes.NoField,
             message: MmOperationErrMsgs.NoField,
             dbName: dbName || null,
-            operation: MongoMethods.Distinct
+            operation: MmControllerOperations.Distinct
         });
     }
 
@@ -28,7 +28,7 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
         code: MmOperationErrCodes.OperationFailed,
         message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
         dbName: dbName || null,
-        operation: MongoMethods.Distinct,
+        operation: MmControllerOperations.Distinct,
         originalError: err
     });
 }
