@@ -1,8 +1,13 @@
+import { MongoMethods } from "../constants/methods.js";
+import { MmOperationErrCodes, MmOperationErrMsgs } from "../constants/operations.js";
+import { MmOperationError } from "../errors/operationError.js";
+import { MmValidationError } from "../errors/validationError.js";
 import MongoController from "../MongoController.js";
+import QueryResult from "../QueryResult.js";
 
 export type MethodEnsureIndexOptions = {keys: string[]}[]
 
-export type MethodEnsureIndexResult = {
+export interface MethodEnsureIndexResult {
     isChecked: boolean,
     byKeys: {[key: string]: boolean},
     passed: string[],
@@ -10,8 +15,8 @@ export type MethodEnsureIndexResult = {
 }
 
 // Ensures index is created in collection
-export default function ensureIndex(this: MongoController, checkIndexesArr: MethodEnsureIndexOptions): Promise<MethodEnsureIndexResult> {
-    return new Promise(async (resolve, reject) => {
+async function ensureIndex(this: MongoController, checkIndexesArr: MethodEnsureIndexOptions) {
+    try {
         const client = this.getClient()
         const db = client.db(this.db.dbName);
         const col = db.collection(this.collection);
@@ -47,6 +52,21 @@ export default function ensureIndex(this: MongoController, checkIndexesArr: Meth
     
         output.isChecked = Object.values(output.byKeys).every((el) => el === true);
     
-        resolve(output);
-    })
+        return new QueryResult(true, output);
+    } catch (err: any) {
+        if (err instanceof MmValidationError) throw err;
+
+        throw new MmOperationError({
+            code: MmOperationErrCodes.OperationFailed,
+            message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+            dbName: this.db.dbName || null,
+            operation: MongoMethods.EnsureIndex,
+            originalError: err
+        });
+
+        // This line is unreachable but included for type consistency
+        return new QueryResult(false, null);
+    }
 };
+
+export default ensureIndex;

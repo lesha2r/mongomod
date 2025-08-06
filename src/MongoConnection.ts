@@ -61,11 +61,11 @@ class MongoConnection {
             timeoutId = setTimeout(() => {
                 if (this.isConnected) return;
                 
-                throw new MmConnectionError(
-                    ConnectErrCodes.ConnectionTimeout,
-                    ConnectErrMsgs.ConnectionTimeout,
-                    this.dbName || null
-                );
+                throw new MmConnectionError({
+                    code: ConnectErrCodes.ConnectionTimeout,
+                    message: ConnectErrMsgs.ConnectionTimeout,
+                    dbName: this.dbName || null
+                });
             }, timeout || 30000);
 
             const result = await mongoClient.connect();
@@ -83,12 +83,12 @@ class MongoConnection {
             this.isConnected = false;
             this.client = null;
 
-            throw new MmConnectionError(
-                ConnectErrCodes.ConnectionFailed,
-                ConnectErrMsgs.ConnectionFailed,
-                this.dbName || null,
-                err
-            );
+            throw new MmConnectionError({
+                code: ConnectErrCodes.ConnectionFailed,
+                message: ConnectErrMsgs.ConnectionFailed,
+                dbName: this.dbName || null,
+                originalError: err
+            });
         }
     }
 
@@ -105,12 +105,12 @@ class MongoConnection {
 
             return true
         } catch (err) {
-            throw new MmConnectionError(
-                ConnectErrCodes.CloseConnectionFailed,
-                ConnectErrMsgs.CloseConnectionFailed,
-                this.dbName || null,
-                err
-            );
+            throw new MmConnectionError({
+                code: ConnectErrCodes.CloseConnectionFailed,
+                message: ConnectErrMsgs.CloseConnectionFailed,
+                dbName: this.dbName || null,
+                originalError: err
+            });
         }
     };
 

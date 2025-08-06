@@ -1,57 +1,119 @@
+import Schema from "validno";
+import { MongoMethods } from "../constants/methods.js"
+import { MmOperationErrCodes, MmOperationErrMsgs } from "../constants/operations.js"
+import { MmOperationError } from "../errors/operationError.js"
+import { MmValidationError } from "../errors/validationError.js"
 import MongoController from "../MongoController.js"
-import { MethodResult } from "../types/methods.js"
+import QueryResult from "../QueryResult.js"
 
-export type MethodUpdateManyOptions = {
-    query: {[key: string]: any}
-    data: {[key: string]: any}
-    upsert?: boolean
-    unset?: boolean
+export interface MethodUpdateManyOptions {
+    filter: {[key: string]: any}
+    update: {[key: string]: any}
+    params?: {
+        upsert?: boolean
+    }
 }
 
-// Updates many documents matching the query
-export default function updateMany(this: MongoController, options: MethodUpdateManyOptions): Promise<MethodResult>  {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let { query, data, upsert, unset } = options;
-            
-            const collection = this.collection;
+const throwOperationError = (err: any, dbName?: string): MmOperationError => {
+    throw new MmOperationError({
+        code: MmOperationErrCodes.OperationFailed,
+        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        dbName: dbName || null,
+        operation: MongoMethods.UpdateMany,
+        originalError: err
+    });
+}
 
-            const client = this.getClient()
-            const db = client.db(this.db.dbName);
-            const col = db.collection(collection);
-        
-            // Checks, validations
-            if (!collection) throw new Error('no collection specified');
-            let upsertParam = (!upsert) ? { upsert: false } : { upsert: upsert };
-            if (!query) query = {};
+const parseOptions = (options: MethodUpdateManyOptions): UpdateManyOptions => {
+    const { filter = {}, update } = options;
 
-            type TUpdateManySet = {$unset: {}}|{$set: {}}
+    const upsert = (typeof options.params?.upsert !== 'boolean') ? false : options.params.upsert;
+    let updateRe: UpdateManyUpdate = update || {};
 
-            const setDefault: TUpdateManySet = (unset === true) ? { $unset: data } : { $set: data};
-            let setRe: TUpdateManySet | {[key: string]: any} = {}
+    // checks that update has atomic operators and add $set if not
+    if (Object.keys(updateRe).length > 0 && Object.keys(updateRe).every(key => !key.startsWith('$'))) {
+        updateRe = { $set: updateRe };
+    }
 
-            // In case if 'set' operator is not needed
-            if (data.$addToSet) setRe = data;
-            else if (data.$pull) setRe = data;
-            else if (data.$inc) setRe = data;
-            else setRe = setDefault
+    return {
+        filter,
+        update: updateRe,
+        params: {
+            upsert
+        },
+    };
+}
 
-            const result = await col.updateMany(
-                query,
-                setRe,
-                upsertParam
-            );
-            
-            resolve({
-                ok: true,
-                result: result
-            });
-        } catch (err) {
-            reject({
-                ok: false,
-                details: 'error catched',
-                error: err
-            });
+interface UpdateManyFilter {
+    [key: string]: any
+}
+
+interface UpdateManyUpdate {
+    $set?: {[key: string]: any}
+    $unset?: {[key: string]: any}
+    [key: string]: any
+}
+
+interface UpdateManyParams {
+    upsert: boolean
+    unset?: boolean
+    [key: string]: any
+}
+
+interface UpdateManyOptions {
+    filter: UpdateManyFilter
+    update: UpdateManyUpdate
+    params: UpdateManyParams
+}
+
+const validateOptions = (options: MethodUpdateManyOptions, dbName?: string): boolean => {
+    const optionsSchema = new Schema({
+        filter: { type: Object, required: false },
+        update: { type: Object, required: true },
+        params: {
+            upsert: { type: Boolean, required: false }
         }
     });
+
+    const validationResult = optionsSchema.validate(options);
+
+    if (!validationResult.ok) {
+        throw new MmValidationError({
+            code: MmOperationErrCodes.InvalidOptions,
+            message: MmOperationErrMsgs.InvalidOptions + '. ' + validationResult.joinErrors(),
+            dbName: dbName || null,
+            operation: MongoMethods.UpdateMany
+        });
+    }
+
+    return true;
+}
+
+async function updateMany(this: MongoController, options: MethodUpdateManyOptions)  {
+    try {
+        validateOptions(options, this.db.dbName);
+        const { filter, update, params } = parseOptions(options);
+        
+        const collection = this.getCollectionCtrl();
+        const result = await collection.updateMany(filter, update, params);
+        
+        if (!result.acknowledged) {
+            throw new MmOperationError({
+                code: MmOperationErrCodes.OperationFailed,
+                message: MmOperationErrMsgs.OperationFailed,
+                dbName: this.db.dbName,
+                operation: MongoMethods.UpdateMany
+            });
+        }
+
+        return new QueryResult(true, result);
+    } catch (err: any) {
+        if (err instanceof MmValidationError) throw err;
+        throwOperationError(err, this.db.dbName);
+
+        // This line is unreachable but included for type consistency
+        return new QueryResult(false, null);
+    }
 };
+
+export default updateMany;

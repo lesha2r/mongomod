@@ -1,67 +1,110 @@
-import { ObjectId } from 'mongodb';
-import { MethodResult } from '../types/methods.js';
+import { ObjectId, ReturnDocument } from 'mongodb';
 import MongoController from '../MongoController.js';
+import { MmOperationError } from '../errors/operationError.js';
+import { MmOperationErrCodes, MmOperationErrMsgs } from '../constants/operations.js';
+import { MongoMethods } from '../constants/methods.js';
+import QueryResult from '../QueryResult.js';
+import { MmValidationError } from '../errors/validationError.js';
+import Schema from 'validno';
 
 export type MethodUpdateOneOptions = {
-    query: {[key: string]: any}
-    data: {[key: string]: any}
-    upsert?: boolean
-    unset?: boolean
+    filter: {[key: string]: any}
+    update: {[key: string]: any}
+    params?: {
+        upsert?: boolean
+    }
 }
 
-// Updates one document matching the query
-export default function updateOne(this: MongoController, options: MethodUpdateOneOptions): Promise<MethodResult> {
-    return new Promise(async (resolve, reject) => {
-        let { 
-            query,
-            data,
-            upsert,
-            unset
-        } = options;
+const throwOperationError = (err: any, dbName?: string): MmOperationError => {
+    // if (err.code === 121) {
+    //     reject({ ok: false, details: 'validation failed', error: err });
+    // } else {
+    //     reject({ ok: false, details: 'error catched', error: err });
+    // }
 
-        const collection = this.collection;
-
-        // Check, validate, prepare data
-        if (!collection) throw new Error('no collection specified');
-        if (!query) query = {};
-        if (query._id) query._id = new ObjectId(query._id);
-
-        if (!data && Object.keys(data).length === 0) throw new Error('missing data object');
-
-        const upsertParam = (!upsert) ? { upsert: false } : { upsert: upsert };
-
-        type TUpdateManySet = {$unset: {}}|{$set: {}}
-        const setDefault: TUpdateManySet = (unset === true) ? { $unset: data } : { $set: data};
-        let setRe: TUpdateManySet | {[key: string]: any} = {}
-
-        if (data.$addToSet) setRe = data;
-        else if (data.$pull) setRe = data;
-        else if (data.$inc) setRe = data;
-        else setRe = setDefault
-        
-        try {
-            const client = this.getClient()
-            const db = client.db(this.db.dbName);
-            const col = db.collection(collection);
-            
-            const result = await col.findOneAndUpdate(query, setRe, upsertParam);
-
-            if (!result || result.ok !== 1) {
-                reject({ ok: false, details: 'document not found or something went wrong' });
-                return;
-            } else if (result) {
-                resolve({
-                    ok: true,
-                    result: result
-                });
-            }
-        } catch (err) {
-            // @ts-ignore
-            if (err.code === 121) {
-                reject({ ok: false, details: 'validation failed', error: err });
-            } else {
-                reject({ ok: false, details: 'error catched', error: err });
-            }
-        }
+    throw new MmOperationError({
+        code: MmOperationErrCodes.OperationFailed,
+        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        dbName: dbName || null,
+        operation: MongoMethods.UpdateOne,
+        originalError: err
     });
+}
+
+const optionsSchema = new Schema({
+    filter: { type: Object },
+    update: { type: Object },
+    params: {
+        upsert: { type: Boolean, required: false },
+    }
+})
+
+const validateOptions = (options: MethodUpdateOneOptions, dbName?: string): boolean => {
+    const validationResult = optionsSchema.validate(options);
+    
+    if (!validationResult.ok) {
+        throw new MmValidationError({
+            code: MmOperationErrCodes.InvalidOptions,
+            message: `${MmOperationErrMsgs.InvalidOptions}. ${validationResult.joinErrors()}`,
+            dbName: dbName || null,
+            operation: MongoMethods.UpdateOne
+        });
+    }
+
+    if (!options.update || Object.keys(options.update).length === 0) {
+        throw new MmValidationError({
+            code: MmOperationErrCodes.NoData,
+            message: `${MmOperationErrMsgs.NoData}. Data to update cannot be empty.`,
+            dbName: dbName || null,
+            operation: MongoMethods.UpdateOne
+        });
+    }
+
+    return true;
+}
+
+const parseOptions = (options: MethodUpdateOneOptions) => {
+    const filter = options.filter || {};
+    let updateRe = options.update || {};
+    const params = {
+        upsert: (!options.params || typeof options.params?.upsert !== 'boolean') ? false : options.params.upsert,
+        returnDocument: ReturnDocument.AFTER // default to returning the updated document
+    }
+
+    // convert _id to ObjectId if it's a string
+    if (filter._id) filter._id = new ObjectId(filter._id);
+    
+    // checks that update has atomic operators and add $set if not
+    if (Object.keys(updateRe).length > 0 && Object.keys(updateRe).every(key => !key.startsWith('$'))) {
+        updateRe = { $set: updateRe };
+    }
+
+    return {
+        filter,
+        update: updateRe,
+        params
+    };
 };
+
+// Updates one document matching the filter
+async function updateOne(this: MongoController, options: MethodUpdateOneOptions) {
+    try {
+        validateOptions(options, this.db.dbName);
+        const { filter, update, params } = parseOptions(options);
+
+        const collection = this.getCollectionCtrl();
+        const result = await collection.findOneAndUpdate(
+            filter, update, params
+        );
+
+        return new QueryResult(true, result.value)
+    } catch (err: any) {
+        if (err instanceof MmValidationError) throw err;
+        throwOperationError(err, this.db.dbName);
+
+        // This line is unreachable but included for type consistency
+        return new QueryResult(false, null);
+    }
+};
+
+export default updateOne;

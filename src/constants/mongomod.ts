@@ -1,11 +1,11 @@
-export const MongomodErrorCodes = {
+export const MongomodErrCodes = {
     WrongInstance: 'WrongInstance',
     WrongSchema: 'WrongSchema',
     ReservedMethodName: 'ReservedMethodName',
     CustomMethodNotFunction: 'CustomMethodNotFunction',
     CannotUsedWithoutNew: 'CannotUsedWithoutNew'
 }
-export const MongomodErrorMessages = {
+export const MongomodErrMsgs = {
     WrongInstance: 'Provided db is not an instance of MongoConnection',
     WrongSchema: 'Provided schema is not an instance of MongoSchema',
     ReservedMethodName: `Method name is reserved for built-in methods`,

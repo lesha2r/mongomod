@@ -1,3 +1,4 @@
-export * from './validation.js';
-export * from './connection.js';
-export * from './operation.js';
+export * from './validationError.js';
+export * from './connectionError.js';
+export * from './operationError.js';
+export * from './controllerError.js';

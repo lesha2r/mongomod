@@ -1,7 +1,12 @@
-// ** DONE **
 import Schema from 'validno'
 
 type MongomodSchemaSettings = { strict: boolean }
+
+const validateSchemaInput = (input: any) => {
+    if (typeof input !== 'object' || input === null || Array.isArray(input)) {
+        throw new Error('Schema definition must be a non-null object')
+    }
+}
 
 class MongoSchema {
     settings: MongomodSchemaSettings
@@ -11,6 +16,8 @@ class MongoSchema {
         schemaObj: { [key: string]: any } = {},
         options: MongomodSchemaSettings = { strict: false }
     ) {
+        validateSchemaInput(schemaObj)
+
         this.settings = {
             strict: options.strict || true
         };

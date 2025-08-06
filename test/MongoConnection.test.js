@@ -1,30 +1,13 @@
 import { jest } from '@jest/globals';
 import mongomod from '../dist/mongomod.js';
-import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
-import path from 'path';
-import { link } from 'fs';
+import { mongoCreds } from './env.js'
 
-// Init dotenv module
-dotenv.config({
-    path: path.join(path.resolve(path.dirname('')), "/.env")
-});
-
-const TIMEOUT_MS = 25000
-
-const credsDummy = {
+const brokenCreds = {
     link: 'test.dummy.link:27888',
     login: 'login',
     password: 'pass',
     dbName: 'dbName'
-};
-
-const credsOK = {
-    link: process.env.MONGO_LINK,
-    login: process.env.MONGO_USER,
-    password: process.env.MONGO_PASSWORD,
-    dbName: process.env.MONGO_DBNAME,
-    srv: process.env.MONGO_SRV === 'true' ? true : false
 };
 
 // describe('MongoConnection validation', () => {
@@ -67,7 +50,7 @@ const credsOK = {
 
 describe('MongoConnection.connect', () => {
     test('Connects to MongoDB with valid credentials', async () => {
-        const db = new mongomod.Connection(credsOK);
+        const db = new mongomod.Connection(mongoCreds);
         await db.connect()
 
         expect(db.client).toBeInstanceOf(MongoClient);
@@ -78,22 +61,22 @@ describe('MongoConnection.connect', () => {
 
     test('Connection to MongoDB with invalid credentials fails', async () => {
         const db = new mongomod.Connection({
-            ...credsOK,
-            login: credsDummy.login,
+            ...mongoCreds,
+            login: brokenCreds.login,
         });
 
         await expect(db.connect()).rejects.toThrow();
     });
 
     test('Connect callback fails validation if not a function', async () => {
-        const db = new mongomod.Connection(credsOK);
+        const db = new mongomod.Connection(mongoCreds);
 
         expect(db.connect('not a function')).rejects.toThrow();
         await db.disconnect()
     });
 
     test('Connect callback is called on successful connection', async () => {
-        const db = new mongomod.Connection(credsOK);
+        const db = new mongomod.Connection(mongoCreds);
         const callback = jest.fn();
 
         await db.connect(callback);
@@ -107,7 +90,7 @@ describe('MongoConnection.connect', () => {
 
 describe('MongoConnection.disconnect', () => {
     test('Disconnects from MongoDB', async () => {
-        const db = new mongomod.Connection(credsOK);
+        const db = new mongomod.Connection(mongoCreds);
         await db.connect();
 
         expect(db.isConnected).toBe(true);
@@ -119,7 +102,7 @@ describe('MongoConnection.disconnect', () => {
     });
 
     test('Disconnect does not throw if not connected', async () => {
-        const db = new mongomod.Connection(credsOK);
+        const db = new mongomod.Connection(mongoCreds);
         await expect(db.disconnect()).resolves.not.toThrow();
     });
 });

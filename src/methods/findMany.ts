@@ -1,44 +1,82 @@
 import { ObjectId } from 'mongodb';
-import { MethodResult } from '../types/methods.js';
+import Schema from 'validno'
 import MongoController from '../MongoController.js';
+import { MmOperationError } from '../errors/operationError.js';
+import { MmOperationErrCodes, MmOperationErrMsgs } from '../constants/operations.js';
+import { MongoMethods } from '../constants/methods.js';
+import QueryResult from '../QueryResult.js';
+import { MmValidationError } from '../errors/validationError.js';
 
-export type MethodFindManyOptions = {
-    query: {[key: string]: any}
+export interface MethodFindManyOptions {
+    filter: {[key: string]: any}
     limit?: number
     skip?: number
 }
 
-// Finds many documents matching the query
-export default function findMany(this: MongoController, options: MethodFindManyOptions): Promise<MethodResult> {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let { query, limit, skip } = options;
-            const collection = this.collection;
+interface MethodFindManyParsedOptions {
+    filter: {[key: string]: any}
+    limit: number
+    skip: number
+}
 
-            // Check and validate
-            if (!collection) throw new Error('no collection specified');
+const MAX_QUERY_LIMIT = 99999
 
-            if (!query) query = {};
-            if (!limit) limit = 99999999;
-            if (!skip) skip = 0;
+const validateOptions = (options: MethodFindManyParsedOptions) => {
+    const optionsSchema = new Schema({
+        filter: { type: Object, required: true },
+        limit: { type: Number, required: false },
+        skip: { type: Number, required: false }
+    })
 
-            if (query._id) query._id = new ObjectId(query._id);
-
-            const client = this.getClient()
-
-            const db = client.db(this.db.dbName);
-            const col = db.collection(collection);
-
-            const result = await col.find(query).limit(limit).skip(skip).toArray();
-
-            if (!result || Array.isArray(result) && result.length === 0) {
-                resolve({ ok: true, details: 'nothing found', result: [] });
-                return;
-            }
-            
-            if (result) resolve({ ok: true, result: result });
-        } catch (err) {
-            if (err) reject({ ok: false, details: 'error catched', error: err });
-        }
+    const validationResult = optionsSchema.validate(options);
+    if (!validationResult.ok) throw new MmValidationError({
+        code: MmOperationErrCodes.InvalidOptions,
+        message: `${MmOperationErrMsgs.InvalidOptions}. ${validationResult.joinErrors()}`,
+        dbName: null,
+        operation: MongoMethods.FindMany
     });
+}
+
+const parseOptions = (options: MethodFindManyOptions): MethodFindManyParsedOptions => {
+    let filter = options.filter || {};
+    let limit = options.limit || MAX_QUERY_LIMIT; // Default to a very high limit
+    let skip = options.skip || 0; // Default to no skip
+
+    if (filter._id && typeof filter._id === "string") {
+        filter._id = new ObjectId(filter._id); // Convert _id to ObjectId if it exists
+    }
+
+    const output = { filter, limit, skip };
+
+    return output;
+}
+
+const throwOperationError = (err: any, dbName?: string): MmOperationError => {
+    throw new MmOperationError({
+        code: MmOperationErrCodes.OperationFailed,
+        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        dbName: dbName || null,
+        operation: MongoMethods.FindMany,
+        originalError: err
+    });
+}
+
+async function findMany(this: MongoController, options: MethodFindManyOptions) {
+    try {
+        const { filter, limit, skip } = parseOptions(options);
+        validateOptions({ filter, limit, skip });
+        
+        const collection = this.getCollectionCtrl();
+        const result = await collection.find(filter).limit(limit).skip(skip).toArray();
+
+        return new QueryResult(true, result);
+    } catch (err: any) {
+        if (err instanceof MmValidationError) throw err;
+        throwOperationError(err, this.db.dbName);
+
+        // This line is unreachable but included for type consistency
+        return new QueryResult(false, null);
+    }
 };
+
+export default findMany;

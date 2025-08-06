@@ -11,6 +11,22 @@ export const MmMethods = {
     Delete: 'delete'
 }
 
+export const MongoMethods = {
+    Aggregate: 'aggregate',
+    FindOne: 'findOne',
+    FindMany: 'findMany',
+    InsertOne: 'insertOne',
+    UpdateOne: 'updateOne',
+    DeleteOne: 'deleteOne',
+    EnsureIndex: 'ensureIndex',
+    UpdateMany: 'updateMany',
+    InsertMany: 'insertMany',
+    BulkWrite: 'bulkWrite',
+    DeleteMany: 'deleteMany',
+    Count: 'count',
+    Distinct: 'distinct'
+}
+
 export const MmMethodsNames: ReservedMethod[] = [
     MmMethods.Validate,
     MmMethods.ClearBySchema,

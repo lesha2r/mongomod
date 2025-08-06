@@ -1,12 +1,8 @@
 .env
-dev.js
-
+examples
+/*/dev.*
 node_modules
 dist
-
-examples
-testapp.js
-
 TODO.md
 TODOS.md
 TODOS_le.md

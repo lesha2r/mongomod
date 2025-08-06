@@ -1,12 +1,5 @@
 import { MmMethods } from "../constants/methods.js"
 
-export type MethodResult = {
-    ok: boolean,
-    result: {[key: string]: any}|{[key: string]: any}[],
-    details?: string
-    error?: string
-}
-
 export type ReservedMethod = 
     typeof MmMethods.Validate |
     typeof MmMethods.ClearBySchema |
