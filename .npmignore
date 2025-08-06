@@ -2,3 +2,10 @@ src
 tests
 jest.config.ts
 .eslintrc.*
+.env
+examples
+/*/dev.*
+node_modules
+TODO.md
+TODOS.md
+TODOS_le.md
