@@ -1,7 +1,6 @@
 import { filterObject } from '../utils/common.js';
 import _constructorUtils from './utils/constructor.utils.js';
 import MongoController from "../MongoController/index.js";
-import { MmModelErrCodes, MmModelErrMsgs } from '../constants/model.js';
 import { MmOperationError } from '../errors/index.js';
 import clearBySchema from './methods/cleaBySchema.js';
 import init from './methods/init.js';
@@ -11,6 +10,7 @@ import get from './methods/get.js';
 import save from './methods/save.js';
 import deleteMethod from './methods/delete.js';
 import validate from './methods/validate.js';
+import { MmModelErrors } from '../constants/model.js';
 const MongoModelMethods = {
     FindOne: 'findOne',
     FindMany: 'findMany',
@@ -44,8 +44,8 @@ class MongoModel extends MongoController {
         if (this.modelData)
             return true;
         throw new MmOperationError({
-            code: MmModelErrCodes.ModelDataEmpty,
-            message: MmModelErrMsgs.ModelDataEmpty,
+            code: MmModelErrors.ModelDataEmpty.code,
+            message: MmModelErrors.ModelDataEmpty.message,
             dbName: this.db.dbName,
             operation: 'ensureModelData'
         });
@@ -55,8 +55,8 @@ class MongoModel extends MongoController {
         if (this.modelData && this.modelData._id)
             return true;
         throw new MmOperationError({
-            code: MmModelErrCodes.MissingId,
-            message: MmModelErrMsgs.MissingId,
+            code: MmModelErrors.MissingId.code,
+            message: MmModelErrors.MissingId.message,
             dbName: this.db.dbName,
             operation: 'ensureModelId'
         });

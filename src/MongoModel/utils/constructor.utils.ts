@@ -1,11 +1,11 @@
-import { MongomodErrCodes, MongomodErrMsgs } from "../../constants/mongomod.js";
+import { MmModelErrors } from "../../constants/model.js";
 import { MmValidationError } from "../../errors/validationError.js";
 import MongoModel from "../MongoModel.js";
 
 const throwCustomMethodError = (methodName: string) => {
     throw new MmValidationError({
-        code: MongomodErrCodes.CustomMethodNotFunction,
-        message: `${MongomodErrMsgs.CustomMethodNotFunction}: ${methodName}`,
+        code: MmModelErrors.CustomMethodNotFunction.code,
+        message: `${MmModelErrors.CustomMethodNotFunction.message}: ${methodName}`,
     });
 }
 

@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 async function save(insertIfNotExists = false) {
     this.ensureModelData();
     const dataFrozen = _.clone(this._modelDataBeforeSave);
@@ -16,8 +16,8 @@ async function save(insertIfNotExists = false) {
             });
             if (!result.ok) {
                 throw new MmOperationError({
-                    code: MmModelErrCodes.SaveFailed,
-                    message: MmModelErrMsgs.SaveFailed,
+                    code: MmModelErrors.SaveFailed.code,
+                    message: MmModelErrors.SaveFailed.message,
                     dbName: this.db.dbName,
                     operation: 'save'
                 });
@@ -32,8 +32,8 @@ async function save(insertIfNotExists = false) {
             throw err;
         }
         throw new MmOperationError({
-            code: MmModelErrCodes.SaveFailed,
-            message: `${MmModelErrMsgs.SaveFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+            code: MmModelErrors.SaveFailed.code,
+            message: `${MmModelErrors.SaveFailed.message}: ${err instanceof Error ? err.message : 'Unknown error'}`,
             dbName: this.db.dbName,
             operation: 'save'
         });

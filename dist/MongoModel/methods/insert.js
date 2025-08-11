@@ -1,5 +1,5 @@
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 async function insert() {
     this.ensureModelData();
     const dataFrozen = this.data(true);
@@ -7,8 +7,8 @@ async function insert() {
         const result = await this.insertOne(this.modelData);
         if (!result.ok) {
             throw new MmOperationError({
-                code: MmModelErrCodes.InsertFailed,
-                message: MmModelErrMsgs.InsertFailed,
+                code: MmModelErrors.InsertFailed.code,
+                message: MmModelErrors.InsertFailed.message,
                 dbName: this.db.dbName,
                 operation: 'insert'
             });
@@ -24,7 +24,7 @@ async function insert() {
             throw err;
         }
         throw new MmOperationError({
-            code: MmModelErrCodes.SaveFailed,
+            code: MmModelErrors.InsertFailed.code,
             message: `Failed to insert model to database: ${err instanceof Error ? err.message : 'Unknown error'}`,
             dbName: this.db.dbName,
             operation: 'insert'

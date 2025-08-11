@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import MongoModel from '../MongoModel.js';
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 
 async function insert(this: MongoModel): Promise<MongoModel> {
     this.ensureModelData();
@@ -12,8 +12,8 @@ async function insert(this: MongoModel): Promise<MongoModel> {
 
         if (!result.ok) {
             throw new MmOperationError({
-                code: MmModelErrCodes.InsertFailed,
-                message: MmModelErrMsgs.InsertFailed,
+                code: MmModelErrors.InsertFailed.code,
+                message: MmModelErrors.InsertFailed.message,
                 dbName: this.db.dbName,
                 operation: 'insert'
             });
@@ -33,7 +33,7 @@ async function insert(this: MongoModel): Promise<MongoModel> {
 
         // Wrap other errors
         throw new MmOperationError({
-            code: MmModelErrCodes.SaveFailed,
+            code: MmModelErrors.InsertFailed.code,
             message: `Failed to insert model to database: ${err instanceof Error ? err.message : 'Unknown error'}`,
             dbName: this.db.dbName,
             operation: 'insert'

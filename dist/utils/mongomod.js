@@ -2,12 +2,12 @@ import MongoSchema from "../MongoSchema/index.js";
 import MongoConnection from "../MongoConnection/index.js";
 import { MmMethodNames } from "../constants/model.js";
 import { MmValidationError } from "../errors/validationError.js";
-import { MongomodErrCodes, MongomodErrMsgs } from "../constants/mongomod.js";
+import { MongomodErrors } from "../constants/mongomod.js";
 export const validateDbInstance = (db) => {
     if (db instanceof MongoConnection === false) {
         throw new MmValidationError({
-            code: MongomodErrCodes.WrongInstance,
-            message: MongomodErrMsgs.WrongInstance,
+            code: MongomodErrors.WrongInstance.code,
+            message: MongomodErrors.WrongInstance.message,
         });
     }
 };
@@ -16,16 +16,16 @@ export const validateSchema = (schema) => {
         return;
     if (schema instanceof MongoSchema === false) {
         throw new MmValidationError({
-            code: MongomodErrCodes.WrongSchema,
-            message: MongomodErrMsgs.WrongSchema,
+            code: MongomodErrors.WrongSchema.code,
+            message: MongomodErrors.WrongSchema.message,
         });
     }
 };
 export const ensureMethodNameIsNotReserved = (methodName) => {
     if (MmMethodNames.includes(methodName)) {
         throw new MmValidationError({
-            code: MongomodErrCodes.ReservedMethodName,
-            message: `${MongomodErrMsgs.ReservedMethodName}: ${methodName}`,
+            code: MongomodErrors.ReservedMethodName.code,
+            message: `${MongomodErrors.ReservedMethodName.message}: ${methodName}`,
         });
     }
 };
@@ -34,8 +34,8 @@ export const validateCustomMethods = (customs) => {
         return true;
     if (typeof customs !== 'object' || Array.isArray(customs)) {
         throw new MmValidationError({
-            code: MongomodErrCodes.CustomMethodInvalidated,
-            message: `${MongomodErrMsgs.CustomMethodInvalidated}`
+            code: MongomodErrors.CustomMethodInvalidated.code,
+            message: `${MongomodErrors.CustomMethodInvalidated.message}`
         });
     }
     const failedMethods = [];
@@ -49,14 +49,14 @@ export const validateCustomMethods = (customs) => {
     });
     if (failedReserved.length > 0) {
         throw new MmValidationError({
-            code: MongomodErrCodes.ReservedMethodName,
-            message: `${MongomodErrMsgs.ReservedMethodName}: ${failedReserved.join(',')}`
+            code: MongomodErrors.ReservedMethodName.code,
+            message: `${MongomodErrors.ReservedMethodName.message}: ${failedReserved.join(',')}`
         });
     }
     if (failedMethods.length > 0) {
         throw new MmValidationError({
-            code: MongomodErrCodes.CustomMethodNotFunction,
-            message: `${MongomodErrMsgs.CustomMethodNotFunction}: ${failedMethods.join(',')}`
+            code: MongomodErrors.CustomMethodNotFunction.code,
+            message: `${MongomodErrors.CustomMethodNotFunction.message}: ${failedMethods.join(',')}`
         });
     }
 };

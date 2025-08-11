@@ -1,14 +1,14 @@
 import Schema from 'validno';
 import QueryResult from '../../QueryResult.js';
 import { MmOperationError } from '../../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import { ObjectId } from 'mongodb';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 const throwOperationError = (err, dbName) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.InsertMany,
         originalError: err
@@ -16,8 +16,8 @@ const throwOperationError = (err, dbName) => {
 };
 const throwPartiallyFailedError = (err, dbName) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationPartiallyFailed,
-        message: MmOperationErrMsgs.OperationPartiallyFailed,
+        code: MmOperationErrors.OperationPartiallyFailed.code,
+        message: MmOperationErrors.OperationPartiallyFailed.message,
         dbName: dbName || null,
         operation: MmControllerOperations.InsertMany
     });
@@ -39,8 +39,8 @@ const validateOptions = (options, dbName) => {
     const validationResult = optionsSchema.validate(options);
     if (!validationResult.ok) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.InvalidOptions,
-            message: MmOperationErrMsgs.InvalidOptions + '. ' + validationResult.joinErrors(),
+            code: MmOperationErrors.InvalidOptions.code,
+            message: MmOperationErrors.InvalidOptions.message + '. ' + validationResult.joinErrors(),
             dbName: dbName || null,
             operation: MmControllerOperations.InsertMany
         });

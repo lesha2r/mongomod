@@ -1,20 +1,32 @@
-export const MmModelErrCodes = {
-    InvalidModelData: 'InvalidModelData',
-    ModelDataEmpty: 'ModelDataEmpty',
-    DeleteFailed: 'DeleteFailed',
-    MissingId: 'MissingId',
-    SaveFailed: 'SaveFailed',
-    InsertFailed: 'InsertFailed',
-    GetFailed: 'GetFailed',
-};
-export const MmModelErrMsgs = {
-    InvalidModelData: 'Provided modelData is not valid according to the schema',
-    ModelDataEmpty: 'Model data is empty, cannot perform operation',
-    DeleteFailed: 'Failed to delete model from database',
-    MissingId: 'Model _id is required for this operation',
-    SaveFailed: 'Failed to save model to database',
-    InsertFailed: 'Failed to insert model into database',
-    GetFailed: 'Failed to retrieve model from database',
+export const MmModelErrors = {
+    InvalidModelData: {
+        code: 'InvalidModelData',
+        message: 'Provided modelData is not valid according to the schema'
+    },
+    ModelDataEmpty: {
+        code: 'ModelDataEmpty',
+        message: 'Model data is empty, cannot perform operation'
+    },
+    DeleteFailed: {
+        code: 'DeleteFailed',
+        message: 'Failed to delete model from database'
+    },
+    MissingId: {
+        code: 'MissingId',
+        message: 'Model _id is required for this operation'
+    },
+    SaveFailed: {
+        code: 'SaveFailed',
+        message: 'Failed to save model to database'
+    },
+    InsertFailed: {
+        code: 'InsertFailed',
+        message: 'Failed to insert model into database'
+    },
+    GetFailed: {
+        code: 'GetFailed',
+        message: 'Failed to retrieve model from database'
+    },
 };
 export const MmMethods = {
     Data: 'data',

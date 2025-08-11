@@ -1,14 +1,14 @@
 import { ObjectId, ReturnDocument } from 'mongodb';
 import { MmOperationError } from '../../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import QueryResult from '../../QueryResult.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import Schema from 'validno';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 const throwOperationError = (err, dbName) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.UpdateOne,
         originalError: err
@@ -25,16 +25,16 @@ const validateOptions = (options, dbName) => {
     const validationResult = optionsSchema.validate(options);
     if (!validationResult.ok) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.InvalidOptions,
-            message: `${MmOperationErrMsgs.InvalidOptions}. ${validationResult.joinErrors()}`,
+            code: MmOperationErrors.InvalidOptions.code,
+            message: `${MmOperationErrors.InvalidOptions.message}. ${validationResult.joinErrors()}`,
             dbName: dbName || null,
             operation: MmControllerOperations.UpdateOne
         });
     }
     if (!options.update || Object.keys(options.update).length === 0) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.NoData,
-            message: `${MmOperationErrMsgs.NoData}. Data to update cannot be empty.`,
+            code: MmOperationErrors.NoData.code,
+            message: `${MmOperationErrors.NoData.message}. Data to update cannot be empty.`,
             dbName: dbName || null,
             operation: MmControllerOperations.UpdateOne
         });

@@ -1,5 +1,5 @@
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmOperationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 async function deleteMethod() {
     this.ensureModelId();
     const dataFrozen = this.data(true);
@@ -8,8 +8,8 @@ async function deleteMethod() {
         const result = await this.deleteOne({ filter });
         if (!result.ok) {
             throw new MmOperationError({
-                code: MmModelErrCodes.DeleteFailed,
-                message: MmModelErrMsgs.DeleteFailed,
+                code: MmModelErrors.DeleteFailed.code,
+                message: MmModelErrors.DeleteFailed.message,
                 dbName: this.db.dbName,
                 operation: 'delete'
             });
@@ -22,8 +22,8 @@ async function deleteMethod() {
         if (err instanceof MmOperationError)
             throw err;
         throw new MmOperationError({
-            code: MmModelErrCodes.DeleteFailed,
-            message: `${MmModelErrMsgs.DeleteFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+            code: MmModelErrors.DeleteFailed.code,
+            message: `${MmModelErrors.DeleteFailed.message}: ${err instanceof Error ? err.message : 'Unknown error'}`,
             dbName: this.db.dbName,
             operation: 'delete'
         });

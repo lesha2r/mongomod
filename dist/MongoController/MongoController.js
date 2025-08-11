@@ -13,7 +13,7 @@ import deleteOneMethod from './operations/deleteOne.js';
 import ensureIndex from './operations/ensureIndex.js';
 import updateManyMethod from './operations/updateMany.js';
 import insertManyMethod from './operations/insertMany.js';
-import { MmControllerErrCodes, MmControllerErrMsgs } from '../constants/controller.js';
+import { MmControllerErrors } from '../constants/controller.js';
 class MongoController {
     db;
     collection;
@@ -26,8 +26,8 @@ class MongoController {
     getClient() {
         if (!this.db || !this.db.client) {
             throw new MmControllerError({
-                code: MmControllerErrCodes.NotConnected,
-                message: MmControllerErrMsgs.NotConnected,
+                code: MmControllerErrors.NotConnected.code,
+                message: MmControllerErrors.NotConnected.message,
                 dbName: this.db?.dbName || null
             });
         }

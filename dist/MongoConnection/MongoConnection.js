@@ -1,7 +1,7 @@
 import mongo from 'mongodb';
 import { MmConnectionError } from '../errors/index.js';
-import { MmConnectionErrCodes, MmConnectionErrMsgs } from '../constants/connection.js';
 import { validateConnectCallback, validateOptions } from '../utils/connection.js';
+import { MmConnectionErrors } from '../constants/connection.js';
 class MongoConnection {
     link;
     login;
@@ -39,8 +39,8 @@ class MongoConnection {
                 if (this.isConnected)
                     return;
                 throw new MmConnectionError({
-                    code: MmConnectionErrCodes.ConnectionTimeout,
-                    message: MmConnectionErrMsgs.ConnectionTimeout,
+                    code: MmConnectionErrors.ConnectionTimeout.code,
+                    message: MmConnectionErrors.ConnectionTimeout.message,
                     dbName: this.dbName || null
                 });
             }, timeout || 30000);
@@ -59,8 +59,8 @@ class MongoConnection {
             this.isConnected = false;
             this.client = null;
             throw new MmConnectionError({
-                code: MmConnectionErrCodes.ConnectionFailed,
-                message: MmConnectionErrMsgs.ConnectionFailed,
+                code: MmConnectionErrors.ConnectionFailed.code,
+                message: MmConnectionErrors.ConnectionFailed.message,
                 dbName: this.dbName || null,
                 originalError: err
             });
@@ -79,8 +79,8 @@ class MongoConnection {
         }
         catch (err) {
             throw new MmConnectionError({
-                code: MmConnectionErrCodes.CloseConnectionFailed,
-                message: MmConnectionErrMsgs.CloseConnectionFailed,
+                code: MmConnectionErrors.CloseConnectionFailed.code,
+                message: MmConnectionErrors.CloseConnectionFailed.message,
                 dbName: this.dbName || null,
                 originalError: err
             });

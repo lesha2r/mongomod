@@ -2,10 +2,10 @@ import Schema from 'validno';
 import QueryResult from '../../QueryResult.js';
 import MongoController from '../MongoController.js';
 import { MmOperationError } from '../../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import { ObjectId } from 'mongodb';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 
 export interface MethodInsertManyOptions {
     data: {[key: string]: any}[]
@@ -14,8 +14,8 @@ export interface MethodInsertManyOptions {
 
 const throwOperationError = (err: any, dbName?: string): MmOperationError => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.InsertMany,
         originalError: err
@@ -24,8 +24,8 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
 
 const throwPartiallyFailedError = (err: any, dbName?: string): MmOperationError => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationPartiallyFailed,
-        message: MmOperationErrMsgs.OperationPartiallyFailed,
+        code: MmOperationErrors.OperationPartiallyFailed.code,
+        message: MmOperationErrors.OperationPartiallyFailed.message,
         dbName: dbName || null,
         operation: MmControllerOperations.InsertMany
     });
@@ -53,8 +53,8 @@ const validateOptions = (options: MethodInsertManyOptions, dbName?: string): boo
 
     if (!validationResult.ok) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.InvalidOptions,
-            message: MmOperationErrMsgs.InvalidOptions + '. ' + validationResult.joinErrors(),
+            code: MmOperationErrors.InvalidOptions.code,
+            message: MmOperationErrors.InvalidOptions.message + '. ' + validationResult.joinErrors(),
             dbName: dbName || null,
             operation: MmControllerOperations.InsertMany
         });

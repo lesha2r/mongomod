@@ -1,20 +1,34 @@
-export const MmOperationErrCodes = {
-    NoFilter: 'NoFilter',
-    NoData: 'NoData',
-    InvalidOptions: 'InvalidOptions',
-    WrongAggregatePipeline: 'WrongAggregatePipeline',
-    NoField: 'NoField',
-    OperationFailed: 'OperationFailed',
-    OperationPartiallyFailed: 'OperationPartiallyFailed',
-    Duplicate: 'Duplicate'
-};
-export const MmOperationErrMsgs = {
-    NoFilter: 'No filter specified',
-    NoData: 'No data specified',
-    InvalidOptions: 'Invalid options provided',
-    WrongAggregatePipeline: 'Wrong aggregate pipeline format',
-    NoField: 'No field specified',
-    OperationFailed: 'Failed to execute the operation',
-    OperationPartiallyFailed: 'Operation partially failed',
-    Duplicate: 'Duplicate key error'
+export const MmOperationErrors = {
+    NoFilter: {
+        code: 'NoFilter',
+        message: 'No filter specified'
+    },
+    NoData: {
+        code: 'NoData',
+        message: 'No data specified'
+    },
+    InvalidOptions: {
+        code: 'InvalidOptions',
+        message: 'Invalid options provided'
+    },
+    WrongAggregatePipeline: {
+        code: 'WrongAggregatePipeline',
+        message: 'Wrong aggregate pipeline format'
+    },
+    NoField: {
+        code: 'NoField',
+        message: 'No field specified'
+    },
+    OperationFailed: {
+        code: 'OperationFailed',
+        message: 'Failed to execute the operation'
+    },
+    OperationPartiallyFailed: {
+        code: 'OperationPartiallyFailed',
+        message: 'Operation partially failed'
+    },
+    Duplicate: {
+        code: 'Duplicate',
+        message: 'Duplicate key error'
+    }
 };

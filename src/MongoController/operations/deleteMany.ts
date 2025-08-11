@@ -2,8 +2,8 @@ import QueryResult from "../../QueryResult.js";
 import MongoController from "../MongoController.js";
 import { MmControllerOperations } from "../../constants/controller.js";
 import { MmOperationError } from "../../errors/operationError.js";
-import { MmOperationErrCodes, MmOperationErrMsgs } from "../../constants/operations.js";
 import { MmValidationError } from "../../errors/validationError.js";
+import { MmOperationErrors } from "../../constants/operations.js";
 
 export interface MethodDeleteOptions {
     filter: {[key: string]: any}
@@ -11,8 +11,8 @@ export interface MethodDeleteOptions {
 
 const throwOperationError = (err: any, dbName?: string): MmOperationError => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.DeleteMany,
         originalError: err
@@ -22,8 +22,8 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
 const validateFilter = (filter: {[key: string]: any}, dbName?: string): boolean => {
     if (!filter) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.NoFilter,
-            message: MmOperationErrMsgs.NoFilter,
+            code: MmOperationErrors.NoFilter.code,
+            message: MmOperationErrors.NoFilter.message,
             dbName: dbName || null,
             operation: MmControllerOperations.DeleteMany
         });

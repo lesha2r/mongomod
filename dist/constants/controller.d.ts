@@ -1,13 +1,5 @@
-export declare const MmControllerErrCodes: {
-    InvalidDb: string;
-    InvalidCollection: string;
-    NotConnected: string;
-};
-export declare const MmControllerErrMsgs: {
-    InvalidDb: string;
-    InvalidCollection: string;
-    NotConnected: string;
-};
+import { ErrorConst } from "../types/errors.js";
+export declare const MmControllerErrors: ErrorConst;
 export declare const MmControllerOperations: {
     Aggregate: string;
     FindOne: string;

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import MongoModel from '../MongoModel.js';
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 
 async function save(this: MongoModel, insertIfNotExists: boolean = false): Promise<MongoModel> {
     this.ensureModelData();
@@ -20,8 +20,8 @@ async function save(this: MongoModel, insertIfNotExists: boolean = false): Promi
 
             if (!result.ok) {
                 throw new MmOperationError({
-                    code: MmModelErrCodes.SaveFailed,
-                    message: MmModelErrMsgs.SaveFailed,
+                    code: MmModelErrors.SaveFailed.code,
+                    message: MmModelErrors.SaveFailed.message,
                     dbName: this.db.dbName,
                     operation: 'save'
                 });
@@ -40,8 +40,8 @@ async function save(this: MongoModel, insertIfNotExists: boolean = false): Promi
 
         // Wrap other errors
         throw new MmOperationError({
-            code: MmModelErrCodes.SaveFailed,
-            message: `${MmModelErrMsgs.SaveFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+            code: MmModelErrors.SaveFailed.code,
+            message: `${MmModelErrors.SaveFailed.message}: ${err instanceof Error ? err.message : 'Unknown error'}`,
             dbName: this.db.dbName,
             operation: 'save'
         });

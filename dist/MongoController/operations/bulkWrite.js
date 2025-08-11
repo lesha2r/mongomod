@@ -1,13 +1,13 @@
 import QueryResult from '../../QueryResult.js';
 import { MmOperationError } from '../../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 const validateBulkWriteOptions = (operations, dbName) => {
     if (Array.isArray(operations) !== true || operations.length === 0) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.NoData,
-            message: MmOperationErrMsgs.NoData,
+            code: MmOperationErrors.NoData.code,
+            message: MmOperationErrors.NoData.message,
             dbName: dbName || null,
             operation: MmControllerOperations.BulkWrite
         });
@@ -16,8 +16,8 @@ const validateBulkWriteOptions = (operations, dbName) => {
 };
 const throwOperationError = (err, dbName) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.BulkWrite,
         originalError: err

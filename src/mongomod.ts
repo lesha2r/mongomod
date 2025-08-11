@@ -37,7 +37,6 @@ const mongomod: {[key: string]: any} & Mongomod = {
         validateDbInstance(options.db);
         validateSchema(options.schema);
         validateCustomMethods(options.customs);
-        console.log(options.customs)
 
         const { db, collection, schema, customs } = options;
         const schemaHandled = !schema ? new MongoSchema() : schema;

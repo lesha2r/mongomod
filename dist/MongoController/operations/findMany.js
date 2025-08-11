@@ -1,10 +1,10 @@
 import { ObjectId } from 'mongodb';
 import Schema from 'validno';
 import { MmOperationError } from '../../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import QueryResult from '../../QueryResult.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 const MAX_QUERY_LIMIT = 99999;
 const validateOptions = (options) => {
     const optionsSchema = new Schema({
@@ -15,8 +15,8 @@ const validateOptions = (options) => {
     const validationResult = optionsSchema.validate(options);
     if (!validationResult.ok)
         throw new MmValidationError({
-            code: MmOperationErrCodes.InvalidOptions,
-            message: `${MmOperationErrMsgs.InvalidOptions}. ${validationResult.joinErrors()}`,
+            code: MmOperationErrors.InvalidOptions.code,
+            message: `${MmOperationErrors.InvalidOptions.message}. ${validationResult.joinErrors()}`,
             dbName: null,
             operation: MmControllerOperations.FindMany
         });
@@ -33,8 +33,8 @@ const parseOptions = (options) => {
 };
 const throwOperationError = (err, dbName) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.FindMany,
         originalError: err

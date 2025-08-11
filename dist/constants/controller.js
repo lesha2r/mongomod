@@ -1,12 +1,16 @@
-export const MmControllerErrCodes = {
-    InvalidDb: 'InvalidDb',
-    InvalidCollection: 'InvalidCollection',
-    NotConnected: 'NotConnected',
-};
-export const MmControllerErrMsgs = {
-    InvalidDb: 'Provided db is not a valid MongoConnection instance',
-    InvalidCollection: 'Collection name must be a non-empty string',
-    NotConnected: 'Database is not connected, cannot perform operation',
+export const MmControllerErrors = {
+    InvalidDb: {
+        code: 'InvalidDb',
+        message: 'Provided db is not a valid MongoConnection instance'
+    },
+    InvalidCollection: {
+        code: 'InvalidCollection',
+        message: 'Collection name must be a non-empty string'
+    },
+    NotConnected: {
+        code: 'NotConnected',
+        message: 'Database is not connected, cannot perform operation'
+    }
 };
 export const MmControllerOperations = {
     Aggregate: 'aggregate',

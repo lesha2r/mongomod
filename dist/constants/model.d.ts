@@ -1,22 +1,6 @@
+import { ErrorConst } from "../types/errors.js";
 import { ReservedMethod } from "../types/methods.js";
-export declare const MmModelErrCodes: {
-    InvalidModelData: string;
-    ModelDataEmpty: string;
-    DeleteFailed: string;
-    MissingId: string;
-    SaveFailed: string;
-    InsertFailed: string;
-    GetFailed: string;
-};
-export declare const MmModelErrMsgs: {
-    InvalidModelData: string;
-    ModelDataEmpty: string;
-    DeleteFailed: string;
-    MissingId: string;
-    SaveFailed: string;
-    InsertFailed: string;
-    GetFailed: string;
-};
+export declare const MmModelErrors: ErrorConst;
 export declare const MmMethods: {
     Data: string;
     DataFilterd: string;

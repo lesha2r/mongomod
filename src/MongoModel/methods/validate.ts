@@ -1,6 +1,6 @@
 import MongoModel from '../MongoModel.js';
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmValidationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 
 function validate(this: MongoModel, data: {[key: string]: any} | null = this.modelData) {
     if (!this.schema) return null;
@@ -9,8 +9,8 @@ function validate(this: MongoModel, data: {[key: string]: any} | null = this.mod
 
     if (validationResult.ok === false) {
         throw new MmValidationError({
-            code: MmModelErrCodes.InvalidModelData,
-            message: `${MmModelErrMsgs.InvalidModelData}: ${validationResult.failed.join(', ')}`,
+            code: MmModelErrors.InvalidModelData.code,
+            message: `${MmModelErrors.InvalidModelData.message}: ${validationResult.failed.join(', ')}`,
             dbName: this.db.dbName || null
         });
     }

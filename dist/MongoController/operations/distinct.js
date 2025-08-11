@@ -1,13 +1,13 @@
 import { MmOperationError } from '../../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import QueryResult from '../../QueryResult.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 const validateDistinctOptions = (options, dbName) => {
     if (!options || typeof options !== 'object' || !options.field || typeof options.field !== 'string') {
         throw new MmValidationError({
-            code: MmOperationErrCodes.NoField,
-            message: MmOperationErrMsgs.NoField,
+            code: MmOperationErrors.NoField.code,
+            message: MmOperationErrors.NoField.message,
             dbName: dbName || null,
             operation: MmControllerOperations.Distinct
         });
@@ -16,8 +16,8 @@ const validateDistinctOptions = (options, dbName) => {
 };
 const throwOperationError = (err, dbName) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.Distinct,
         originalError: err

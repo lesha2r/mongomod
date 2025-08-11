@@ -2,10 +2,10 @@ import { ObjectId } from 'mongodb';
 import Schema from 'validno';
 import MongoController from '../MongoController.js';
 import { MmOperationError } from '../../errors/operationError.js';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import QueryResult from '../../QueryResult.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 
 export interface MethodFindOneOptions {
     filter: {[key: string]: any}
@@ -15,8 +15,8 @@ export interface MethodFindOneOptions {
 
 const throwOperationError = (err: any, dbName?: string) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.FindOne,
         originalError: err
@@ -31,8 +31,8 @@ const validateOptions = (options: MethodFindOneOptions) => {
     const validationResult = optionsSchema.validate(options);
 
     if (!validationResult.ok) throw new MmValidationError({
-        code: MmOperationErrCodes.InvalidOptions,
-        message: `${MmOperationErrMsgs.InvalidOptions}. ${validationResult.joinErrors()}`,
+        code: MmOperationErrors.InvalidOptions.code,
+        message: `${MmOperationErrors.InvalidOptions.message}. ${validationResult.joinErrors()}`,
         dbName: null,
         operation: MmControllerOperations.FindOne
     });

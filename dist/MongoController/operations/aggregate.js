@@ -1,14 +1,14 @@
 import QueryResult from "../../QueryResult.js";
 import { MmOperationError } from "../../errors/operationError.js";
-import { MmOperationErrCodes, MmOperationErrMsgs } from "../../constants/operations.js";
 import { MmValidationError } from "../../errors/validationError.js";
 import { MmControllerOperations } from "../../constants/controller.js";
+import { MmOperationErrors } from "../../constants/operations.js";
 const validateAggregationPipeline = (pipeline, dbName) => {
     const areAllObjects = () => pipeline.every(obj => typeof obj === 'object' && obj !== null);
     if (!pipeline || !Array.isArray(pipeline) || pipeline.length === 0 || !areAllObjects()) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.WrongAggregatePipeline,
-            message: MmOperationErrMsgs.WrongAggregatePipeline,
+            code: MmOperationErrors.WrongAggregatePipeline.code,
+            message: MmOperationErrors.WrongAggregatePipeline.message,
             dbName: dbName || null,
             operation: MmControllerOperations.Aggregate
         });
@@ -17,8 +17,8 @@ const validateAggregationPipeline = (pipeline, dbName) => {
 };
 const throwOperationError = (err, dbName) => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.Aggregate,
         originalError: err

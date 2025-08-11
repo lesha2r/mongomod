@@ -1,10 +1,10 @@
 import Schema from "validno";
-import { MmOperationErrCodes, MmOperationErrMsgs } from "../../constants/operations.js"
 import { MmOperationError } from "../../errors/operationError.js"
 import { MmValidationError } from "../../errors/validationError.js"
 import MongoController from "../MongoController.js"
 import QueryResult from "../../QueryResult.js"
 import { MmControllerOperations } from "../../constants/controller.js";
+import { MmOperationErrors } from "../../constants/operations.js";
 
 export interface MethodUpdateManyOptions {
     filter: {[key: string]: any}
@@ -16,8 +16,8 @@ export interface MethodUpdateManyOptions {
 
 const throwOperationError = (err: any, dbName?: string): MmOperationError => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.UpdateMany,
         originalError: err
@@ -79,8 +79,8 @@ const validateOptions = (options: MethodUpdateManyOptions, dbName?: string): boo
 
     if (!validationResult.ok) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.InvalidOptions,
-            message: MmOperationErrMsgs.InvalidOptions + '. ' + validationResult.joinErrors(),
+            code: MmOperationErrors.InvalidOptions.code,
+            message: MmOperationErrors.InvalidOptions.message + '. ' + validationResult.joinErrors(),
             dbName: dbName || null,
             operation: MmControllerOperations.UpdateMany
         });
@@ -99,8 +99,8 @@ async function updateMany(this: MongoController, options: MethodUpdateManyOption
         
         if (!result.acknowledged) {
             throw new MmOperationError({
-                code: MmOperationErrCodes.OperationFailed,
-                message: MmOperationErrMsgs.OperationFailed,
+                code: MmOperationErrors.OperationFailed.code,
+                message: MmOperationErrors.OperationFailed.message,
                 dbName: this.db.dbName,
                 operation: MmControllerOperations.UpdateMany
             });

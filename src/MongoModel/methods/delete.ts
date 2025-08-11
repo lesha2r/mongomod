@@ -1,6 +1,6 @@
 import MongoModel from '../MongoModel.js';
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmOperationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 
 async function deleteMethod(this: MongoModel): Promise<MongoModel> {
     this.ensureModelId();
@@ -13,8 +13,8 @@ async function deleteMethod(this: MongoModel): Promise<MongoModel> {
         // Check if deletion was successful
         if (!result.ok) {
             throw new MmOperationError({
-                code: MmModelErrCodes.DeleteFailed,
-                message: MmModelErrMsgs.DeleteFailed,
+                code: MmModelErrors.DeleteFailed.code,
+                message: MmModelErrors.DeleteFailed.message,
                 dbName: this.db.dbName,
                 operation: 'delete'
             });
@@ -32,8 +32,8 @@ async function deleteMethod(this: MongoModel): Promise<MongoModel> {
 
         // Wrap other errors
         throw new MmOperationError({
-            code: MmModelErrCodes.DeleteFailed,
-            message: `${MmModelErrMsgs.DeleteFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+            code: MmModelErrors.DeleteFailed.code,
+            message: `${MmModelErrors.DeleteFailed.message}: ${err instanceof Error ? err.message : 'Unknown error'}`,
             dbName: this.db.dbName,
             operation: 'delete'
         });

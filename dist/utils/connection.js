@@ -1,6 +1,6 @@
 import Schema from 'validno';
 import { MmValidationError } from '../errors/validationError.js';
-import { MmConnectionErrCodes, MmConnectionErrMsgs } from '../constants/connection.js';
+import { MmConnectionErrors } from '../constants/connection.js';
 const connectionOptionsSchema = new Schema({
     link: { type: String },
     login: { type: String },
@@ -15,16 +15,16 @@ export const validateOptions = (options) => {
     }
     catch (err) {
         throw new MmValidationError({
-            code: MmConnectionErrCodes.InvalidOptions,
-            message: `${MmConnectionErrMsgs.InvalidOptions}: ${err.message}`,
+            code: MmConnectionErrors.InvalidOptions.code,
+            message: `${MmConnectionErrors.InvalidOptions.message}: ${err.message}`,
             dbName: options?.dbName || null
         });
     }
     if (validationResult.ok === true)
         return true;
     throw new MmValidationError({
-        code: MmConnectionErrCodes.InvalidOptions,
-        message: `${MmConnectionErrMsgs.InvalidOptions}: ${validationResult.joinErrors()}`,
+        code: MmConnectionErrors.InvalidOptions.code,
+        message: `${MmConnectionErrors.InvalidOptions.message}: ${validationResult.joinErrors()}`,
         dbName: options?.dbName || null
     });
 };
@@ -34,8 +34,8 @@ export const validateConnectCallback = (callback) => {
     if (typeof callback === 'function')
         return true;
     throw new MmValidationError({
-        code: MmConnectionErrCodes.ConnectCallbackFunction,
-        message: MmConnectionErrMsgs.ConnectCallbackFunction,
+        code: MmConnectionErrors.ConnectCallbackFunction.code,
+        message: MmConnectionErrors.ConnectCallbackFunction.message,
         dbName: null
     });
 };

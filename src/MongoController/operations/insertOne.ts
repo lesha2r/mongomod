@@ -1,18 +1,18 @@
 import { ObjectId } from 'mongodb';
-import { MmOperationErrCodes, MmOperationErrMsgs } from '../../constants/operations.js';
 import { MmOperationError } from '../../errors/operationError.js';
 import { MmValidationError } from '../../errors/validationError.js';
 import MongoController from '../MongoController.js';
 import QueryResult from '../../QueryResult.js';
 import { MmControllerOperations } from '../../constants/controller.js';
+import { MmOperationErrors } from '../../constants/operations.js';
 
 export interface MethodInsertOneOptions {[key: string]: any}
 
 const validateData = (data: {[key: string]: any}, dbName?: string): boolean => {
     if (!data || typeof data !== 'object' || Array.isArray(data) || Object.keys(data).length === 0) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.NoData,
-            message: MmOperationErrMsgs.NoData,
+            code: MmOperationErrors.NoData.code,
+            message: MmOperationErrors.NoData.message,
             dbName: dbName || null,
             operation: MmControllerOperations.InsertOne
         });
@@ -24,16 +24,16 @@ const validateData = (data: {[key: string]: any}, dbName?: string): boolean => {
 const throwOperationError = (err: any, dbName?: string): MmOperationError => {
     if (err.code === 11000) {
         throw new MmOperationError({
-            code: MmOperationErrCodes.Duplicate,
-            message: `${MmOperationErrMsgs.Duplicate}. ${err.message}`,
+            code: MmOperationErrors.Duplicate.code,
+            message: `${MmOperationErrors.Duplicate.message}. ${err.message}`,
             dbName: dbName || null,
             operation: MmControllerOperations.InsertOne,
             originalError: err
         });
     } else if (err.code === 121) {
         throw new MmOperationError({
-            code: MmOperationErrCodes.OperationFailed,
-            message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+            code: MmOperationErrors.OperationFailed.code,
+            message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
             dbName: dbName || null,
             operation: MmControllerOperations.InsertOne,
             originalError: err
@@ -41,8 +41,8 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
     }
     
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.InsertOne,
         originalError: err

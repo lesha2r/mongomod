@@ -3,9 +3,9 @@ import QueryResult from "../../QueryResult.js";
 import { MmOperationError } from "../../errors/operationError.js";
 import MongoController from "../MongoController.js";
 import { AggregationStage } from "../../types/aggregationStages.js";
-import { MmOperationErrCodes, MmOperationErrMsgs } from "../../constants/operations.js";
 import { MmValidationError } from "../../errors/validationError.js";
 import { MmControllerOperations } from "../../constants/controller.js";
+import { MmOperationErrors } from "../../constants/operations.js";
 
 export type AggregationPipeline = AggregationStage[]
 
@@ -14,8 +14,8 @@ const validateAggregationPipeline = (pipeline: AggregationPipeline, dbName?: str
 
     if (!pipeline || !Array.isArray(pipeline) || pipeline.length === 0 || !areAllObjects()) {
         throw new MmValidationError({
-            code: MmOperationErrCodes.WrongAggregatePipeline,
-            message: MmOperationErrMsgs.WrongAggregatePipeline,
+            code: MmOperationErrors.WrongAggregatePipeline.code,
+            message: MmOperationErrors.WrongAggregatePipeline.message,
             dbName: dbName || null,
             operation: MmControllerOperations.Aggregate
         });
@@ -26,8 +26,8 @@ const validateAggregationPipeline = (pipeline: AggregationPipeline, dbName?: str
 
 const throwOperationError = (err: any, dbName?: string): MmOperationError => {
     throw new MmOperationError({
-        code: MmOperationErrCodes.OperationFailed,
-        message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+        code: MmOperationErrors.OperationFailed.code,
+        message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
         dbName: dbName || null,
         operation: MmControllerOperations.Aggregate,
         originalError: err

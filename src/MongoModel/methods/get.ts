@@ -1,6 +1,6 @@
 import MongoModel from '../MongoModel.js';
-import { MmModelErrCodes, MmModelErrMsgs } from '../../constants/model.js';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
+import { MmModelErrors } from '../../constants/model.js';
 
 async function get(this: MongoModel, filter: {[key: string]: any} = {}): Promise<MongoModel> {
     try {
@@ -8,8 +8,8 @@ async function get(this: MongoModel, filter: {[key: string]: any} = {}): Promise
         
         if (!found.ok) {
             throw new MmOperationError({
-                code: MmModelErrCodes.GetFailed,
-                message: MmModelErrMsgs.GetFailed,
+                code: MmModelErrors.GetFailed.code,
+                message: MmModelErrors.GetFailed.message,
                 dbName: this.db.dbName,
                 operation: 'get'
             });
@@ -17,7 +17,7 @@ async function get(this: MongoModel, filter: {[key: string]: any} = {}): Promise
 
         if (found.data === null || Object.keys(found.data).length === 0) {
             throw new MmOperationError({
-                code: MmModelErrCodes.GetFailed,
+                code: MmModelErrors.GetFailed.code,
                 message: 'No document found matching the provided filter',
                 dbName: this.db.dbName,
                 operation: 'get'
@@ -36,8 +36,8 @@ async function get(this: MongoModel, filter: {[key: string]: any} = {}): Promise
 
         // Wrap other errors
         throw new MmOperationError({
-            code: MmModelErrCodes.GetFailed,
-            message: `${MmModelErrMsgs.GetFailed}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+            code: MmModelErrors.GetFailed.code,
+            message: `${MmModelErrors.GetFailed.message}: ${err instanceof Error ? err.message : 'Unknown error'}`,
             dbName: this.db.dbName,
             operation: 'get'
         });

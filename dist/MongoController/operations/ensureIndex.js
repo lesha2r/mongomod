@@ -1,8 +1,8 @@
-import { MmOperationErrCodes, MmOperationErrMsgs } from "../../constants/operations.js";
 import { MmOperationError } from "../../errors/operationError.js";
 import { MmValidationError } from "../../errors/validationError.js";
 import QueryResult from "../../QueryResult.js";
 import { MmControllerOperations } from "../../constants/controller.js";
+import { MmOperationErrors } from "../../constants/operations.js";
 async function ensureIndex(checkIndexesArr) {
     try {
         const client = this.getClient();
@@ -38,8 +38,8 @@ async function ensureIndex(checkIndexesArr) {
         if (err instanceof MmValidationError)
             throw err;
         throw new MmOperationError({
-            code: MmOperationErrCodes.OperationFailed,
-            message: `${MmOperationErrMsgs.OperationFailed}. ${err.message}`,
+            code: MmOperationErrors.OperationFailed.code,
+            message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
             dbName: this.db.dbName || null,
             operation: MmControllerOperations.EnsureIndex,
             originalError: err
