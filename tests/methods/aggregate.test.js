@@ -50,8 +50,6 @@ describe('Aggregate. Input validation: correct cases', () => {
             { $group: { _id: '$name', count: { $sum: 1 } } }
         ]);
 
-        console.log(result)
-
         expect(result).toBeDefined();
         expect(result.ok).toBe(true);
         expect(Array.isArray(result.data)).toBe(true);
