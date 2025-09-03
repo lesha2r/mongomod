@@ -5,5 +5,5 @@ export interface MethodDeleteOneOptions {
         [key: string]: any;
     };
 }
-declare function deleteOne(this: MongoController, options: MethodDeleteOneOptions): Promise<QueryResult<null> | QueryResult<import("mongodb").ModifyResult<import("bson").Document>>>;
+declare function deleteOne(this: MongoController, options: MethodDeleteOneOptions): Promise<QueryResult<import("mongodb").WithId<import("bson").Document>> | QueryResult<null>>;
 export default deleteOne;

@@ -3,6 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import MongoSchema from '../dist/MongoSchema/MongoSchema.js';
 import MongoController from '../dist/MongoController/MongoController.js';
+import { ObjectId } from 'mongodb';
 
 // Init dotenv module
 dotenv.config({
@@ -77,7 +78,7 @@ describe('MongoModel creation: validation', () => {
     })
 })
 
-const schema = new MongoSchema({ name: {type: String}, age: {type: Number} })
+const schema = new MongoSchema({ _id: {type: ObjectId, required: false}, name: {type: String}, age: {type: Number} })
 const customMethods = {hello: ()=> console.log('hi')}
 const options = {db, collection: TEST_COLLECTION, schema, customs: customMethods}
 const User = mongomod.createModel(options)
@@ -159,7 +160,9 @@ describe('Mongomodel: working with model instance', () => {
 
     test('model.get fetches required document by filter', async () => {
         const name = 'Ann'
-        const user = await new User().get({name})
+        const user = await new User()
+        await user.get({name})
+
         expect(user.modelData.name).toBe(name)
     })
 
@@ -178,6 +181,7 @@ describe('Mongomodel: working with model instance', () => {
 
         expect(user.data()).toEqual(user.modelData)
     })
+    
 
     test('model.delete() deletes document in collection', async() => {
         const data = { name: "John Wick", age: 0}

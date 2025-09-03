@@ -47,7 +47,7 @@ async function insertOne(data) {
         validateData(data, this.db.dbName);
         const collection = this.getCollectionCtrl();
         const result = await collection.findOneAndUpdate({ _id: new ObjectId() }, { $setOnInsert: data }, { upsert: true, returnDocument: 'after' });
-        return new QueryResult(true, result.value);
+        return new QueryResult(true, result);
     }
     catch (err) {
         if (err instanceof MmValidationError)

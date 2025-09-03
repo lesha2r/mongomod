@@ -92,7 +92,7 @@ describe('UpdateOne. Correct filter works', () => {
       filter: { name: testObj3.name},
       update: { age: newAge },
     });
-
+    console.log(result)
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data.name).toBe(testObj3.name);

@@ -65,7 +65,7 @@ async function updateOne(options) {
         const { filter, update, params } = parseOptions(options);
         const collection = this.getCollectionCtrl();
         const result = await collection.findOneAndUpdate(filter, update, params);
-        return new QueryResult(true, result.value);
+        return new QueryResult(true, result);
     }
     catch (err) {
         if (err instanceof MmValidationError)

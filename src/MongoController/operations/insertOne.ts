@@ -60,7 +60,7 @@ async function insertOne(this: MongoController, data: MethodInsertOneOptions) {
             {upsert: true, returnDocument: 'after'}
         );
         
-        return new QueryResult(true, result.value);
+        return new QueryResult(true, result);
     } catch (err: any) {
         if (err instanceof MmValidationError) throw err;
         throwOperationError(err, this.db.dbName);

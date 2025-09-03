@@ -97,7 +97,7 @@ async function updateOne(this: MongoController, options: MethodUpdateOneOptions)
             filter, update, params
         );
 
-        return new QueryResult(true, result.value)
+        return new QueryResult(true, result)
     } catch (err: any) {
         if (err instanceof MmValidationError) throw err;
         throwOperationError(err, this.db.dbName);

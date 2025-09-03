@@ -7,5 +7,5 @@ export interface MethodFindOneOptions {
     limit?: number;
     skip?: number;
 }
-declare function findOne(this: MongoController, options: MethodFindOneOptions): Promise<QueryResult<null> | QueryResult<import("mongodb").WithId<import("bson").Document>>>;
+declare function findOne(this: MongoController, options: MethodFindOneOptions): Promise<QueryResult<import("mongodb").WithId<import("bson").Document>> | QueryResult<null>>;
 export default findOne;
