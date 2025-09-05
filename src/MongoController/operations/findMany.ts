@@ -8,6 +8,7 @@ import { MmControllerOperations } from '../../constants/controller.js';
 import { MmOperationErrors } from '../../constants/operations.js';
 
 export interface MethodFindManyOptions {
+    // TODO: add sort
     filter: {[key: string]: any}
     limit?: number
     skip?: number

@@ -18,7 +18,7 @@ MongoMod is a feature-rich MongoDB ODM (Object Document Mapper) that provides an
 ## 📦 Installation
 
 ```bash
-npm install mongomod
+npm i mongomod
 ```
 
 ## 🔧 Quick Start
@@ -50,7 +50,7 @@ const userSchema = new MongoSchema({
     name: { type: String, required: true },
     email: { type: String, required: true },
     age: { type: Number, required: false },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, required: false }
 });
 ```
 
@@ -136,7 +136,7 @@ const schema = new MongoSchema({
     title: { type: String, required: true },
     content: { type: String },
     tags: { type: Array },
-    published: { type: Boolean, default: false },
+    published: { type: Boolean },
     publishedAt: { type: Date }
 }, {
     strict: true // Enforce strict validation
@@ -169,11 +169,6 @@ const result = await controller.findMany({
 The main model class that combines schema validation, custom methods, and database operations.
 
 ```javascript
-class BlogPost extends MongoModel {
-    // Models automatically inherit all controller methods
-    // and can be extended with custom functionality
-}
-
 // Or use the factory method
 const Post = mongomod.createModel({
     db: connection,
@@ -241,7 +236,7 @@ const users = await User.findMany({
 
 // Insert operations
 const result = await User.insertOne({
-    data: { name: 'Bob', email: 'bob@example.com', age: 25 }
+    name: 'Bob', email: 'bob@example.com', age: 25
 });
 
 const results = await User.insertMany({
@@ -289,13 +284,11 @@ const distinctAges = await User.distinct({
 });
 
 // Bulk operations
-await User.bulkWrite({
-    operations: [
-        { insertOne: { document: { name: 'Eve', age: 22 } } },
-        { updateOne: { filter: { name: 'Alice' }, update: { $inc: { age: 1 } } } },
-        { deleteOne: { filter: { status: 'deleted' } } }
-    ]
-});
+await User.bulkWrite([
+    { insertOne: { document: { name: 'Eve', age: 22 } } },
+    { updateOne: { filter: { name: 'Alice' }, update: { $inc: { age: 1 } } } },
+    { deleteOne: { filter: { status: 'deleted' } } }
+]);
 ```
 
 ## 🎯 Event System
@@ -321,7 +314,7 @@ User.subscribe('deleted', (deletedData) => {
 
 // Events are automatically triggered during operations
 const user = new User().init({ name: 'Test User', age: 25 });
-await user.save(true); // Triggers 'created' event
+await user.insert(); // Triggers 'created' event
 
 user.set({ age: 26 });
 await user.save(); // Triggers 'updated' event
@@ -331,43 +324,8 @@ await user.delete(); // Triggers 'deleted' event
 
 ## 🛠️ Advanced Usage
 
-### Custom Connection Options
-
-```javascript
-const connection = new mongomod.Connection({
-    link: 'cluster0.mongodb.net',
-    login: 'username',
-    password: 'password',
-    dbName: 'production',
-    srv: true // Enable for MongoDB Atlas
-});
-
-// Connect with custom timeout
-await connection.connect(
-    () => console.log('Connected!'),
-    15000 // 15 second timeout
-);
-```
-
 ### Complex Schema Validation
-
-```javascript
-const productSchema = new MongoSchema({
-    name: { type: String, required: true },
-    price: { type: Number, required: true, min: 0 },
-    category: { type: String, enum: ['electronics', 'clothing', 'books'] },
-    tags: { type: Array, default: [] },
-    inStock: { type: Boolean, default: true },
-    metadata: {
-        weight: { type: Number },
-        dimensions: {
-            length: { type: Number },
-            width: { type: Number },
-            height: { type: Number }
-        }
-    }
-}, { strict: true });
-```
+For more information about advanced schema validation, see the [`validno` package on NPM](https://www.npmjs.com/package/validno).
 
 ### Model Inheritance and Extension
 
@@ -456,51 +414,6 @@ try {
 - Review schema definitions for new validation syntax
 - Update custom method definitions to use the new binding system
 - Check event subscriber syntax for any changes
-
-## 📝 API Reference
-
-### mongomod
-
-- `createModel(options)` - Create a new model class
-- `Connection` - Database connection class
-- `Controller` - Database operations controller
-- `Model` - Base model class
-- `Schema` - Schema validation class
-
-### Connection Options
-
-```typescript
-interface MongomodConnectionOptions {
-    link: string;      // MongoDB host:port
-    login: string;     // Username
-    password: string;  // Password
-    dbName: string;    // Database name
-    srv: boolean;      // Use MongoDB Atlas SRV connection
-}
-```
-
-### Model Options
-
-```typescript
-interface MongoModelOptions {
-    db: MongoConnection;           // Database connection
-    collection: string;            // Collection name
-    schema?: MongoSchema;          // Optional schema
-    customs?: Record<string, Function>; // Custom methods
-}
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the ISC License.
 
 ## 🔗 Links
 
