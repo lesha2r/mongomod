@@ -25,8 +25,8 @@ class MongoSchema {
         this.schema = new Schema(schemaObj)
     }
 
-    validate(data: any) {
-        return this.schema.validate(data)
+    validate(data: any, fields: string | string[]) {
+        return this.schema.validate(data, fields || undefined)
     }
 }
 
