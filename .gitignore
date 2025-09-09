@@ -3,3 +3,7 @@ examples
 /*/dev.*
 node_modules
 TODO*.md
+
+# VitePress
+docs/.vitepress/cache
+docs/.vitepress/dist
