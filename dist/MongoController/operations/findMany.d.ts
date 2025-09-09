@@ -7,5 +7,5 @@ export interface MethodFindManyOptions {
     limit?: number;
     skip?: number;
 }
-declare function findMany(this: MongoController, options: MethodFindManyOptions): Promise<QueryResult<import("mongodb").WithId<import("bson").Document>> | QueryResult<null>>;
+declare function findMany(this: MongoController, options: MethodFindManyOptions): Promise<QueryResult<any>>;
 export default findMany;
