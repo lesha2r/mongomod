@@ -5,5 +5,5 @@ export interface MethodDeleteOptions {
         [key: string]: any;
     };
 }
-declare function deleteMany(this: MongoController, options: MethodDeleteOptions): Promise<QueryResult<null> | QueryResult<import("mongodb").DeleteResult>>;
+declare function deleteMany(this: MongoController, options: MethodDeleteOptions): Promise<QueryResult<any>>;
 export default deleteMany;
