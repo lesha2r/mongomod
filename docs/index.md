@@ -96,5 +96,5 @@ npm install mongomod
 ```
 
 ::: tip Version 2.0+
-Version 2.0.0 introduces breaking changes. See the [Migration Guide](/migration-guide) for upgrading from earlier versions.
+Version 2.0.0 introduces breaking changes. See [For v1 users](/migration-guide) for upgrading from earlier versions.
 :::

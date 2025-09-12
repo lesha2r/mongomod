@@ -106,42 +106,27 @@ const userData = {
 };
 
 // Validate all fields
-const isValid = schema.validate(userData);
-console.log('Valid:', isValid); // true or false
+const result = schema.validate(userData);
+console.log('Valid:', result.ok); // Boolean
+if (!result.ok) {
+    console.log('Errors:', result.errors); // Array of error details
+}
 
 // Validate specific fields only
-const isNameValid = schema.validate(userData, 'name');
-const areFieldsValid = schema.validate(userData, ['name', 'email']);
+const nameResult = schema.validate(userData, 'name');
+const fieldsResult = schema.validate(userData, ['name', 'email']);
 ```
 
 **Parameters:**
 - `data` (object): Data to validate
 - `fields` (optional string|array): Specific fields to validate
 
-**Returns:** Boolean indicating if data is valid
+**Returns:** Object with validation results containing:
+- `ok` (boolean) - Whether validation passed
+- `errors` (array) - Array of validation error details if validation fails
+- Other validation result properties
 
-### `getValidationErrors(data, fields?)`
 
-Returns detailed validation errors.
-
-```javascript
-const invalidData = {
-    email: 'not-an-email',
-    age: 'not-a-number'
-};
-
-const errors = schema.getValidationErrors(invalidData);
-console.log('Validation errors:', errors);
-/*
-{
-  name: 'Field is required',
-  email: 'Must be a valid email',
-  age: 'Must be a number'
-}
-*/
-```
-
-**Returns:** Object with field names as keys and error messages as values
 
 ## Complex Schema Examples
 
@@ -357,17 +342,7 @@ const userSchema = new MongoSchema({
 });
 ```
 
-### Validate Early and Often
 
-```javascript
-// Validate before saving
-const user = new User().init(userData);
-if (!user.validate()) {
-    const errors = user.getValidationErrors();
-    throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
-}
-await user.save();
-```
 
 ## Related
 

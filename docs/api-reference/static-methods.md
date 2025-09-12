@@ -633,36 +633,7 @@ const taggedUsers = await User.findMany({
 });
 ```
 
-### Pagination Helpers
 
-```javascript
-// Efficient pagination
-async function paginateUsers(page = 1, limit = 20, filter = {}) {
-    const skip = (page - 1) * limit;
-    
-    const [users, total] = await Promise.all([
-        User.findMany({ filter, skip, limit, sort: { createdAt: -1 } }),
-        User.count({ filter })
-    ]);
-    
-    return {
-        users,
-        pagination: {
-            page,
-            limit,
-            total,
-            pages: Math.ceil(total / limit),
-            hasNext: page * limit < total,
-            hasPrev: page > 1
-        }
-    };
-}
-
-// Usage
-const result = await paginateUsers(1, 20, { active: true });
-console.log('Page 1 users:', result.users.length);
-console.log('Total pages:', result.pagination.pages);
-```
 
 ## Error Handling
 

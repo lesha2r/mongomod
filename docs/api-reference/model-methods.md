@@ -255,13 +255,16 @@ if (confirm('Are you sure you want to delete this user?')) {
 Validates the current model data against the schema.
 
 ```javascript
-const isValid = user.validate();
-if (!isValid) {
-    console.log('Validation failed');
+const result = user.validate();
+if (!result.ok) {
+    console.log('Validation failed:', result.errors);
 }
 ```
 
-**Returns:** Boolean indicating whether the data is valid
+**Returns:** Object with validation results containing:
+- `ok` (boolean): Whether the data is valid
+- `errors` (array): Array of validation error details if validation fails
+- Other validation result properties
 
 **Example:**
 ```javascript
@@ -271,53 +274,16 @@ const user = new User().init({
     age: -5 // Invalid age
 });
 
-if (user.validate()) {
+const result = user.validate();
+if (result.ok) {
     await user.save();
 } else {
     console.log('Cannot save: validation failed');
-    const errors = user.getValidationErrors();
-    console.log('Errors:', errors);
+    console.log('Errors:', result.errors);
 }
 ```
 
-### `getValidationErrors()`
 
-Returns detailed validation errors for the current model data.
-
-```javascript
-const errors = user.getValidationErrors();
-console.log(errors);
-// { email: 'Invalid email format', age: 'Age must be positive' }
-```
-
-**Returns:** Object with field names as keys and error messages as values
-
-**Example:**
-```javascript
-const user = new User();
-
-try {
-    user.init({
-        name: '', // Empty name
-        email: 'not-an-email', // Invalid email
-        age: 'twenty-five' // Invalid type
-    });
-} catch (error) {
-    if (error instanceof MmValidationError) {
-        console.log('Validation failed');
-        const errors = user.getValidationErrors();
-        
-        // Handle each error
-        Object.entries(errors).forEach(([field, message]) => {
-            console.log(`${field}: ${message}`);
-        });
-        
-        // name: Field is required
-        // email: Must be a valid email address  
-        // age: Must be a number
-    }
-}
-```
 
 ## Utility Methods
 

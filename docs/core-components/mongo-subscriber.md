@@ -223,46 +223,7 @@ User.subscribe('created', async (newData) => {
 });
 ```
 
-### Cross-Model Event Handling
 
-```javascript
-// When a user is created, create related records
-User.subscribe('created', async (userData) => {
-    // Create user profile
-    const Profile = mongomod.get('Profile');
-    const profile = new Profile().init({
-        userId: userData._id,
-        displayName: userData.name,
-        createdAt: new Date()
-    });
-    await profile.save(true);
-    
-    // Create user preferences
-    const Preferences = mongomod.get('Preferences');
-    const preferences = new Preferences().init({
-        userId: userData._id,
-        theme: 'light',
-        notifications: true
-    });
-    await preferences.save(true);
-});
-
-// When a user is deleted, cleanup related data
-User.subscribe('deleted', async (userData) => {
-    const userId = userData._id;
-    
-    // Delete related records
-    const Profile = mongomod.get('Profile');
-    const Post = mongomod.get('Post');
-    const Comment = mongomod.get('Comment');
-    
-    await Profile.deleteMany({ filter: { userId } });
-    await Post.deleteMany({ filter: { authorId: userId } });
-    await Comment.deleteMany({ filter: { userId } });
-    
-    console.log('Cleaned up data for deleted user:', userData.email);
-});
-```
 
 ### Event Error Handling
 
@@ -290,77 +251,7 @@ User.subscribe('*', (eventName, ...args) => {
 });
 ```
 
-## Event System Integration
 
-### With Custom Model Methods
-
-```javascript
-const userCustoms = {
-    async promote(newRole) {
-        const oldData = { ...this.data() }; // Capture old state
-        
-        this.set({
-            role: newRole,
-            promotedAt: new Date(),
-            updatedAt: new Date()
-        });
-        
-        const result = await this.save();
-        
-        // Manually trigger custom event
-        this._subscriber.emit('promoted', this.data(), oldData);
-        
-        return result;
-    }
-};
-
-const User = mongomod.createModel({
-    db: connection,
-    collection: 'users',
-    schema: userSchema,
-    customs: userCustoms
-});
-
-// Subscribe to custom event
-User.subscribe('promoted', (newData, oldData) => {
-    console.log(`User ${newData.name} promoted from ${oldData.role} to ${newData.role}`);
-    
-    // Send promotion notification
-    notificationService.send(`Congratulations! You've been promoted to ${newData.role}`);
-});
-```
-
-### Event Chaining
-
-```javascript
-// Chain events across different models
-User.subscribe('created', async (userData) => {
-    // Create initial post for new user
-    const Post = mongomod.get('Post');
-    const welcomePost = new Post().init({
-        title: 'Welcome to our platform!',
-        content: 'This is your first post. Start sharing your thoughts!',
-        authorId: userData._id,
-        published: true
-    });
-    await welcomePost.save(true);
-});
-
-Post.subscribe('created', async (postData) => {
-    // Update user's post count
-    const User = mongomod.get('User');
-    await User.updateOne({
-        filter: { _id: postData.authorId },
-        update: { $inc: { postCount: 1 } }
-    });
-    
-    // If it's user's first post, send achievement notification
-    const user = await User.findOne({ filter: { _id: postData.authorId } });
-    if (user && user.postCount === 1) {
-        achievementService.unlock(user._id, 'first_post');
-    }
-});
-```
 
 ## Best Practices
 
@@ -399,73 +290,11 @@ User.subscribe('updated', userEventHandlers.onUserUpdated);
 User.subscribe('deleted', userEventHandlers.onUserDeleted);
 ```
 
-### Error Resilience
 
-```javascript
-function createResilientHandler(handler, context = '') {
-    return async (...args) => {
-        try {
-            await handler(...args);
-        } catch (error) {
-            console.error(`Event handler error ${context}:`, error);
-            
-            // Optional: Add to retry queue or dead letter queue
-            // Optional: Send error notifications to monitoring service
-            
-            // Don't throw - prevent event errors from breaking main operations
-        }
-    };
-}
 
-// Use resilient handlers
-User.subscribe('created', createResilientHandler(
-    userEventHandlers.onUserCreated,
-    'user-created'
-));
-```
 
-### Performance Considerations
 
-```javascript
-// For high-volume operations, consider async processing
-User.subscribe('created', (userData) => {
-    // Queue for background processing instead of doing work immediately
-    jobQueue.add('process-new-user', userData, {
-        delay: 1000, // 1 second delay
-        attempts: 3
-    });
-});
 
-// Background job processor
-jobQueue.process('process-new-user', async (job) => {
-    const userData = job.data;
-    
-    await emailService.sendWelcomeEmail(userData.email);
-    await analytics.track('user_signup', userData);
-    await userOnboarding.initialize(userData._id);
-});
-```
-
-## Debugging Events
-
-```javascript
-// Enable debug logging for all events
-User.subscribe('*', (eventName, ...args) => {
-    if (process.env.NODE_ENV === 'development') {
-        console.log(`[DEBUG] Event: ${eventName}`, args);
-    }
-});
-
-// Log event execution time
-function createTimedHandler(handler, eventName) {
-    return async (...args) => {
-        const start = Date.now();
-        await handler(...args);
-        const duration = Date.now() - start;
-        console.log(`Event ${eventName} completed in ${duration}ms`);
-    };
-}
-```
 
 ## Related
 
