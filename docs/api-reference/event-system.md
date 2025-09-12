@@ -199,17 +199,6 @@ User.subscribe('created', async (userData) => {
         });
         await profile.save(true);
         
-        // Create user settings
-        const Settings = mongomod.get('Settings');
-        const settings = new Settings().init({
-            userId: userData._id,
-            emailNotifications: true,
-            pushNotifications: true,
-            theme: 'auto',
-            language: 'en'
-        });
-        await settings.save(true);
-        
         // Create initial dashboard
         const Dashboard = mongomod.get('Dashboard');
         const dashboard = new Dashboard().init({
@@ -235,7 +224,6 @@ User.subscribe('deleted', async (userData) => {
     try {
         // Get all related models
         const Profile = mongomod.get('Profile');
-        const Settings = mongomod.get('Settings');
         const Post = mongomod.get('Post');
         const Comment = mongomod.get('Comment');
         const Dashboard = mongomod.get('Dashboard');
@@ -243,7 +231,6 @@ User.subscribe('deleted', async (userData) => {
         // Delete related records
         await Promise.all([
             Profile.deleteMany({ filter: { userId } }),
-            Settings.deleteMany({ filter: { userId } }),
             Dashboard.deleteMany({ filter: { userId } }),
             
             // Handle posts - either delete or reassign to anonymous
