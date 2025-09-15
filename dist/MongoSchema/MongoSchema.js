@@ -14,8 +14,8 @@ class MongoSchema {
         };
         this.schema = new Schema(schemaObj);
     }
-    validate(data) {
-        return this.schema.validate(data);
+    validate(data, fields) {
+        return this.schema.validate(data, fields || undefined);
     }
 }
 export default MongoSchema;

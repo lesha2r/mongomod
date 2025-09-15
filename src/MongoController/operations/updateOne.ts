@@ -16,12 +16,6 @@ export type MethodUpdateOneOptions = {
 }
 
 const throwOperationError = (err: any, dbName?: string): MmOperationError => {
-    // if (err.code === 121) {
-    //     reject({ ok: false, details: 'validation failed', error: err });
-    // } else {
-    //     reject({ ok: false, details: 'error catched', error: err });
-    // }
-
     throw new MmOperationError({
         code: MmOperationErrors.OperationFailed.code,
         message: `${MmOperationErrors.OperationFailed.message}. ${err.message}`,
