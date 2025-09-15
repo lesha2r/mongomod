@@ -6,3 +6,5 @@ jest.config.ts
 examples
 /*/dev.*
 node_modules
+
+docs
