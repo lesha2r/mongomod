@@ -1,6 +1,6 @@
 # Schema Validation
 
-MongoSchema provides data validation capabilities using the `validno` library.
+<!--@include: ../includes/validno-info.md-->
 
 ## Basic Methods
 
@@ -17,8 +17,8 @@ const schema = new MongoSchema({
 
 // Validate all fields
 const result = schema.validate({
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: 'Jesse Pinkman',
+    email: 'jesse@lospollos.com',
     age: 25
 });
 

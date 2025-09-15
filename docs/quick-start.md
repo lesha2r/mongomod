@@ -34,14 +34,16 @@ await db.connect();
 
 ## Step 2: Define a Schema
 
+<!--@include: ./includes/validno-info.md-->
+
 Create a schema to define the structure and validation rules for your data:
 
 ```javascript
 import { MongoSchema } from 'mongomod';
 
 const userSchema = new MongoSchema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
+    name: { type: String },
+    email: { type: String },
     age: { type: Number, required: false },
     createdAt: { type: Date, required: false },
     active: { type: Boolean, required: false }
@@ -58,12 +60,14 @@ MongoMod supports the following schema types:
 - `Date` - Date and time
 - `Array` - Lists of data
 - `Object` - Nested objects
+- `CustomClass` - Custom type
+- `any` - Any type
 
 ### Schema Options
 
-- `required: true` - Field must be provided
+- `required: boolean` - Is field required (default: true)
 - `type: Type` - Data type validation
-- Custom validation rules (see [Schema Validation](/api-reference/schema-validation))
+- `rules: Object` - Custom validation rules (see [Schema Validation](/api-reference/schema-validation))
 
 ## Step 3: Create a Model
 
@@ -102,8 +106,8 @@ const User = mongomod.createModel({
 ```javascript
 // Create and save a new user
 const user = new User().init({
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: 'Jesse Pinkman',
+    email: 'jesse@lospollos.com',
     age: 25,
     createdAt: new Date(),
     active: true
@@ -113,7 +117,7 @@ const user = new User().init({
 await user.save(true); // true = insert if not exists
 
 // Use custom methods
-console.log(user.getFullInfo()); // "John Doe (john@example.com)"
+console.log(user.getFullInfo()); // "Jesse Pinkman (jesse@lospollos.com)"
 console.log(user.isAdult()); // true
 
 // Activate user
@@ -125,7 +129,7 @@ await user.activate();
 ```javascript
 // Find single document
 const foundUser = await User.findOne({
-    filter: { email: 'john@example.com' }
+    filter: { email: 'jesse@lospollos.com' }
 });
 
 // Find multiple documents
@@ -150,7 +154,7 @@ await user.save();
 
 // Static update methods
 await User.updateOne({
-    filter: { email: 'john@example.com' },
+    filter: { email: 'jesse@lospollos.com' },
     update: { $set: { age: 27 } }
 });
 
@@ -168,7 +172,7 @@ await user.delete();
 
 // Static delete methods
 await User.deleteOne({
-    filter: { email: 'john@example.com' }
+    filter: { email: 'jesse@lospollos.com' }
 });
 
 await User.deleteMany({

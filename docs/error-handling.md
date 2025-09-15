@@ -540,7 +540,7 @@ class HealthCheck {
         try {
             // Test basic connectivity
             const connection = mongomod.get('connection'); // Your main connection
-            if (!connection.isConnected()) {
+            if (!connection.isConnected) {
                 return { status: 'unhealthy', reason: 'Database not connected' };
             }
             

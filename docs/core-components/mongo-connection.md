@@ -58,17 +58,6 @@ await connection.disconnect();
 
 **Returns:** Promise that resolves when disconnection is complete
 
-### `isConnected()`
-
-Checks if the connection is currently active.
-
-```javascript
-const isConnected = connection.isConnected();
-console.log('Connected:', isConnected); // true or false
-```
-
-**Returns:** Boolean indicating connection status
-
 ## Properties
 
 ### `db`
@@ -89,6 +78,17 @@ Access to the underlying MongoDB client instance.
 const client = connection.client;
 // Access client-level operations
 ```
+
+### `isConnected`
+
+Checks if the connection is currently active.
+
+```javascript
+const isConnected = connection.isConnected;
+console.log('Connected:', isConnected); // true or false
+```
+
+**Returns:** Boolean indicating connection status
 
 ## Examples
 
@@ -167,14 +167,14 @@ class DatabaseManager {
     }
     
     async connect() {
-        if (!this.connection.isConnected()) {
+        if (!this.connection.isConnected) {
             await this.connection.connect();
             console.log('Database connected');
         }
     }
     
     async disconnect() {
-        if (this.connection.isConnected()) {
+        if (this.connection.isConnected) {
             await this.connection.disconnect();
             console.log('Database disconnected');
         }

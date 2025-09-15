@@ -32,8 +32,12 @@ const controller = new mongomod.Controller(db, 'users');
 const result = await controller.findMany({
     filter: { active: true },
     sort: { createdAt: -1 },
-    limit: 10
+    limit: 10,
+    skip: 10
 });
+
+console.log('Operation result:', result.ok)
+console.log('Documents found:', result.data)
 ```
 
 ## Query Methods
@@ -44,18 +48,14 @@ Finds a single document matching the filter.
 
 ```javascript
 const user = await controller.findOne({
-    filter: { email: 'john@example.com' },
-    projection: { name: 1, email: 1 }, // optional
-    sort: { createdAt: -1 }            // optional
+    filter: { email: 'jesse@lospollos.com' }
 });
 ```
 
 **Options:**
 - `filter` (object): MongoDB filter criteria
-- `projection` (optional object): Fields to include/exclude
-- `sort` (optional object): Sort order
-
-**Returns:** Document object or null if not found
+<!-- TODO-->
+**Returns:** `QueryResult<T>`
 
 ### `findMany(options)`
 
@@ -67,7 +67,6 @@ const users = await controller.findMany({
     sort: { name: 1 },
     limit: 50,
     skip: 0,
-    projection: { password: 0 } // exclude password field
 });
 ```
 
@@ -76,9 +75,8 @@ const users = await controller.findMany({
 - `sort` (optional object): Sort order
 - `limit` (optional number): Maximum number of documents
 - `skip` (optional number): Number of documents to skip
-- `projection` (optional object): Fields to include/exclude
-
-**Returns:** Array of documents
+<!-- TODO-->
+**Returns:** `QueryResult<T[]>`
 
 ## Insert Methods
 
@@ -88,17 +86,18 @@ Inserts a single document.
 
 ```javascript
 const result = await controller.insertOne({
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: 'Jesse Pinkman',
+    email: 'jesse@lospollos.com',
     createdAt: new Date()
 });
 
-console.log('Inserted ID:', result.insertedId);
+console.log('Insert result:', result.ok)
+console.log('Inserted document:', result.data);
 ```
 
 **Parameters:** Document object to insert
-
-**Returns:** Object with `insertedId` property
+<!-- TODO-->
+**Returns:** `QueryResult<T>`
 
 ### `insertMany(options)`
 
@@ -112,13 +111,15 @@ const result = await controller.insertMany({
     ]
 });
 
-console.log('Inserted IDs:', result.insertedIds);
+console.log('Insert result:', result.ok);
+console.log('Inserted records:', result.data);
 ```
 
 **Options:**
 - `data` (array): Array of documents to insert
-
-**Returns:** Object with `insertedIds` array
+- `ordered` (optional boolean): AI_FILL_IT_PLX
+<!-- TODO-->
+**Returns:** QueryResult<T[]>
 
 ## Update Methods
 
@@ -128,7 +129,7 @@ Updates a single document.
 
 ```javascript
 const result = await controller.updateOne({
-    filter: { email: 'john@example.com' },
+    filter: { email: 'jesse@lospollos.com' },
     update: { 
         $set: { 
             name: 'John Smith',
@@ -137,14 +138,16 @@ const result = await controller.updateOne({
     }
 });
 
-console.log('Modified count:', result.modifiedCount);
+console.log('Updated document:', result.data);
 ```
 
 **Options:**
 - `filter` (object): MongoDB filter criteria
 - `update` (object): MongoDB update operations
-
-**Returns:** Object with `modifiedCount`, `matchedCount`, etc.
+- `params` (optional object)
+    - `params.upsert` (optional boolean): AI_FILL_IT_PLX
+<!-- TODO-->
+**Returns:** `QueryResult<T>`
 
 ### `updateMany(options)`
 
@@ -161,14 +164,16 @@ const result = await controller.updateMany({
     }
 });
 
-console.log('Modified count:', result.modifiedCount);
+console.log('Updated document:', result.data);
 ```
 
 **Options:**
 - `filter` (object): MongoDB filter criteria
 - `update` (object): MongoDB update operations
-
-**Returns:** Object with `modifiedCount`, `matchedCount`, etc.
+- `params` (optional object)
+    - `params.upsert` (optional boolean): AI_FILL_IT_PLX
+<!-- TODO-->
+**Returns:** `QueryResult<T>`
 
 ## Delete Methods
 
@@ -178,15 +183,13 @@ Deletes a single document.
 
 ```javascript
 const result = await controller.deleteOne({
-    filter: { email: 'john@example.com' }
+    filter: { email: 'jesse@lospollos.com' }
 });
-
-console.log('Deleted count:', result.deletedCount);
 ```
 
 **Options:**
 - `filter` (object): MongoDB filter criteria
-
+<!-- TODO-->
 **Returns:** Object with `deletedCount` property
 
 ### `deleteMany(options)`
@@ -197,13 +200,11 @@ Deletes multiple documents.
 const result = await controller.deleteMany({
     filter: { active: false }
 });
-
-console.log('Deleted count:', result.deletedCount);
 ```
 
 **Options:**
 - `filter` (object): MongoDB filter criteria
-
+<!-- TODO-->
 **Returns:** Object with `deletedCount` property
 
 ## Aggregation Methods
@@ -225,7 +226,7 @@ const results = await controller.aggregate([
 ```
 
 **Parameters:** Aggregation pipeline array
-
+<!-- TODO-->
 **Returns:** Array of aggregation results
 
 ### `count(options)`
@@ -237,12 +238,12 @@ const count = await controller.count({
     filter: { active: true }
 });
 
-console.log('Active users:', count);
+console.log('Active users:', count); // TODO:
 ```
 
 **Options:**
 - `filter` (object): MongoDB filter criteria
-
+<!-- TODO-->
 **Returns:** Number of matching documents
 
 ### `distinct(options)`
@@ -261,7 +262,7 @@ console.log('Unique ages:', uniqueAges);
 **Options:**
 - `field` (string): Field name to get distinct values for
 - `filter` (optional object): MongoDB filter criteria
-
+<!-- TODO-->
 **Returns:** Array of distinct values
 
 ## Bulk Operations
@@ -322,21 +323,20 @@ const users = await controller.findMany({
 });
 ```
 
+<!-- 
 ### Projection Examples
 
 ```javascript
 // Include only specific fields
 const users = await controller.findMany({
     filter: { active: true },
-    projection: { name: 1, email: 1, _id: 0 }
 });
 
 // Exclude specific fields
 const users = await controller.findMany({
     filter: { active: true },
-    projection: { password: 0, secretKey: 0 }
 });
-```
+``` -->
 
 ### Pagination
 
@@ -418,7 +418,7 @@ For operations not covered by controller methods, access the underlying MongoDB 
 
 ```javascript
 // Get native MongoDB collection
-const collection = controller.collection;
+const collection = controller.getCollectionCtrl();
 
 // Use native MongoDB methods
 const result = await collection.createIndex({ email: 1 }, { unique: true });
@@ -469,15 +469,8 @@ const User = mongomod.createModel({
 ### Performance Optimization
 
 ```javascript
-// Use projection to limit data transfer
-const summaries = await controller.findMany({
-    filter: { published: true },
-    projection: { title: 1, summary: 1, publishedAt: 1 },
-    sort: { publishedAt: -1 }
-});
-
 // Use indexes for better performance
-const collection = controller.collection;
+const collection = controller.getCollectionCtrl();
 await collection.createIndex({ email: 1 }, { unique: true });
 await collection.createIndex({ createdAt: -1 });
 ```

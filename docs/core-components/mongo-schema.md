@@ -1,6 +1,6 @@
 # MongoSchema
 
-The `MongoSchema` class provides data validation and structure definition using the `validno` library.
+<!--@include: ../includes/validno-info.md-->
 
 ## Constructor
 
@@ -19,8 +19,8 @@ const schema = new MongoSchema(definition, options?);
 import { MongoSchema } from 'mongomod';
 
 const userSchema = new MongoSchema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
+    name: { type: String },
+    email: { type: String },
     age: { type: Number, required: false },
     createdAt: { type: Date, required: false },
     active: { type: Boolean, required: false }
@@ -39,31 +39,28 @@ const userSchema = new MongoSchema({
 | `Date` | Date and time | `new Date()` |
 | `Array` | Lists of data | `[1, 2, 3]` |
 | `Object` | Nested objects | `{ key: 'value' }` |
+| `any` | any type | `any kind of data` |
 
 ### Field Options
 
 ```javascript
 const schema = new MongoSchema({
     // Required field
-    name: { type: String, required: true },
+    name: { type: String },
     
     // Optional field
     description: { type: String, required: false },
     
     // Field with default value
-    createdAt: { type: Date, required: false, default: () => new Date() },
+    createdAt: { type: Date },
     
     // Array field
     tags: { type: Array, required: false },
     
     // Nested object
     profile: {
-        type: Object,
-        required: false,
-        properties: {
-            bio: { type: String },
-            website: { type: String }
-        }
+        bio: { type: String },
+        website: { type: String }
     }
 });
 ```
@@ -74,23 +71,12 @@ Configure schema behavior with options:
 
 ```javascript
 const schema = new MongoSchema({
-    title: { type: String, required: true },
-    content: { type: String },
-    published: { type: Boolean }
-}, {
-    strict: true,           // Enforce strict validation
-    allowUnknown: false,    // Reject unknown fields
-    stripUnknown: true      // Remove unknown fields
+    title: { type: String },
+    content: { type: String, required: false },
+    published: { type: Boolean, required: false }
 });
 ```
 
-### Available Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `strict` | boolean | `false` | Enable strict validation mode |
-| `allowUnknown` | boolean | `true` | Allow fields not in schema |
-| `stripUnknown` | boolean | `false` | Remove unknown fields from data |
 
 ## Methods
 
@@ -100,8 +86,8 @@ Validates data against the schema.
 
 ```javascript
 const userData = {
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: 'Jesse Pinkman',
+    email: 'jesse@lospollos.com',
     age: 25
 };
 
@@ -124,7 +110,7 @@ const fieldsResult = schema.validate(userData, ['name', 'email']);
 **Returns:** Object with validation results containing:
 - `ok` (boolean) - Whether validation passed
 - `errors` (array) - Array of validation error details if validation fails
-- Other validation result properties
+- Other validation result properties [see validno docs](https://validno.kodzero.pro/validation-results)
 
 
 
@@ -134,21 +120,14 @@ const fieldsResult = schema.validate(userData, ['name', 'email']);
 
 ```javascript
 const postSchema = new MongoSchema({
-    title: { type: String, required: true },
-    content: { type: String, required: true },
+    title: { type: String },
+    content: { type: String },
     author: {
-        type: Object,
-        required: true,
-        properties: {
-            name: { type: String, required: true },
-            email: { type: String, required: true },
-            profile: {
-                type: Object,
-                properties: {
-                    bio: { type: String },
-                    avatar: { type: String }
-                }
-            }
+        name: { type: String },
+        email: { type: String },
+        profile: {
+            bio: { type: String },
+            avatar: { type: String }
         }
     },
     tags: { type: Array, required: false },
@@ -160,104 +139,49 @@ const postSchema = new MongoSchema({
 
 ```javascript
 const productSchema = new MongoSchema({
-    name: { type: String, required: true },
+    name: { type: String },
     categories: {
         type: Array,
-        required: true,
-        items: { type: String }  // All array items must be strings
+        eachType: String
     },
     reviews: {
-        type: Array,
-        items: {
-            type: Object,
-            properties: {
-                rating: { type: Number, required: true },
-                comment: { type: String },
-                reviewer: { type: String, required: true }
+        rating: { type: Number },
+        comment: { type: String },
+        reviewer: { type: String }
+    }
+});
+```
+
+### Custom validation callback
+
+Custom rule functions receive value and context:
+
+```javascript
+const schema = new MongoSchema({
+    confirmPassword: {
+        type: String,
+        rules: {
+            custom: (value, { input }) => {
+                // Access the original input data
+                const password = input.password;
+                
+                return {
+                    result: value === password,
+                    details: value === password ? '' : 'Passwords do not match'
+                };
             }
         }
-    }
-});
-```
-
-### Conditional Validation
-
-```javascript
-const userSchema = new MongoSchema({
-    type: { type: String, required: true }, // 'admin' or 'user'
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    
-    // Admin-specific fields
-    permissions: {
-        type: Array,
-        required: function(data) {
-            return data.type === 'admin';
-        }
     },
-    
-    // User-specific fields
-    subscription: {
+    password: {
         type: String,
-        required: function(data) {
-            return data.type === 'user';
+        rules: {
+        lengthMin: 8
         }
     }
 });
 ```
 
-## Advanced Validation
-
-### Custom Validators
-
-```javascript
-const schema = new MongoSchema({
-    email: {
-        type: String,
-        required: true,
-        validator: function(value) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(value);
-        },
-        message: 'Must be a valid email address'
-    },
-    
-    age: {
-        type: Number,
-        required: true,
-        validator: function(value) {
-            return value >= 0 && value <= 120;
-        },
-        message: 'Age must be between 0 and 120'
-    }
-});
-```
-
-### Min/Max Validation
-
-```javascript
-const schema = new MongoSchema({
-    username: {
-        type: String,
-        required: true,
-        minLength: 3,
-        maxLength: 20
-    },
-    
-    score: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 100
-    },
-    
-    tags: {
-        type: Array,
-        minItems: 1,
-        maxItems: 5
-    }
-});
-```
+You may also use built-in `validno` rules for validation: [see all built-in rules](https://validno.kodzero.pro/string-rules)
 
 ## Schema Inheritance
 
@@ -268,18 +192,18 @@ Create base schemas and extend them:
 const baseSchema = new MongoSchema({
     createdAt: { type: Date, required: true },
     updatedAt: { type: Date, required: true },
-    active: { type: Boolean, required: true, default: true }
+    active: { type: Boolean, required: true }
 });
 
 // Extended schema
 const userSchema = new MongoSchema({
-    ...baseSchema.definition,
+    ...baseSchema.schema.definition,
     name: { type: String, required: true },
     email: { type: String, required: true }
 });
 
 const productSchema = new MongoSchema({
-    ...baseSchema.definition,
+    ...baseSchema.schema.definition,
     name: { type: String, required: true },
     price: { type: Number, required: true }
 });
@@ -290,18 +214,16 @@ const productSchema = new MongoSchema({
 MongoSchema is built on top of the `validno` library. For more advanced validation features, you can access the underlying validno schema:
 
 ```javascript
-const schema = new MongoSchema({
+const userSchema = new MongoSchema({
     email: { type: String, required: true }
 });
 
 // Access underlying validno schema for advanced features
-const validnoSchema = schema._schema;
+const validnoSchema = userSchema.schema;
 
 // Use validno-specific features
 const result = validnoSchema.validate(data);
-if (result.error) {
-    console.log('Validation error:', result.error);
-}
+console.log(result)
 ```
 
 For complete validation capabilities, see the [validno package documentation](https://www.npmjs.com/package/validno).
@@ -315,7 +237,7 @@ For complete validation capabilities, see the [validno package documentation](ht
 export const userSchema = new MongoSchema({
     name: { type: String, required: true },
     email: { type: String, required: true },
-    createdAt: { type: Date, required: true, default: () => new Date() }
+    createdAt: { type: Date, required: true }
 });
 
 // schemas/post.js  
@@ -325,24 +247,6 @@ export const postSchema = new MongoSchema({
     authorId: { type: String, required: true }
 });
 ```
-
-### Use Defaults for Common Fields
-
-```javascript
-const baseFields = {
-    createdAt: { type: Date, required: true, default: () => new Date() },
-    updatedAt: { type: Date, required: true, default: () => new Date() },
-    active: { type: Boolean, required: true, default: true }
-};
-
-const userSchema = new MongoSchema({
-    ...baseFields,
-    name: { type: String, required: true },
-    email: { type: String, required: true }
-});
-```
-
-
 
 ## Related
 

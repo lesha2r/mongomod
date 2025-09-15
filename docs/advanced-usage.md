@@ -332,7 +332,6 @@ class UserService {
                 lastLoginAt: { $gte: cutoffDate }
             },
             sort: { lastLoginAt: -1 },
-            projection: { passwordHash: 0 } // Exclude sensitive data
         });
     }
     
@@ -350,7 +349,6 @@ class UserService {
             sort: { name: 1 },
             limit,
             skip,
-            projection: { passwordHash: 0 }
         });
     }
 }
@@ -365,7 +363,6 @@ class PaginationHelper {
             page = 1,
             limit = 20,
             sort = { createdAt: -1 },
-            projection = {}
         } = options;
         
         const skip = (page - 1) * limit;
@@ -376,7 +373,6 @@ class PaginationHelper {
                 sort,
                 limit,
                 skip,
-                projection
             }),
             Model.count({ filter })
         ]);
@@ -399,7 +395,6 @@ class PaginationHelper {
             cursor,
             limit = 20,
             sort = { _id: 1 },
-            projection = {}
         } = options;
         
         // Add cursor condition to filter
@@ -417,7 +412,6 @@ class PaginationHelper {
             filter: finalFilter,
             sort,
             limit: limit + 1, // Get one extra to check if there's a next page
-            projection
         });
         
         const hasNext = results.length > limit;

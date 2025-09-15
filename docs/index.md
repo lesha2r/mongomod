@@ -28,7 +28,7 @@ features:
     details: Extend models with your own custom functionality and business logic.
   - icon: 🎯
     title: Event System
-    details: Subscribe to model lifecycle events (create, update, delete) for reactive programming.
+    details: Subscribe to model lifecycle events for reactive programming.
   - icon: 📊
     title: Full MongoDB Support
     details: Complete CRUD operations, aggregation, indexing, and more advanced MongoDB features.
@@ -61,9 +61,9 @@ await db.connect();
 
 // Define schema
 const userSchema = new mongomod.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    age: { type: Number }
+    name: { type: String },
+    email: { type: String },
+    age: { type: Number, required: false }
 });
 
 // Create model with custom methods
@@ -80,13 +80,13 @@ const User = mongomod.createModel({
 
 // Use the model
 const user = new User().init({
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: 'Jesse Pinkman',
+    email: 'jesse@lospollos.com',
     age: 25
 });
 
 await user.save(true);
-console.log(user.getFullInfo()); // "John Doe (john@example.com)"
+console.log(user.getFullInfo()); // "Jesse Pinkman (jesse@lospollos.com)"
 ```
 
 ## Installation

@@ -10,13 +10,12 @@ Finds a single document matching the filter criteria.
 
 ```javascript
 const user = await User.findOne({
-    filter: { email: 'john@example.com' }
+    filter: { email: 'jesse@lospollos.com' }
 });
 ```
 
 **Options:**
 - `filter` (object) - MongoDB filter criteria
-- `projection` (optional object) - Fields to include/exclude
 - `sort` (optional object) - Sort order
 
 **Returns:** Promise resolving to document object or null
@@ -25,7 +24,7 @@ const user = await User.findOne({
 ```javascript
 // Basic find
 const user = await User.findOne({
-    filter: { email: 'john@example.com' }
+    filter: { email: 'jesse@lospollos.com' }
 });
 
 if (user) {
@@ -33,12 +32,6 @@ if (user) {
 } else {
     console.log('User not found');
 }
-
-// With projection
-const userProfile = await User.findOne({
-    filter: { _id: userId },
-    projection: { name: 1, email: 1, _id: 0 }
-});
 
 // With sorting (gets the newest user with that email)
 const latestUser = await User.findOne({
@@ -64,7 +57,6 @@ const activeUsers = await User.findMany({
 - `sort` (optional object) - Sort order
 - `limit` (optional number) - Maximum documents to return
 - `skip` (optional number) - Number of documents to skip
-- `projection` (optional object) - Fields to include/exclude
 
 **Returns:** Promise resolving to array of documents
 
@@ -99,7 +91,6 @@ const premiumUsers = await User.findMany({
             { createdAt: { $gte: new Date('2023-01-01') } }
         ]
     },
-    projection: { password: 0 }, // Exclude sensitive data
     sort: { lastLoginAt: -1 }
 });
 ```
@@ -196,7 +187,7 @@ Updates a single document matching the filter.
 
 ```javascript
 const result = await User.updateOne({
-    filter: { email: 'john@example.com' },
+    filter: { email: 'jesse@lospollos.com' },
     update: { $set: { age: 26, updatedAt: new Date() } }
 });
 
@@ -614,7 +605,6 @@ const results = await User.findMany({
 // Text search (requires text index)
 const searchResults = await User.findMany({
     filter: { $text: { $search: 'john developer' } },
-    projection: { score: { $meta: 'textScore' } },
     sort: { score: { $meta: 'textScore' } }
 });
 
