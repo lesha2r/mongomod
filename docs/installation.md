@@ -1,3 +1,4 @@
+<!-- ✅ checked @ 16.09.2025 -->
 # Installation
 
 ## Prerequisites
@@ -10,7 +11,7 @@
 Install MongoMod using npm:
 
 ```bash
-npm install mongomod
+npm i mongomod
 ```
 
 ## Dependencies

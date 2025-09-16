@@ -1,3 +1,5 @@
+<!-- ✅ checked @ 16.09.2025 -->
+
 # Quick Start
 
 This guide will help you get started with MongoMod in just a few minutes.
@@ -24,13 +26,7 @@ await db.connect();
 
 ### Connection Options
 
-| Option | Type | Description | Required |
-|--------|------|-------------|----------|
-| `link` | string | MongoDB host and port | ✅ |
-| `dbName` | string | Database name | ✅ |
-| `login` | string | Username for authentication | ❌ |
-| `password` | string | Password for authentication | ❌ |
-| `srv` | boolean | Use SRV record (for MongoDB Atlas) | ❌ |
+<!--@include: ./includes/connection-options.md-->
 
 ## Step 2: Define a Schema
 
@@ -197,9 +193,9 @@ async function main() {
     
     // 2. Define schema
     const userSchema = new mongomod.Schema({
-        name: { type: String, required: true },
-        email: { type: String, required: true },
-        age: { type: Number }
+        name: { type: String },
+        email: { type: String },
+        age: { type: Number, required: false }
     });
     
     // 3. Create model
@@ -225,7 +221,7 @@ async function main() {
     console.log(user.greet()); // "Hello, Alice!"
     
     const allUsers = await User.findMany({ filter: {} });
-    console.log('Total users:', allUsers.length);
+    console.log('Total users:', allUsers.data.length);
 }
 
 main().catch(console.error);

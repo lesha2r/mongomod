@@ -12,15 +12,7 @@ export default defineConfig({
       { text: 'Guide', link: '/quick-start' },
       { text: 'API Reference', link: '/api-reference/' },
       { text: 'Examples', link: '/advanced-usage' },
-      {
-        text: 'Links',
-        items: [
-          { text: 'GitHub', link: 'https://github.com/lesha2r/mongomod' },
-          { text: 'NPM', link: 'https://www.npmjs.com/package/mongomod' }
-        ]
-      }
     ],
-    
     sidebar: {
       '/': [
         {
@@ -72,7 +64,7 @@ export default defineConfig({
     
     footer: {
       message: 'Released under the ISC License.',
-      copyright: 'Copyright © 2024 lesha2r'
+      copyright: 'Copyright © 2025 lesha2r'
     },
     
     editLink: {

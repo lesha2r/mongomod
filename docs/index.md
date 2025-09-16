@@ -6,7 +6,7 @@ hero:
   text: "MongoDB ODM for Node.js"
   tagline: "A powerful MongoDB model-based library with TypeScript support"
   image:
-    src: /logo.png
+    src: https://files.kodzero.pro/validno/validno-logo-large.svg
     alt: MongoMod
   actions:
     - theme: brand
@@ -46,6 +46,18 @@ features:
 ## Why MongoMod?
 
 MongoMod is a feature-rich MongoDB ODM (Object Document Mapper) that provides an intuitive, model-based approach to working with MongoDB databases. It combines the flexibility of MongoDB with the structure and safety of schema validation, custom methods, and event-driven programming.
+
+It was developed as a custom and flexible solution for Kodzero framework.
+
+## Installation
+
+```bash
+npm install mongomod
+```
+
+::: tip Version 2.0+
+Version 2.0.0 introduces breaking changes. See [For v1 users](/migration-guide) for upgrading from earlier versions.
+:::
 
 ## Quick Example
 
@@ -89,12 +101,24 @@ await user.save(true);
 console.log(user.getFullInfo()); // "Jesse Pinkman (jesse@lospollos.com)"
 ```
 
-## Installation
+<script setup>
+import { VPTeamMembers } from 'vitepress/theme'
 
-```bash
-npm install mongomod
-```
+const members = [
+  {
+    avatar: 'https://avatars.githubusercontent.com/u/66374113?v=4',
+    name: 'Aleksey Tur',
+    title: 'Creator',
+    links: [
+      { icon: 'github', link: 'https://github.com/lesha2r' },
+      { icon: 'telegram', link: 'https://t.me/leshatour' }
+    ]
+  }
+]
+</script>
 
-::: tip Version 2.0+
-Version 2.0.0 introduces breaking changes. See [For v1 users](/migration-guide) for upgrading from earlier versions.
-:::
+# Team
+
+Created as part of something bigger and more grandiose by...
+
+<VPTeamMembers size="small" :members />

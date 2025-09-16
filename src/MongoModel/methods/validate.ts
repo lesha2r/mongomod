@@ -5,7 +5,7 @@ import { MmModelErrors } from '../../constants/model.js';
 function validate(this: MongoModel, data: {[key: string]: any} | null = this.modelData) {
     if (!this.schema) return null;
 
-    const validationResult = this.schema.validate(data);
+    const validationResult = this.schema.validate(data, []);
 
     if (validationResult.ok === false) {
         throw new MmValidationError({

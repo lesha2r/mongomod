@@ -1,3 +1,4 @@
+<!-- ✅ checked @ 16.09.2025 -->
 # MongoConnection
 
 The `MongoConnection` class handles database connections with robust error handling and timeout management.
@@ -10,13 +11,7 @@ const connection = new mongomod.Connection(options);
 
 ### Options
 
-| Parameter | Type | Description | Required |
-|-----------|------|-------------|----------|
-| `link` | string | MongoDB host and port (e.g., 'localhost:27017') | ✅ |
-| `dbName` | string | Database name | ✅ |
-| `login` | string | Username for authentication | ❌ |
-| `password` | string | Password for authentication | ❌ |
-| `srv` | boolean | Use SRV record (for MongoDB Atlas) | ❌ |
+<!--@include: ../includes/connection-options.md-->
 
 ## Methods
 
@@ -65,7 +60,7 @@ await connection.disconnect();
 Access to the underlying MongoDB database instance.
 
 ```javascript
-const database = connection.db;
+const database = connection.db();
 // Use native MongoDB operations if needed
 const collection = database.collection('users');
 ```
@@ -91,17 +86,6 @@ console.log('Connected:', isConnected); // true or false
 **Returns:** Boolean indicating connection status
 
 ## Examples
-
-### Basic Local Connection
-
-```javascript
-const connection = new mongomod.Connection({
-    link: 'localhost:27017',
-    dbName: 'myapp'
-});
-
-await connection.connect();
-```
 
 ### Authenticated Connection
 
@@ -216,12 +200,7 @@ const connection = new mongomod.Connection({
 
 ### Connection Pooling
 
-MongoMod automatically handles connection pooling through the underlying MongoDB driver. You can configure pool settings by accessing the client:
-
-```javascript
-// Connection pooling is handled automatically
-// The underlying driver manages connection reuse efficiently
-```
+MongoMod automatically handles connection pooling through the underlying MongoDB driver. You can configure pool settings by accessing the client.
 
 ### Error Handling
 

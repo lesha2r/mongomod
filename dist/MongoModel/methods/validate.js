@@ -3,7 +3,7 @@ import { MmModelErrors } from '../../constants/model.js';
 function validate(data = this.modelData) {
     if (!this.schema)
         return null;
-    const validationResult = this.schema.validate(data);
+    const validationResult = this.schema.validate(data, []);
     if (validationResult.ok === false) {
         throw new MmValidationError({
             code: MmModelErrors.InvalidModelData.code,

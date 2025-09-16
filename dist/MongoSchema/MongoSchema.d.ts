@@ -8,6 +8,6 @@ declare class MongoSchema {
     constructor(schemaObj?: {
         [key: string]: any;
     }, options?: MongomodSchemaSettings);
-    validate(data: any): any;
+    validate(data: any, fields: string | string[]): any;
 }
 export default MongoSchema;

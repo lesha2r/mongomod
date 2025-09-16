@@ -1,3 +1,4 @@
+<!-- ✅ checked @ 16.09.2025 -->
 # MongoSubscriber
 
 The `MongoSubscriber` class provides an event system that allows you to subscribe to model lifecycle events such as create, update, and delete operations.
@@ -57,13 +58,13 @@ User.subscribe('deleted', (deletedData) => {
 
 Events are automatically triggered during model operations:
 
-```javascript
+```javascript{6,10,13}
 // This will trigger 'created' event
 const user = new User().init({
     name: 'John Doe',
     email: 'john@example.com'
 });
-await user.save(true); // Triggers 'created' event
+await user.insert(); // Triggers 'created' event
 
 // This will trigger 'updated' event
 user.set({ age: 25 });
@@ -81,15 +82,15 @@ Subscribes to a specific event.
 
 ```javascript
 User.subscribe('created', (newData, oldData) => {
-    // Handle creation event
+    // Any side effects
 });
 
 User.subscribe('updated', (newData, oldData) => {
-    // Handle update event
+    // Any side effects
 });
 
 User.subscribe('deleted', (deletedData) => {
-    // Handle deletion event
+    // Any side effects
 });
 ```
 
@@ -99,15 +100,12 @@ User.subscribe('deleted', (deletedData) => {
 
 ### Multiple Subscribers
 
-You can have multiple subscribers for the same event:
+You can have multiple subscribers for the same model and event:
 
 ```javascript
 // Analytics subscriber
 User.subscribe('created', (newData) => {
-    analytics.track('user_created', {
-        userId: newData._id,
-        email: newData.email
-    });
+    analytics.track('user_created', newData._id);
 });
 
 // Email subscriber
@@ -117,11 +115,7 @@ User.subscribe('created', (newData) => {
 
 // Audit log subscriber
 User.subscribe('created', (newData) => {
-    auditLog.log('USER_CREATED', {
-        userId: newData._id,
-        timestamp: new Date(),
-        data: newData
-    });
+    auditLog.log('USER_CREATED', { userId: newData._id });
 });
 ```
 
@@ -173,7 +167,7 @@ User.subscribe('deleted', (deletedData) => {
 await user.delete();
 ```
 
-## Advanced Usage
+## Advanced examples
 
 ### Conditional Event Handling
 
@@ -205,7 +199,7 @@ User.subscribe('updated', (newData, oldData) => {
 });
 ```
 
-### Async Event Handlers
+### Async Event Handling
 
 ```javascript
 User.subscribe('created', async (newData) => {
@@ -222,79 +216,6 @@ User.subscribe('created', async (newData) => {
     }
 });
 ```
-
-
-
-### Event Error Handling
-
-```javascript
-User.subscribe('created', async (newData) => {
-    try {
-        await externalService.createUser(newData);
-    } catch (error) {
-        console.error('External service error:', error);
-        
-        // Handle the error gracefully
-        // Maybe add to retry queue or log for manual processing
-        retryQueue.add('create_external_user', newData);
-    }
-});
-
-// Global error handler for all events
-User.subscribe('*', (eventName, ...args) => {
-    try {
-        // Log all events for debugging
-        console.log(`Event ${eventName} triggered:`, args);
-    } catch (error) {
-        console.error('Event logging error:', error);
-    }
-});
-```
-
-
-
-## Best Practices
-
-### Organize Event Handlers
-
-```javascript
-// events/userEvents.js
-export const userEventHandlers = {
-    async onUserCreated(userData) {
-        await emailService.sendWelcomeEmail(userData.email);
-        await analytics.track('user_signup', userData);
-    },
-    
-    async onUserUpdated(newData, oldData) {
-        if (newData.email !== oldData.email) {
-            await emailService.sendVerification(newData.email);
-        }
-    },
-    
-    async onUserDeleted(userData) {
-        await cleanupService.removeUserData(userData._id);
-    }
-};
-
-// models/User.js
-import { userEventHandlers } from '../events/userEvents.js';
-
-const User = mongomod.createModel({
-    db: connection,
-    collection: 'users',
-    schema: userSchema
-});
-
-User.subscribe('created', userEventHandlers.onUserCreated);
-User.subscribe('updated', userEventHandlers.onUserUpdated);
-User.subscribe('deleted', userEventHandlers.onUserDeleted);
-```
-
-
-
-
-
-
 
 ## Related
 

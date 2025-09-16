@@ -4,7 +4,7 @@ export interface MongomodConnectionOptions {
     login: string;
     password: string;
     dbName: string;
-    srv: boolean;
+    srv?: boolean;
 }
 declare class MongoConnection {
     link: string;

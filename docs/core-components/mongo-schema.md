@@ -1,3 +1,5 @@
+<!-- ✅ checked @ 16.09.2025 -->
+
 # MongoSchema
 
 <!--@include: ../includes/validno-info.md-->
@@ -5,13 +7,12 @@
 ## Constructor
 
 ```javascript
-const schema = new MongoSchema(definition, options?);
+const schema = new MongoSchema(definition);
 ```
 
 ### Parameters
 
 - `definition` (object): Schema field definitions
-- `options` (optional object): Schema configuration options
 
 ## Basic Schema Definition
 
@@ -27,6 +28,9 @@ const userSchema = new MongoSchema({
 });
 ```
 
+<i>Note that all fields are recognized as `required: true` by default, so you only need to set `required: false` when a field is optional.</i>
+
+
 ## Field Types
 
 ### Supported Types
@@ -37,7 +41,7 @@ const userSchema = new MongoSchema({
 | `Number` | Numeric data | `42`, `3.14` |
 | `Boolean` | True/false values | `true`, `false` |
 | `Date` | Date and time | `new Date()` |
-| `Array` | Lists of data | `[1, 2, 3]` |
+| `Array` | List of values | `[1, 2, 3]` |
 | `Object` | Nested objects | `{ key: 'value' }` |
 | `any` | any type | `any kind of data` |
 
@@ -64,19 +68,6 @@ const schema = new MongoSchema({
     }
 });
 ```
-
-## Schema Options
-
-Configure schema behavior with options:
-
-```javascript
-const schema = new MongoSchema({
-    title: { type: String },
-    content: { type: String, required: false },
-    published: { type: Boolean, required: false }
-});
-```
-
 
 ## Methods
 
@@ -109,8 +100,15 @@ const fieldsResult = schema.validate(userData, ['name', 'email']);
 
 **Returns:** Object with validation results containing:
 - `ok` (boolean) - Whether validation passed
-- `errors` (array) - Array of validation error details if validation fails
-- Other validation result properties [see validno docs](https://validno.kodzero.pro/validation-results)
+- `errors` (string[]) - Array of validation error details if validation fails
+- `passed` (string[]) - List of keys that passed validation
+- `failed` (string[]) - List of keys that failed validation
+- `missed` (string[]) - List of keys that are missing
+- `byKeys` (Record<string, boolean>) - Validation result for each key (note that nested keys are specified as `parent.child`)
+- `errorsByKeys` (Record<string, string[]>) - Array of validation error details for each key that failed validation (helper for building validation messages)
+- `joinErrors()` (Function<string[]>) - Helper method for getting all errors as a string separated by `; ` or a specified separator provided as an argument
+
+See all validation result properties: [validno docs](https://validno.kodzero.pro/validation-results)
 
 
 
@@ -137,12 +135,12 @@ const postSchema = new MongoSchema({
 
 ### Array Validation
 
-```javascript
+```javascript{4-5}
 const productSchema = new MongoSchema({
     name: { type: String },
     categories: {
         type: Array,
-        eachType: String
+        eachType: String // Specifies the expected type for all items in the array
     },
     reviews: {
         rating: { type: Number },
@@ -181,7 +179,7 @@ const schema = new MongoSchema({
 });
 ```
 
-You may also use built-in `validno` rules for validation: [see all built-in rules](https://validno.kodzero.pro/string-rules)
+See all built-in `validno` rules: [Custom rules docs](https://validno.kodzero.pro/string-rules)
 
 ## Schema Inheritance
 
