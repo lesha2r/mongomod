@@ -10,7 +10,9 @@ const validateOptions = (options) => {
     const optionsSchema = new Schema({
         filter: { type: Object, required: true },
         limit: { type: Number, required: false },
-        skip: { type: Number, required: false }
+        skip: { type: Number, required: false },
+        sort: { type: Object, required: false },
+        project: { type: Object, required: false }
     });
     const validationResult = optionsSchema.validate(options);
     if (!validationResult.ok)
@@ -22,14 +24,15 @@ const validateOptions = (options) => {
         });
 };
 const parseOptions = (options) => {
-    let filter = options.filter || {};
-    let limit = options.limit || MAX_QUERY_LIMIT;
-    let skip = options.skip || 0;
+    const filter = options.filter || {};
+    const limit = options.limit || MAX_QUERY_LIMIT;
+    const skip = options.skip || 0;
+    const sort = options.sort || undefined;
+    const project = options.project || undefined;
     if (filter._id && typeof filter._id === "string") {
         filter._id = new ObjectId(filter._id);
     }
-    const output = { filter, limit, skip };
-    return output;
+    return { filter, limit, skip, sort, project };
 };
 const throwOperationError = (err, dbName) => {
     throw new MmOperationError({
@@ -42,10 +45,19 @@ const throwOperationError = (err, dbName) => {
 };
 async function findMany(options) {
     try {
-        const { filter, limit, skip } = parseOptions(options);
-        validateOptions({ filter, limit, skip });
+        const { filter, limit, skip, sort, project } = parseOptions(options);
+        validateOptions({ filter, limit, skip, sort, project });
         const collection = this.getCollectionCtrl();
-        const result = await collection.find(filter).limit(limit).skip(skip).toArray();
+        let query = collection.find(filter);
+        if (sort)
+            query = query.sort(sort);
+        if (skip > 0)
+            query = query.skip(skip);
+        if (limit > 0)
+            query = query.limit(limit);
+        if (project)
+            query = query.project(project);
+        const result = await query.toArray();
         return new QueryResult(true, result);
     }
     catch (err) {

@@ -8,7 +8,7 @@ export interface MongomodConnectionOptions {
     login: string
     password: string
     dbName: string
-    srv: boolean
+    srv?: boolean
 }
 
 class MongoConnection {
@@ -38,7 +38,7 @@ class MongoConnection {
         this.password = options.password;
         this.dbName = options?.dbName || '';
         this.options = {
-            srv: options.srv
+            srv: options.srv || false
         };
 
         this.client = null;

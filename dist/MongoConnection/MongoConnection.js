@@ -21,7 +21,7 @@ class MongoConnection {
         this.password = options.password;
         this.dbName = options?.dbName || '';
         this.options = {
-            srv: options.srv
+            srv: options.srv || false
         };
         this.client = null;
         this.isConnected = false;
