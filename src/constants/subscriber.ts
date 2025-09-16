@@ -2,6 +2,7 @@ export enum MmSubscribeEvents {
     Created = 'created',
     Updated = 'updated',
     Deleted = 'deleted',
+    All = '*'
 }
 
 export const SubscriberOperationName = 'subscribe'

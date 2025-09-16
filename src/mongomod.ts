@@ -58,7 +58,7 @@ const mongomod: {[key: string]: any} & Mongomod = {
                 Object.assign(this, customs);
             }
             
-            static _subscriber = new MongoSubscriber('TestId10129309120312903')
+            static _subscriber = new MongoSubscriber('')
             _subscriber = CustomModel._subscriber
             static subscribe = CustomModel._subscriber.subscribe
 

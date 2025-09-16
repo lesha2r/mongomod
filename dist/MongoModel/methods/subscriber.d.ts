@@ -1,17 +1,11 @@
 import { MmSubscribeEvents } from "../../constants/subscriber.js";
+import MongoSubscriber from "../../MongoSubscriber/index.js";
 type NewData = Record<string, any>;
 type OldData = Record<string, any>;
-interface ICustomModel {
-    activeSubscribers: {
-        [MmSubscribeEvents.Created]: Function[];
-        [MmSubscribeEvents.Updated]: Function[];
-        [MmSubscribeEvents.Deleted]: Function[];
-    };
-}
-declare function subscribe(this: ICustomModel, event: MmSubscribeEvents, callback: Function): void;
-declare function onCreated(this: ICustomModel, newData: NewData, oldData: OldData): void;
-declare function onUpdated(this: ICustomModel, newData: NewData, oldData: OldData): void;
-declare function onDeleted(this: ICustomModel, newData: NewData, oldData: OldData): void;
+declare function subscribe(this: MongoSubscriber, event: MmSubscribeEvents, callback: Function): void;
+declare function onCreated(this: MongoSubscriber, newData: NewData, oldData: OldData): void;
+declare function onUpdated(this: MongoSubscriber, newData: NewData, oldData: OldData): void;
+declare function onDeleted(this: MongoSubscriber, newData: NewData, oldData: OldData): void;
 declare const _default: {
     subscribe: typeof subscribe;
     onCreated: typeof onCreated;

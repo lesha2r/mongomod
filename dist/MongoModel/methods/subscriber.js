@@ -18,15 +18,24 @@ function subscribe(event, callback) {
     this.activeSubscribers[event].push(callback);
 }
 function onCreated(newData, oldData) {
-    const callbacks = this.activeSubscribers[MmSubscribeEvents.Created];
+    const callbacks = [
+        ...this.activeSubscribers[MmSubscribeEvents.Created],
+        ...this.activeSubscribers[MmSubscribeEvents.All]
+    ];
     executeForCallbacks(callbacks, newData, oldData);
 }
 function onUpdated(newData, oldData) {
-    const callbacks = this.activeSubscribers[MmSubscribeEvents.Created];
+    const callbacks = [
+        ...this.activeSubscribers[MmSubscribeEvents.Updated],
+        ...this.activeSubscribers[MmSubscribeEvents.All]
+    ];
     executeForCallbacks(callbacks, newData, oldData);
 }
 function onDeleted(newData, oldData) {
-    const callbacks = this.activeSubscribers[MmSubscribeEvents.Created];
+    const callbacks = [
+        ...this.activeSubscribers[MmSubscribeEvents.Deleted],
+        ...this.activeSubscribers[MmSubscribeEvents.All]
+    ];
     executeForCallbacks(callbacks, newData, oldData);
 }
 export default {

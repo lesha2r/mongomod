@@ -21,7 +21,7 @@ async function insert(this: MongoModel): Promise<MongoModel> {
 
         if (result.data && '_id' in result.data) {
             this.modelData!._id = result.data._id;
-            this._subscriber.onCreated(this.modelData, dataFrozen)
+            this._subscriber.onCreated(this.modelData, null)
         }
 
         return this;

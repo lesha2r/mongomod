@@ -3,6 +3,7 @@ export var MmSubscribeEvents;
     MmSubscribeEvents["Created"] = "created";
     MmSubscribeEvents["Updated"] = "updated";
     MmSubscribeEvents["Deleted"] = "deleted";
+    MmSubscribeEvents["All"] = "*";
 })(MmSubscribeEvents || (MmSubscribeEvents = {}));
 export const SubscriberOperationName = 'subscribe';
 export const MmSubscriberErrCodes = {
