@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
-async function save(insertIfNotExists = false) {
+async function save() {
     this.ensureModelData();
     const dataFrozen = _.clone(this._modelDataBeforeSave);
     try {
-        if (insertIfNotExists === true) {
+        if (!this.modelData || !this.modelData._id) {
             return this.insert();
         }
         else {

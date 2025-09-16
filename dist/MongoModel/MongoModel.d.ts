@@ -47,7 +47,7 @@ declare class MongoModel extends MongoController {
     get(filter?: {
         [key: string]: any;
     }): Promise<MongoModel>;
-    save(insertIfNotExists?: boolean): Promise<MongoModel>;
+    save(): Promise<MongoModel>;
     delete(): Promise<MongoModel>;
 }
 export default MongoModel;

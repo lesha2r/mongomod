@@ -159,8 +159,8 @@ class MongoModel extends MongoController {
     }
 
     // Saves current model data into the db
-    async save(insertIfNotExists: boolean = false): Promise<MongoModel> {
-        return save.call(this, insertIfNotExists);
+    async save(): Promise<MongoModel> {
+        return save.call(this);
     }
 
     // Deletes current item from db
