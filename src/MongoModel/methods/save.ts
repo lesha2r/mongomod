@@ -3,9 +3,22 @@ import MongoModel from '../MongoModel.js';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
 
+const getUnsetPayload = (dataFrozen: Record<string, any>): Record<string, ''> => {
+    const $unset: Record<string, any> = {}
+
+    for (const key in dataFrozen) {
+        if (dataFrozen[key] === undefined) {
+            $unset[key] = true;
+            delete dataFrozen[key];
+        }
+    }
+
+    return $unset
+}
+
 async function save(this: MongoModel): Promise<MongoModel> {
     this.ensureModelData();
-    const dataFrozen = _.clone(this._modelDataBeforeSave)
+    const dataBeforeSave = _.clone(this._modelDataBeforeSave)
 
     try {
         if (!this.modelData || !this.modelData._id) {
@@ -13,9 +26,15 @@ async function save(this: MongoModel): Promise<MongoModel> {
         } else {
             this.ensureModelId();
 
+            const dataFrozen = this.modelData;
+            dataFrozen!._id = this.modelData!._id;
+
             const result = await this.updateOne({
-                filter: { _id: this.modelData!._id },
-                update: this.modelData!
+                filter: { _id: dataFrozen!._id },
+                update: {
+                    $set: dataFrozen,
+                    $unset: getUnsetPayload(dataFrozen)
+                }
             });
 
             if (!result.ok) {
@@ -26,10 +45,12 @@ async function save(this: MongoModel): Promise<MongoModel> {
                     operation: 'save'
                 });
             }
+
+
         }
 
         this._modelDataBeforeSave = this.data(true)
-        this._subscriber.onUpdated(this.modelData, dataFrozen)
+        this._subscriber.onUpdated(this.modelData, dataBeforeSave)
 
         return this;
     } catch (err) {
