@@ -1,6 +1,6 @@
 # Schema Validation
 
-<!--@include: ../includes/validno-info.md-->
+<!--@include: ../.includes/validno-info.md-->
 
 ## Basic Methods
 

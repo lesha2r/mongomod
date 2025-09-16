@@ -1,0 +1,10 @@
+:root {
+    --my-mongo-green: #00ED64;
+    --my-mongo-green-dark: #00aa57;
+    --my-mongo-green-soft: rgba(0, 237, 100, 0.25);
+    --vp-c-brand-1: var(--my-mongo-green-dark);
+    --vp-c-brand-2: var(--my-mongo-green-dark);
+    --vp-c-brand-3: var(--my-mongo-green);
+    --vp-c-brand-soft: var(--my-mongo-green-soft);
+    --vp-code-line-highlight-color: rgba(0, 237, 100, 0.12);
+}

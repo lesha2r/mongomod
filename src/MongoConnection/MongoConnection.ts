@@ -114,23 +114,29 @@ class MongoConnection {
         }
     };
 
-    // Passes client object
-    passClient() {
+    // Returns client object
+    getClient() {
         return this.client;
     }
 
     // Returns database instance
-    getDatabase() {
+    getDb() {
         return this.client!.db(this.dbName);
     }
 
     // Aliases:
+    
+    // getClient alias
+    passClient() {
+        return this.getClient();
+    }
+
     // getDatabase alias
-    getDb() {
-        return this.getDatabase();
+    getDatabase() {
+        return this.getDb();
     }
     db() {
-        return this.getDatabase();
+        return this.getDb();
     }
 }
 

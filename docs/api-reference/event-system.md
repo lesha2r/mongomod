@@ -197,7 +197,7 @@ User.subscribe('created', async (userData) => {
                 privacy: 'public'
             }
         });
-        await profile.save(true);
+        await profile.save();
         
         // Create initial dashboard
         const Dashboard = mongomod.get('Dashboard');
@@ -206,7 +206,7 @@ User.subscribe('created', async (userData) => {
             widgets: ['welcome', 'quick-start'],
             layout: 'default'
         });
-        await dashboard.save(true);
+        await dashboard.save();
         
         console.log('User initialization completed for:', userData.email);
     } catch (error) {
@@ -278,7 +278,7 @@ User.subscribe('created', async (userData) => {
         published: true,
         tags: ['welcome', 'introduction']
     });
-    await welcomePost.save(true); // This will trigger Post 'created' event
+    await welcomePost.save(); // This will trigger Post 'created' event
 });
 
 Post.subscribe('created', async (postData) => {

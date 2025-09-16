@@ -1,4 +1,3 @@
-<!-- ✅ checked @ 16.09.2025 -->
 # MongoSubscriber
 
 The `MongoSubscriber` class provides an event system that allows you to subscribe to model lifecycle events such as create, update, and delete operations.
@@ -22,6 +21,7 @@ The following events are automatically triggered during model operations:
 | `created` | Document is inserted | `(newData, oldData)` |
 | `updated` | Document is modified | `(newData, oldData)` |
 | `deleted` | Document is removed | `(deletedData)` |
+| `*` | Any event  | `(newData, oldData, eventName)` |
 
 ## Basic Usage
 
@@ -61,10 +61,10 @@ Events are automatically triggered during model operations:
 ```javascript{6,10,13}
 // This will trigger 'created' event
 const user = new User().init({
-    name: 'John Doe',
-    email: 'john@example.com'
+    name: 'Jesse Pinkman',
+    email: 'jesse@lospollos.com'
 });
-await user.insert(); // Triggers 'created' event
+await user.save(); // Triggers 'created' event
 
 // This will trigger 'updated' event
 user.set({ age: 25 });
@@ -90,6 +90,10 @@ User.subscribe('updated', (newData, oldData) => {
 });
 
 User.subscribe('deleted', (deletedData) => {
+    // Any side effects
+});
+
+User.subscribe('*', (newData, oldData, eventName) => {
     // Any side effects
 });
 ```
@@ -130,8 +134,8 @@ User.subscribe('created', (newData, oldData) => {
 });
 
 // When triggered by:
-const user = new User().init({ name: 'John', email: 'john@example.com' });
-await user.save(true);
+const user = new User().init({ name: 'Jesse Pinkman', email: 'jesse@lospollos.com' });
+await user.save();
 ```
 
 ### Updated Event
@@ -219,6 +223,6 @@ User.subscribe('created', async (newData) => {
 
 ## Related
 
-- [MongoModel](/core-components/mongo-model) - Model operations that trigger events
+- [MongoModel](/core-concepts/model) - Model operations that trigger events
 - [Event System API](/api-reference/event-system) - Detailed event system API
-- [Advanced Usage](/advanced-usage) - Complex event patterns and model inheritance
+- [Advanced Usage](/advanced/advanced-usage) - Complex event patterns and model inheritance

@@ -5,5 +5,5 @@ export interface MethodCountOptions {
         [key: string]: any;
     };
 }
-declare function count(this: MongoController, options?: MethodCountOptions): Promise<QueryResult<null> | QueryResult<number>>;
+declare function count(this: MongoController, options?: MethodCountOptions): Promise<QueryResult<number> | QueryResult<null>>;
 export default count;

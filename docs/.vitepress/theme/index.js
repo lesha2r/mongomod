@@ -1,5 +1,6 @@
 import DefaultTheme from 'vitepress/theme'
 import TestComp from '../components/TestComp.vue'
+import './custom.css'
 
 /** @type {import('vitepress').Theme} */
 export default {

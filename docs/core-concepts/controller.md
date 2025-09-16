@@ -1,3 +1,5 @@
+<!-- ❌❌❌❌❌ -->
+
 # MongoController
 
 The `MongoController` class provides low-level database operations. It's usually used internally by models, but can be used directly for advanced database operations.
@@ -477,6 +479,6 @@ await collection.createIndex({ createdAt: -1 });
 
 ## Related
 
-- [MongoModel](/core-components/mongo-model) - High-level model operations
-- [MongoConnection](/core-components/mongo-connection) - Database connection management  
+- [MongoModel](/core-concepts/model) - High-level model operations
+- [MongoConnection](/core-concepts/connection) - Database connection management  
 - [API Reference](/api-reference/static-methods) - Model static methods that use controllers

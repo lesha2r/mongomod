@@ -1,8 +1,6 @@
-<!-- ✅ checked @ 16.09.2025 -->
-
 # MongoSchema
 
-<!--@include: ../includes/validno-info.md-->
+<!--@include: ../.includes/validno-info.md-->
 
 ## Constructor
 
@@ -154,8 +152,14 @@ const productSchema = new MongoSchema({
 
 Custom rule functions receive value and context:
 
-```javascript
+```javascript{11-19}
 const schema = new MongoSchema({
+    password: {
+        type: String,
+            rules: {
+                lengthMin: 8
+            }
+    }
     confirmPassword: {
         type: String,
         rules: {
@@ -168,12 +172,6 @@ const schema = new MongoSchema({
                     details: value === password ? '' : 'Passwords do not match'
                 };
             }
-        }
-    },
-    password: {
-        type: String,
-        rules: {
-        lengthMin: 8
         }
     }
 });
@@ -248,6 +246,6 @@ export const postSchema = new MongoSchema({
 
 ## Related
 
-- [MongoModel](/core-components/mongo-model) - Uses schemas for data validation
+- [MongoModel](/core-concepts/model) - Uses schemas for data validation
 - [Schema Validation](/api-reference/schema-validation) - Detailed validation API
-- [Error Handling](/error-handling) - Validation error management
+- [Error Handling](/advanced/error-handling) - Validation error management

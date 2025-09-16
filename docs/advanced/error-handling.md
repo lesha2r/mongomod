@@ -119,7 +119,7 @@ try {
 async function createUser(userData) {
     try {
         const user = new User().init(userData);
-        await user.save(true);
+        await user.save();
         return { success: true, user };
     } catch (error) {
         if (error instanceof MmValidationError) {
@@ -553,7 +553,7 @@ class HealthCheck {
                 email: `health-check-${Date.now()}@test.com`,
                 temporary: true
             });
-            await testDoc.save(true);
+            await testDoc.save();
             await testDoc.delete();
             
             return { 
@@ -648,7 +648,7 @@ if (error instanceof MmConnectionError) {
 async function createUser(userData) {
     try {
         const user = new User().init(userData);
-        return await user.save(true);
+        return await user.save();
     } catch (error) {
         if (error instanceof MmValidationError) {
             // Handle validation here - this is expected

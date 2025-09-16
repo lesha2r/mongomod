@@ -6,15 +6,18 @@ hero:
   text: "MongoDB ODM for Node.js"
   tagline: "A powerful MongoDB model-based library with TypeScript support"
   image:
-    src: https://files.kodzero.pro/validno/validno-logo-large.svg
+    src: ./cover-img.png
     alt: MongoMod
   actions:
     - theme: brand
       text: Get Started
       link: /quick-start
     - theme: alt
-      text: View on GitHub
+      text: GitHub
       link: https://github.com/lesha2r/mongomod
+    - theme: alt
+      text: npm
+      link: https://npmjs.com/package/mongomod
 
 features:
   - icon: 🏗️
@@ -56,7 +59,7 @@ npm install mongomod
 ```
 
 ::: tip Version 2.0+
-Version 2.0.0 introduces breaking changes. See [For v1 users](/migration-guide) for upgrading from earlier versions.
+Version 2.0.0 introduces breaking changes. See [For v1 users](/advanced/migration-guide) for upgrading from earlier versions.
 :::
 
 ## Quick Example
@@ -67,8 +70,11 @@ import mongomod from 'mongomod';
 // Create connection
 const db = new mongomod.Connection({
     link: 'localhost:27017',
-    dbName: 'myapp'
+    dbName: 'myapp',
+    login: 'user',
+    password: 'pass'
 });
+
 await db.connect();
 
 // Define schema
@@ -97,28 +103,8 @@ const user = new User().init({
     age: 25
 });
 
-await user.save(true);
+await user.save();
 console.log(user.getFullInfo()); // "Jesse Pinkman (jesse@lospollos.com)"
 ```
 
-<script setup>
-import { VPTeamMembers } from 'vitepress/theme'
-
-const members = [
-  {
-    avatar: 'https://avatars.githubusercontent.com/u/66374113?v=4',
-    name: 'Aleksey Tur',
-    title: 'Creator',
-    links: [
-      { icon: 'github', link: 'https://github.com/lesha2r' },
-      { icon: 'telegram', link: 'https://t.me/leshatour' }
-    ]
-  }
-]
-</script>
-
-# Team
-
-Created as part of something bigger and more grandiose by...
-
-<VPTeamMembers size="small" :members />
+<!-- @include: ./.includes/team.md -->

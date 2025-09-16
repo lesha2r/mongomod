@@ -87,17 +87,20 @@ class MongoConnection {
         }
     }
     ;
-    passClient() {
+    getClient() {
         return this.client;
     }
-    getDatabase() {
+    getDb() {
         return this.client.db(this.dbName);
     }
-    getDb() {
-        return this.getDatabase();
+    passClient() {
+        return this.getClient();
+    }
+    getDatabase() {
+        return this.getDb();
     }
     db() {
-        return this.getDatabase();
+        return this.getDb();
     }
 }
 export default MongoConnection;

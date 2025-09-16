@@ -4,11 +4,11 @@ Welcome to the complete MongoMod API reference. This section provides detailed d
 
 ## Core Classes
 
-- [MongoConnection](/core-components/mongo-connection) - Database connection management
-- [MongoSchema](/core-components/mongo-schema) - Data validation and structure
-- [MongoController](/core-components/mongo-controller) - Low-level database operations
-- [MongoModel](/core-components/mongo-model) - High-level model interface
-- [MongoSubscriber](/core-components/mongo-subscriber) - Event system
+- [Connection](/core-concepts/connection) - Database connection management
+- [Schema](/core-concepts/schema) - Data validation and structure
+- [Controller](/core-concepts/controller) - Low-level database operations
+- [Model](/core-concepts/model) - High-level model interface
+- [Events](/core-concepts/events) - Event system
 
 ## Method Categories
 
@@ -33,7 +33,7 @@ MongoMod provides specific error types for different failure scenarios:
 - `MmOperationError` - Database operation failures
 - `MmControllerError` - Low-level controller failures
 
-See [Error Handling](/error-handling) for detailed error management patterns.
+See [Error Handling](/advanced/error-handling) for detailed error management patterns.
 
 ## Quick Reference
 
@@ -73,7 +73,7 @@ const user = new User().init({
     email: 'john@example.com'
 });
 
-await user.save(true);
+await user.save();
 console.log(user.greet()); // "Hello, John Doe!"
 ```
 
@@ -82,7 +82,7 @@ console.log(user.greet()); // "Hello, John Doe!"
 ```javascript
 // Create
 const user = new User().init(userData);
-await user.save(true);
+await user.save();
 
 // Read
 const user = await User.findOne({ filter: { email: 'user@example.com' } });

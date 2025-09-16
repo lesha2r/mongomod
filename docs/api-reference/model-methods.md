@@ -143,20 +143,13 @@ console.log(contactInfo);
 
 ## Database Operations
 
-### `save(upsert?)`
+### `save()`
 
 Saves the model to the database. If the model has an `_id`, it updates the existing document. If no `_id` exists, it inserts a new document.
 
 ```javascript
-// Update existing document
 await user.save();
-
-// Insert if not exists, update if exists
-await user.save(true);
 ```
-
-**Parameters:**
-- `upsert` (optional boolean) - If true, insert document if it doesn't exist
 
 **Returns:** Promise resolving to the operation result
 
@@ -385,7 +378,7 @@ const user = new User()
     .set({ age: 25 })
     .set({ active: true });
 
-await user.save(true);
+await user.save();
 
 // With custom methods that return this
 user.incrementAge().set({ lastLoginAt: new Date() });
@@ -411,4 +404,4 @@ try {
 }
 ```
 
-For complete error handling patterns, see the [Error Handling](/error-handling) guide.
+For complete error handling patterns, see the [Error Handling](/advanced/error-handling) guide.

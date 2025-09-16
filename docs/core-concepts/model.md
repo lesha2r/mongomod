@@ -1,3 +1,5 @@
+<!-- ❌❌❌❌❌ -->
+
 # MongoModel
 
 The `MongoModel` class is the main model class that combines schema validation, custom methods, and database operations. It provides an intuitive, object-oriented interface for working with MongoDB documents.
@@ -93,20 +95,13 @@ console.log(publicData); // { name: 'John Doe', email: 'john@example.com' }
 
 ### Database Operations
 
-#### `save(upsert?)`
+#### `save()`
 
-Saves the model to the database.
+Saves the model to the database. If the model has an _id, it updates the existing document. If no _id exists, it inserts a new document.
 
 ```javascript
-// Update existing document
 await user.save();
-
-// Insert if not exists, update if exists
-await user.save(true);
 ```
-
-**Parameters:**
-- `upsert` (optional boolean): If true, insert document if it doesn't exist
 
 **Returns:** Promise resolving to operation result
 
@@ -477,7 +472,7 @@ async function examples() {
     
     // Add more tags and save
     post.addTags(['tutorial', 'beginner']);
-    await post.save(true); // Insert new document
+    await post.save();
     
     // Publish the post
     await post.publish();
@@ -560,12 +555,12 @@ export { Post } from './Post.js';
 
 ```javascript
 const customMethods = {
-    async safeSave(upsert = false) {
+    async safeSave() {
         if (!this.validate()) {
             const errors = this.getValidationErrors();
             throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
         }
-        return await this.save(upsert);
+        return await this.save();
     }
 };
 ```
@@ -604,7 +599,7 @@ const userCustoms = {
 
 ## Related
 
-- [MongoSchema](/core-components/mongo-schema) - Schema validation for models
-- [MongoController](/core-components/mongo-controller) - Low-level database operations
+- [MongoSchema](/core-concepts/schema) - Schema validation for models
+- [MongoController](/core-concepts/controller) - Low-level database operations
 - [Event System](/api-reference/event-system) - Model lifecycle events
-- [Custom Methods](/advanced-usage#model-inheritance-and-extension) - Advanced custom method patterns
+- [Custom Methods](/advanced/advanced-usage#model-inheritance-and-extension) - Advanced custom method patterns

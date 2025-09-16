@@ -9,28 +9,27 @@ export default defineConfig({
   themeConfig: {
     logo: '/logo.png',
     nav: [
-      { text: 'Guide', link: '/quick-start' },
+      { text: 'Quick Start', link: '/quick-start' },
       { text: 'API Reference', link: '/api-reference/' },
-      { text: 'Examples', link: '/advanced-usage' },
+      // { text: 'Examples', link: '/advanced-usage' },
     ],
     sidebar: {
       '/': [
         {
           text: 'Getting Started',
           items: [
-            { text: 'Introduction', link: '/' },
             { text: 'Installation', link: '/installation' },
             { text: 'Quick Start', link: '/quick-start' }
           ]
         },
         {
-          text: 'Core Components',
+          text: 'Core Concepts',
           items: [
-            { text: 'MongoConnection', link: '/core-components/mongo-connection' },
-            { text: 'MongoSchema', link: '/core-components/mongo-schema' },
-            { text: 'MongoController', link: '/core-components/mongo-controller' },
-            { text: 'MongoModel', link: '/core-components/mongo-model' },
-            { text: 'MongoSubscriber', link: '/core-components/mongo-subscriber' }
+            { text: 'Connection', link: '/core-concepts/connection' },
+            { text: 'Schema', link: '/core-concepts/schema' },
+            { text: 'Collection Controller', link: '/core-concepts/controller' },
+            { text: 'Model', link: '/core-concepts/model' },
+            { text: 'Events', link: '/core-concepts/events' }
           ]
         },
         {
@@ -45,9 +44,9 @@ export default defineConfig({
         {
           text: 'Advanced',
           items: [
-            { text: 'Advanced Usage', link: '/advanced-usage' },
-            { text: 'Error Handling', link: '/error-handling' },
-            { text: 'Migration Guide', link: '/migration-guide' }
+            { text: 'Advanced Usage', link: '/advanced/advanced-usage' },
+            { text: 'Error Handling', link: '/advanced/error-handling' },
+            { text: 'Migration Guide', link: '/advanced/migration-guide' }
           ]
         }
       ]

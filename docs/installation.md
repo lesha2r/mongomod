@@ -1,4 +1,3 @@
-<!-- ✅ checked @ 16.09.2025 -->
 # Installation
 
 ## Prerequisites
@@ -38,20 +37,11 @@ MongoMod uses ES modules. Make sure your `package.json` includes:
 
 ## Import Syntax
 
-### ES Modules (Recommended)
+### ES Modules
 
 ```javascript
 import mongomod from 'mongomod';
 import { MongoSchema, MongoConnection, MongoModel } from 'mongomod';
-```
-
-### CommonJS (Legacy)
-
-If you need to use CommonJS:
-
-```javascript
-const mongomod = require('mongomod').default;
-const { MongoSchema, MongoConnection, MongoModel } = require('mongomod');
 ```
 
 ## Next Steps

@@ -498,7 +498,7 @@ class EventManager {
                 privacy: 'public'
             }
         });
-        await profile.save(true);
+        await profile.save();
     }
     
     static async handleEmailChange(newData, oldData) {
@@ -756,7 +756,7 @@ export class ModelTestHelper {
         };
         
         const user = new User().init(userData);
-        await user.save(true);
+        await user.save();
         return user;
     }
     
