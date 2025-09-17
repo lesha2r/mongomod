@@ -18,12 +18,6 @@ class MongoSubscriber {
         [MmSubscribeEvents.All]: []
     }
 
-    private executeForCallbacks(callbacks: Function[], eventName: string, newData: NewData, oldData: OldData) {
-        for (const fn of callbacks) {
-            fn(newData, oldData, eventName)
-        }
-    }
-
     subscribe = (event: MmSubscribeEvents, callback: Function) => {
         if (typeof callback !== 'function') {
             throw new MmValidationError({
@@ -39,27 +33,45 @@ class MongoSubscriber {
     }
 
     onCreated = (newData: NewData, oldData: OldData) => {
-        const callbacks = [
-            ...this.activeSubscribers[MmSubscribeEvents.Created],
-            ...this.activeSubscribers[MmSubscribeEvents.All]
-        ]
-        this.executeForCallbacks(callbacks, MmSubscribeEvents.Created, newData, oldData)
+        // Execute specific event callbacks (only newData, oldData)
+        const specificCallbacks = this.activeSubscribers[MmSubscribeEvents.Created]
+        for (const fn of specificCallbacks) {
+            fn(newData, oldData)
+        }
+        
+        // Execute '*' event callbacks (newData, oldData, eventName)
+        const allCallbacks = this.activeSubscribers[MmSubscribeEvents.All]
+        for (const fn of allCallbacks) {
+            fn(newData, oldData, MmSubscribeEvents.Created)
+        }
     }
 
     onUpdated = (newData: NewData, oldData: OldData) => {
-        const callbacks = [
-            ...this.activeSubscribers[MmSubscribeEvents.Updated],
-            ...this.activeSubscribers[MmSubscribeEvents.All]
-        ]
-        this.executeForCallbacks(callbacks, MmSubscribeEvents.Updated, newData, oldData)
+        // Execute specific event callbacks (only newData, oldData)
+        const specificCallbacks = this.activeSubscribers[MmSubscribeEvents.Updated]
+        for (const fn of specificCallbacks) {
+            fn(newData, oldData)
+        }
+        
+        // Execute '*' event callbacks (newData, oldData, eventName)
+        const allCallbacks = this.activeSubscribers[MmSubscribeEvents.All]
+        for (const fn of allCallbacks) {
+            fn(newData, oldData, MmSubscribeEvents.Updated)
+        }
     }
 
     onDeleted = (newData: NewData, oldData: OldData) => {
-        const callbacks = [
-            ...this.activeSubscribers[MmSubscribeEvents.Deleted],
-            ...this.activeSubscribers[MmSubscribeEvents.All]
-        ]
-        this.executeForCallbacks(callbacks, MmSubscribeEvents.Deleted, newData, oldData)
+        // Execute specific event callbacks (only newData, oldData)
+        const specificCallbacks = this.activeSubscribers[MmSubscribeEvents.Deleted]
+        for (const fn of specificCallbacks) {
+            fn(newData, oldData)
+        }
+        
+        // Execute '*' event callbacks (newData, oldData, eventName)
+        const allCallbacks = this.activeSubscribers[MmSubscribeEvents.All]
+        for (const fn of allCallbacks) {
+            fn(newData, oldData, MmSubscribeEvents.Deleted)
+        }
     }
 }
 
