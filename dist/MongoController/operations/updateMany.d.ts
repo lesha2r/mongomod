@@ -11,5 +11,5 @@ export interface MethodUpdateManyOptions {
         upsert?: boolean;
     };
 }
-declare function updateMany(this: MongoController, options: MethodUpdateManyOptions): Promise<QueryResult<null> | QueryResult<import("mongodb").UpdateResult<import("bson").Document>>>;
+declare function updateMany(this: MongoController, options: MethodUpdateManyOptions): Promise<QueryResult<any>>;
 export default updateMany;

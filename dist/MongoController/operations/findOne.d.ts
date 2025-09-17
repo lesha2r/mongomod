@@ -5,5 +5,5 @@ export interface MethodFindOneOptions {
         [key: string]: any;
     };
 }
-declare function findOne(this: MongoController, options: MethodFindOneOptions): Promise<QueryResult<import("mongodb").WithId<import("bson").Document>> | QueryResult<null>>;
+declare function findOne(this: MongoController, options: MethodFindOneOptions): Promise<QueryResult<any>>;
 export default findOne;
