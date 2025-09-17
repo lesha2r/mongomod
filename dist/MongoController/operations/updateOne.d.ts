@@ -11,5 +11,5 @@ export type MethodUpdateOneOptions = {
         upsert?: boolean;
     };
 };
-declare function updateOne(this: MongoController, options: MethodUpdateOneOptions): Promise<QueryResult<any>>;
+declare function updateOne(this: MongoController, options: MethodUpdateOneOptions): Promise<QueryResult<null> | QueryResult<import("mongodb").WithId<import("bson").Document>>>;
 export default updateOne;

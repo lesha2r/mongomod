@@ -112,29 +112,35 @@ describe('Mongomodel: working with model instance', () => {
         expect(result.data).toEqual(data)
     })
 
-    test('model.save() throws if document is new', async () => {
-        expect(async () => {
-            const randomId = Math.random()
-            const data = { name: "Nataly", age: 35, randomId}
-            const user = new User().init(data)
-            await user.save()
-        }).rejects.toThrow()
-    })
-
-    test('model.save(true) inserts new document to collection', async () => {
+    test('model.save() automatically inserts new document when _id is missing', async () => {
         const randomId = Math.random()
         const data = { name: "Nataly", age: 35, randomId}
         const user = new User().init(data)
-        await user.save(true)
+        await user.save()
 
         const result = await User.findOne({filter: {randomId}})
         expect(result.data).toEqual(data)
     })
 
+    test('model.save() automatically updates existing document when _id is present', async () => {
+        const randomId = Math.random()
+        const data = { name: "UpdateTest", age: 30, randomId}
+        const user = new User().init(data)
+        await user.save() // This should insert
+
+        // Modify and save again - should update
+        user.set({age: 31})
+        await user.save() // This should update
+
+        const result = await User.findOne({filter: {randomId}})
+        expect(result.data.age).toBe(31)
+        expect(result.data.name).toBe("UpdateTest")
+    })
+
     test('model.set updates modelData but does not update remote document', async () => {
         const data = { name: "Julie", age: 34}
         const user = new User().init(data)
-        await user.save(true)
+        await user.save()
 
         user.set({age: data.age + 1})
 
@@ -147,7 +153,7 @@ describe('Mongomodel: working with model instance', () => {
     test('model.set updates modelData and model.save() updates remote document', async () => {
         const data = { name: "Ann", age: 24}
         const user = new User().init(data)
-        await user.save(true)
+        await user.save()
 
         user.set({age: data.age + 1})
         expect(user.modelData.age).toBe(data.age + 1)
@@ -156,6 +162,46 @@ describe('Mongomodel: working with model instance', () => {
 
         const result = await User.findOne({filter: {name: data.name}})
         expect(result.data.age).toEqual(data.age + 1)
+    })
+
+    test('model.set with undefined value deletes the key from modelData', async () => {
+        const data = { name: "DeleteTest", age: 30, city: "New York"}
+        const user = new User().init(data)
+        await user.save()
+
+        // Set city to undefined should delete it
+        user.set({city: undefined})
+        expect(user.modelData.city).toBeUndefined()
+        expect('city' in user.modelData).toBe(false)
+        expect(user.modelData.name).toBe("DeleteTest")
+        expect(user.modelData.age).toBe(30)
+
+        // Save and verify it's deleted from database too
+        await user.save()
+        const result = await User.findOne({filter: {name: "DeleteTest"}})
+        expect(result.data.city).toBeUndefined()
+        expect('city' in result.data).toBe(false)
+    })
+
+    test('model.set with undefined preserves other fields', () => {
+        const user = new User().init({
+            name: "UndefinedTest",
+            age: 25,
+            email: "test@example.com",
+            city: "Boston"
+        })
+
+        user.set({
+            age: undefined,
+            city: undefined,
+            country: "USA"
+        })
+
+        expect(user.modelData.name).toBe("UndefinedTest")
+        expect('age' in user.modelData).toBe(false)
+        expect('city' in user.modelData).toBe(false) 
+        expect(user.modelData.email).toBe("test@example.com")
+        expect(user.modelData.country).toBe("USA")
     })
 
     test('model.get fetches required document by filter', async () => {
@@ -255,5 +301,34 @@ describe('MongoModel: using subscribers', () => {
 
         expect(dataBefore).toEqual({name: data.name, age: data.age + 1})
         expect(dataAfter).toBe(null)
+    })
+
+    test('subscribe to "*" event triggers for all events with eventName', async() => {
+        const events = []
+        const eventNames = []
+        
+        User.subscribe('*', (newV, oldV, eventName) => {
+            events.push({newV, oldV})
+            eventNames.push(eventName)
+        })
+
+        const data = {name: 'StarSubscriber', age: 25}
+        const user = new User().init(data)
+        
+        // Test insert (created event)
+        await user.insert()
+        
+        // Test update (updated event)
+        user.set({age: data.age + 1})
+        await user.save()
+        
+        // Test delete (deleted event)
+        await user.delete()
+
+        expect(eventNames).toEqual(['created', 'updated', 'deleted'])
+        expect(events).toHaveLength(3)
+        expect(events[0].newV.name).toBe(data.name)
+        expect(events[1].newV.age).toBe(data.age + 1)
+        expect(events[2].newV).toBe(null)
     })
 })
