@@ -1,8 +1,14 @@
 .env
+node_modules
+
 src
 tests
+
 jest.config.ts
 .eslintrc.*
-examples
+
 /*/dev.*
-node_modules
+
+
+examples
+docs
