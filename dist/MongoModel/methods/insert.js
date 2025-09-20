@@ -2,7 +2,6 @@ import { MmOperationError, MmValidationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
 async function insert() {
     this.ensureModelData();
-    const dataFrozen = this.data(true);
     try {
         const result = await this.insertOne(this.modelData);
         if (!result.ok) {

@@ -5,7 +5,6 @@ import { MmModelErrors } from '../../constants/model.js';
 
 async function insert(this: MongoModel): Promise<MongoModel> {
     this.ensureModelData();
-    const dataFrozen = this.data(true)
 
     try {
         const result = await this.insertOne(this.modelData!);
