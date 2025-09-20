@@ -8,7 +8,7 @@ const findManyTestObj = {
 };
 
 const findManyTestObj2 = {
-    name: 'Alice',
+    name: 'Beatrice',
     age: findManyTestObj.age
 }
 
@@ -83,6 +83,55 @@ describe('FindMany. Correct filter works', () => {
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
     expect(result.data.length).toBe(0);
+  });
+});
+
+describe('FindMany. Project parameter works', () => {
+  test('should find documents with only selected fields', async () => {
+    const options = {
+      filter: {age: findManyTestObj.age},
+      project: {name: 1, _id: 0}
+    };
+    const result = await ctrl.findMany(options);
+
+    expect(result).toBeDefined();
+    expect(result.ok).toBe(true);
+    expect(result.data).toBeInstanceOf(Array);
+    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data[0].name).toBeDefined();
+    expect(result.data[0]._id).toBeUndefined();
+    expect(result.data[0].age).toBeUndefined();
+  });
+});
+
+describe('FindMany. Sort parameter works', () => {
+  test('should find documents sorted by name in ascending order', async () => {
+    const options = {
+      filter: {age: findManyTestObj.age},
+      sort: {name: 1}
+    };
+    const result = await ctrl.findMany(options);
+
+    expect(result).toBeDefined();
+    expect(result.ok).toBe(true);
+    expect(result.data).toBeInstanceOf(Array);
+    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data[0].name).toBe(findManyTestObj.name);
+    expect(result.data[1].name).toBe(findManyTestObj2.name);
+  });
+  test('should find documents sorted by name in descending order', async () => {
+    const options = {
+      filter: {age: findManyTestObj.age},
+      sort: {name: -1}
+    };
+    const result = await ctrl.findMany(options);
+
+    expect(result).toBeDefined();
+    expect(result.ok).toBe(true);
+    expect(result.data).toBeInstanceOf(Array);
+    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data[0].name).toBe(findManyTestObj2.name);
+    expect(result.data[1].name).toBe(findManyTestObj.name);
   });
 });
 
