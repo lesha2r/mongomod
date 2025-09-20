@@ -87,7 +87,7 @@ class MongoConnection {
         }
     }
     ;
-    passClient() {
+    getClient() {
         return this.client;
     }
     getDatabase() {
@@ -98,6 +98,9 @@ class MongoConnection {
     }
     db() {
         return this.getDatabase();
+    }
+    passClient() {
+        return this.getClient();
     }
 }
 export default MongoConnection;

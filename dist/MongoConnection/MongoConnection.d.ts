@@ -19,9 +19,10 @@ declare class MongoConnection {
     constructor(options: MongomodConnectionOptions);
     connect(callback?: Function, timeout?: number): Promise<mongo.MongoClient | null>;
     disconnect(callback?: Function): Promise<boolean>;
-    passClient(): mongo.MongoClient | null;
+    getClient(): mongo.MongoClient | null;
     getDatabase(): mongo.Db;
     getDb(): mongo.Db;
     db(): mongo.Db;
+    passClient(): mongo.MongoClient | null;
 }
 export default MongoConnection;

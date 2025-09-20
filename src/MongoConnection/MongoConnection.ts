@@ -115,7 +115,7 @@ class MongoConnection {
     };
 
     // Passes client object
-    passClient() {
+    getClient() {
         return this.client;
     }
 
@@ -125,13 +125,16 @@ class MongoConnection {
     }
 
     // Aliases:
-    // getDatabase alias
     getDb() {
         return this.getDatabase();
     }
     db() {
         return this.getDatabase();
     }
+    passClient() {
+        return this.getClient();
+    }
+
 }
 
 export default MongoConnection;
