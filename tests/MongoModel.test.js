@@ -112,20 +112,21 @@ describe('Mongomodel: working with model instance', () => {
         expect(result.data).toEqual(data)
     })
 
-    test('model.save() throws if document is new', async () => {
+    // Updated: v2.1.2
+    test('model.save() not throws if document is new', async () => {
         expect(async () => {
             const randomId = Math.random()
-            const data = { name: "Nataly", age: 35, randomId}
+            const data = { name: "Kate", age: 34, randomId}
             const user = new User().init(data)
             await user.save()
-        }).rejects.toThrow()
+        }).not.toThrow()
     })
 
-    test('model.save(true) inserts new document to collection', async () => {
+    test('model.save() inserts new document to collection', async () => {
         const randomId = Math.random()
         const data = { name: "Nataly", age: 35, randomId}
         const user = new User().init(data)
-        await user.save(true)
+        await user.save()
 
         const result = await User.findOne({filter: {randomId}})
         expect(result.data).toEqual(data)
@@ -134,7 +135,7 @@ describe('Mongomodel: working with model instance', () => {
     test('model.set updates modelData but does not update remote document', async () => {
         const data = { name: "Julie", age: 34}
         const user = new User().init(data)
-        await user.save(true)
+        await user.save()
 
         user.set({age: data.age + 1})
 
@@ -147,7 +148,7 @@ describe('Mongomodel: working with model instance', () => {
     test('model.set updates modelData and model.save() updates remote document', async () => {
         const data = { name: "Ann", age: 24}
         const user = new User().init(data)
-        await user.save(true)
+        await user.save()
 
         user.set({age: data.age + 1})
         expect(user.modelData.age).toBe(data.age + 1)
@@ -156,6 +157,14 @@ describe('Mongomodel: working with model instance', () => {
 
         const result = await User.findOne({filter: {name: data.name}})
         expect(result.data.age).toEqual(data.age + 1)
+    })
+
+    test('model.set deletes field from modelData if value is undefined', () => {
+        const data = { name: "Jane", age: 22, extra: 'to be deleted'}
+        const user = new User().init(data)
+        user.set({extra: undefined})
+        expect(user.modelData.extra).toBeUndefined()
+        expect(Object.keys(user.modelData)).toEqual(['name', 'age'])
     })
 
     test('model.get fetches required document by filter', async () => {
@@ -186,7 +195,7 @@ describe('Mongomodel: working with model instance', () => {
     test('model.delete() deletes document in collection', async() => {
         const data = { name: "John Wick", age: 0}
         const user = await new User().init(data)
-        await user.save(true)
+        await user.save()
         expect(user.data()).toEqual(data)
 
         await user.delete()
@@ -255,5 +264,18 @@ describe('MongoModel: using subscribers', () => {
 
         expect(dataBefore).toEqual({name: data.name, age: data.age + 1})
         expect(dataAfter).toBe(null)
+    })
+
+    test('* subscriber triggers EVERY TIME when document is created, inserted and deleted', async() => {
+        let count = 0
+        
+        User.subscribe('*', () => count++)
+
+        const user = new User().init({name: 'Tony', age: 56})
+        await user.save()
+        await user.set({age: 57})
+        await user.save()
+        await user.delete()
+        expect(count).toBe(3)
     })
 })

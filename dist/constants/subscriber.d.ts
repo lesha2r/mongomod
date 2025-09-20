@@ -1,7 +1,8 @@
 export declare enum MmSubscribeEvents {
     Created = "created",
     Updated = "updated",
-    Deleted = "deleted"
+    Deleted = "deleted",
+    All = "*"
 }
 export declare const SubscriberOperationName = "subscribe";
 export declare const MmSubscriberErrCodes: {

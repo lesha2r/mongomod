@@ -84,50 +84,6 @@ class MongoModel extends MongoController {
 
     protected _modelDataBeforeSave: Record<string, any> | null = null;
 
-    // static findMany(options: MethodFindManyOptions): any {
-    //     return this.findMany(options)
-    // }
-
-    // static insertOne(options: MethodInsertOneOptions): any {
-    //     return this.insertOne(options)
-    // }
-
-    // static updateOne(options: MethodUpdateOneOptions): any {
-    //     return this.updateOne(options)
-    // }
-
-    // static deleteOne(options: MethodDeleteOneOptions): any {
-    //     return this.deleteOne(options)
-    // }
-
-    // static updateMany(options: MethodUpdateManyOptions): any {
-    //     return this.updateMany(options)
-    // }
-
-    // static deleteMany(options: MethodDeleteOptions): any {
-    //     return this.deleteMany(options)
-    // }
-
-    // static insertMany(options: MethodInsertManyOptions): any {
-    //     return this.insertMany(options)
-    // }
-
-    // static aggregate(options: AggregationPipeline): any {
-    //     return this.aggregate(options)
-    // }
-
-    // static count(options: MethodCountOptions): any {
-    //     return this.count(options)
-    // }
-
-    // static bulkWrite(options: MethodBulkWriteOptions): any {
-    //     return this.bulkWrite(options)
-    // }
-
-    // static distinct(options: MethodDistinctOptions): any {  
-    //     return this.distinct(options)
-    // }
-
     // Helper method to ensure model has data
     protected ensureModelData(): boolean {
         if (this.modelData) return true;
@@ -203,8 +159,8 @@ class MongoModel extends MongoController {
     }
 
     // Saves current model data into the db
-    async save(insertIfNotExists: boolean = false): Promise<MongoModel> {
-        return save.call(this, insertIfNotExists);
+    async save(): Promise<MongoModel> {
+        return save.call(this);
     }
 
     // Deletes current item from db

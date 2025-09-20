@@ -8,16 +8,19 @@ import { MmControllerOperations } from '../../constants/controller.js';
 import { MmOperationErrors } from '../../constants/operations.js';
 
 export interface MethodFindManyOptions {
-    // TODO: add sort
     filter: {[key: string]: any}
     limit?: number
     skip?: number
+    sort?: {[key: string]: 1 | -1}
+    project?: {[key: string]: 0 | 1}
 }
 
 interface MethodFindManyParsedOptions {
     filter: {[key: string]: any}
     limit: number
     skip: number
+    sort?: {[key: string]: 1 | -1}
+    project?: {[key: string]: 0 | 1}
 }
 
 const MAX_QUERY_LIMIT = 99999
@@ -26,7 +29,9 @@ const validateOptions = (options: MethodFindManyParsedOptions) => {
     const optionsSchema = new Schema({
         filter: { type: Object, required: true },
         limit: { type: Number, required: false },
-        skip: { type: Number, required: false }
+        skip: { type: Number, required: false },
+        sort: { type: Object, required: false },
+        project: { type: Object, required: false }
     })
 
     const validationResult = optionsSchema.validate(options);
@@ -39,17 +44,17 @@ const validateOptions = (options: MethodFindManyParsedOptions) => {
 }
 
 const parseOptions = (options: MethodFindManyOptions): MethodFindManyParsedOptions => {
-    let filter = options.filter || {};
-    let limit = options.limit || MAX_QUERY_LIMIT; // Default to a very high limit
-    let skip = options.skip || 0; // Default to no skip
+    const filter = options.filter || {};
+    const limit = options.limit || MAX_QUERY_LIMIT; // Default to a very high limit
+    const skip = options.skip || 0; // Default to no skip
+    const sort = options.sort || undefined;
+    const project = options.project || undefined;
 
     if (filter._id && typeof filter._id === "string") {
         filter._id = new ObjectId(filter._id); // Convert _id to ObjectId if it exists
     }
 
-    const output = { filter, limit, skip };
-
-    return output;
+    return { filter, limit, skip, sort, project };
 }
 
 const throwOperationError = (err: any, dbName?: string): MmOperationError => {
@@ -64,11 +69,19 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
 
 async function findMany(this: MongoController, options: MethodFindManyOptions) {
     try {
-        const { filter, limit, skip } = parseOptions(options);
-        validateOptions({ filter, limit, skip });
+        const { filter, limit, skip, sort, project } = parseOptions(options);
+        validateOptions({ filter, limit, skip, sort, project });
         
         const collection = this.getCollectionCtrl();
-        const result = await collection.find(filter).limit(limit).skip(skip).toArray();
+        let query = collection.find(filter);
+        
+        // Conditionally apply methods only if values exist
+        if (sort) query = query.sort(sort);
+        if (skip > 0) query = query.skip(skip);
+        if (limit > 0) query = query.limit(limit);
+        if (project) query = query.project(project);
+        
+        const result = await query.toArray();
 
         return new QueryResult(true, result);
     } catch (err: any) {

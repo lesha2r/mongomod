@@ -96,8 +96,8 @@ class MongoModel extends MongoController {
     async get(filter = {}) {
         return get.call(this, filter);
     }
-    async save(insertIfNotExists = false) {
-        return save.call(this, insertIfNotExists);
+    async save() {
+        return save.call(this);
     }
     async delete() {
         return deleteMethod.call(this);

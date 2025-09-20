@@ -4,4 +4,7 @@ examples
 node_modules
 TODO*.md
 
+# VitePress
 docs
+docs/.vitepress/cache
+docs/.vitepress/dist

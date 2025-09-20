@@ -5,7 +5,6 @@ import { MmModelErrors } from '../../constants/model.js';
 
 async function insert(this: MongoModel): Promise<MongoModel> {
     this.ensureModelData();
-    const dataFrozen = this.data(true)
 
     try {
         const result = await this.insertOne(this.modelData!);
@@ -21,7 +20,7 @@ async function insert(this: MongoModel): Promise<MongoModel> {
 
         if (result.data && '_id' in result.data) {
             this.modelData!._id = result.data._id;
-            this._subscriber.onCreated(this.modelData, dataFrozen)
+            this._subscriber.onCreated(this.modelData, null)
         }
 
         return this;

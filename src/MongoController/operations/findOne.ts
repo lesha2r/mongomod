@@ -9,8 +9,6 @@ import { MmOperationErrors } from '../../constants/operations.js';
 
 export interface MethodFindOneOptions {
     filter: {[key: string]: any}
-    limit?: number
-    skip?: number
 }
 
 const throwOperationError = (err: any, dbName?: string) => {

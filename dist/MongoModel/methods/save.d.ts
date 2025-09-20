@@ -1,3 +1,3 @@
 import MongoModel from '../MongoModel.js';
-declare function save(this: MongoModel, insertIfNotExists?: boolean): Promise<MongoModel>;
+declare function save(this: MongoModel): Promise<MongoModel>;
 export default save;

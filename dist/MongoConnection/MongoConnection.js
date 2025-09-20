@@ -21,7 +21,7 @@ class MongoConnection {
         this.password = options.password;
         this.dbName = options?.dbName || '';
         this.options = {
-            srv: options.srv
+            srv: options.srv || false
         };
         this.client = null;
         this.isConnected = false;
@@ -87,7 +87,7 @@ class MongoConnection {
         }
     }
     ;
-    passClient() {
+    getClient() {
         return this.client;
     }
     getDatabase() {
@@ -98,6 +98,9 @@ class MongoConnection {
     }
     db() {
         return this.getDatabase();
+    }
+    passClient() {
+        return this.getClient();
     }
 }
 export default MongoConnection;

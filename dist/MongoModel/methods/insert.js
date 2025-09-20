@@ -2,7 +2,6 @@ import { MmOperationError, MmValidationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
 async function insert() {
     this.ensureModelData();
-    const dataFrozen = this.data(true);
     try {
         const result = await this.insertOne(this.modelData);
         if (!result.ok) {
@@ -15,7 +14,7 @@ async function insert() {
         }
         if (result.data && '_id' in result.data) {
             this.modelData._id = result.data._id;
-            this._subscriber.onCreated(this.modelData, dataFrozen);
+            this._subscriber.onCreated(this.modelData, null);
         }
         return this;
     }

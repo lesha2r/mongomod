@@ -6,6 +6,12 @@ export interface MethodFindManyOptions {
     };
     limit?: number;
     skip?: number;
+    sort?: {
+        [key: string]: 1 | -1;
+    };
+    project?: {
+        [key: string]: 0 | 1;
+    };
 }
-declare function findMany(this: MongoController, options: MethodFindManyOptions): Promise<QueryResult<any>>;
+declare function findMany(this: MongoController, options: MethodFindManyOptions): Promise<QueryResult<null> | QueryResult<import("mongodb").WithId<import("bson").Document>>>;
 export default findMany;
