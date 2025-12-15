@@ -13,7 +13,6 @@ const getUnsetPayload = (dataFrozen) => {
 };
 async function save() {
     this.ensureModelData();
-    const dataBeforeSave = _.clone(this._modelDataBeforeSave);
     try {
         if (!this.modelData || !this.modelData._id) {
             return this.insert();
@@ -38,11 +37,12 @@ async function save() {
                 });
             }
         }
-        this._modelDataBeforeSave = this.data(true);
-        this._subscriber.onUpdated(this.modelData, dataBeforeSave);
+        this._subscriber.onUpdated(this.modelData, this._modelDataBeforeSave);
+        this._modelDataBeforeSave = _.clone(this.modelData);
         return this;
     }
     catch (err) {
+        console.log(err);
         if (err instanceof MmOperationError || err instanceof MmValidationError) {
             throw err;
         }

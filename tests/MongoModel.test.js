@@ -240,9 +240,11 @@ describe('MongoModel: using subscribers', () => {
 
         const user = new User().init(data)
         await user.insert()
+        user.set({age: 20})
+        user.set({name: 'Vitto' + ' Corleone'})
+        user.set({age: 30})
         user.set({age: data.age + 1})
         await user.save()
-
         expect(ages).toEqual([data.age + 1, data.age])
     })
 
@@ -258,6 +260,7 @@ describe('MongoModel: using subscribers', () => {
 
         const user = new User().init(data)
         await user.insert()
+        user.set({age: 1})
         user.set({age: data.age + 1})
         await user.save()
         await user.delete()
@@ -274,6 +277,7 @@ describe('MongoModel: using subscribers', () => {
         const user = new User().init({name: 'Tony', age: 56})
         await user.save()
         await user.set({age: 57})
+        await user.set({age: 58})
         await user.save()
         await user.delete()
         expect(count).toBe(3)

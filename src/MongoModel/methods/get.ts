@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import MongoModel from '../MongoModel.js';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
@@ -26,6 +27,7 @@ async function get(this: MongoModel, filter: {[key: string]: any} = {}): Promise
         
         this.modelData = found.data;
         this.validate(this.modelData);
+        this._modelDataBeforeSave = _.clone(this.modelData)
 
         return this;
     } catch (err) {

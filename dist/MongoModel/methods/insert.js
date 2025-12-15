@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
 async function insert() {
@@ -16,6 +17,7 @@ async function insert() {
             this.modelData._id = result.data._id;
             this._subscriber.onCreated(this.modelData, null);
         }
+        this._modelDataBeforeSave = _.clone(this.modelData);
         return this;
     }
     catch (err) {

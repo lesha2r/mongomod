@@ -2,7 +2,6 @@ import { MmOperationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
 async function deleteMethod() {
     this.ensureModelId();
-    const dataFrozen = this.data(true);
     try {
         const filter = { _id: this.modelData._id };
         const result = await this.deleteOne({ filter });
@@ -15,7 +14,7 @@ async function deleteMethod() {
             });
         }
         this.modelData = null;
-        this._subscriber.onDeleted(this.modelData, dataFrozen);
+        this._subscriber.onDeleted(this.modelData, this._modelDataBeforeSave);
         return this;
     }
     catch (err) {

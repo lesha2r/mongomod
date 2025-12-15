@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { MmOperationError, MmValidationError } from '../../errors/index.js';
 import { MmModelErrors } from '../../constants/model.js';
 async function get(filter = {}) {
@@ -21,6 +22,7 @@ async function get(filter = {}) {
         }
         this.modelData = found.data;
         this.validate(this.modelData);
+        this._modelDataBeforeSave = _.clone(this.modelData);
         return this;
     }
     catch (err) {

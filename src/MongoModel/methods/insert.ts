@@ -23,6 +23,8 @@ async function insert(this: MongoModel): Promise<MongoModel> {
             this._subscriber.onCreated(this.modelData, null)
         }
 
+        this._modelDataBeforeSave = _.clone(this.modelData)
+        
         return this;
     } catch (err) {
         // Re-throw our custom errors

@@ -1,7 +1,6 @@
 function set(data) {
     if (!this.modelData)
         this.modelData = {};
-    this._modelDataBeforeSave = this.data(true);
     const updatedModelData = { ...this.modelData };
     for (const key in data) {
         if (data[key] === undefined) {

@@ -4,7 +4,6 @@ import { MmModelErrors } from '../../constants/model.js';
 
 async function deleteMethod(this: MongoModel): Promise<MongoModel> {
     this.ensureModelId();
-    const dataFrozen = this.data(true)
 
     try {
         const filter = { _id: this.modelData!._id };
@@ -23,7 +22,7 @@ async function deleteMethod(this: MongoModel): Promise<MongoModel> {
         // Clear model data after successful deletion
         this.modelData = null;
 
-        this._subscriber.onDeleted(this.modelData, dataFrozen)
+        this._subscriber.onDeleted(this.modelData, this._modelDataBeforeSave)
 
         return this;
     } catch (err) {

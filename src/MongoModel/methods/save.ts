@@ -18,7 +18,6 @@ const getUnsetPayload = (dataFrozen: Record<string, any>): Record<string, ''> =>
 
 async function save(this: MongoModel): Promise<MongoModel> {
     this.ensureModelData();
-    const dataBeforeSave = _.clone(this._modelDataBeforeSave)
 
     try {
         if (!this.modelData || !this.modelData._id) {
@@ -48,12 +47,13 @@ async function save(this: MongoModel): Promise<MongoModel> {
 
 
         }
-
-        this._modelDataBeforeSave = this.data(true)
-        this._subscriber.onUpdated(this.modelData, dataBeforeSave)
+        
+        this._subscriber.onUpdated(this.modelData, this._modelDataBeforeSave)
+        this._modelDataBeforeSave = _.clone(this.modelData)
 
         return this;
     } catch (err) {
+        console.log(err)
         // Re-throw our custom errors
         if (err instanceof MmOperationError || err instanceof MmValidationError) {
             throw err;
