@@ -14,7 +14,6 @@ function set(this: MongoModel, data: Record<string, any>): MongoModel {
         }
     }
 
-    this.validate(updatedModelData);
     this.modelData = updatedModelData;
 
     return this;

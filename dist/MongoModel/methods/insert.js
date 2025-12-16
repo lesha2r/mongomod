@@ -4,6 +4,7 @@ import { MmModelErrors } from '../../constants/model.js';
 async function insert() {
     this.ensureModelData();
     try {
+        this.validate(this.modelData);
         const result = await this.insertOne(this.modelData);
         if (!result.ok) {
             throw new MmOperationError({

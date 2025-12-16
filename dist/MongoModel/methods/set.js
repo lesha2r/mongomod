@@ -10,7 +10,6 @@ function set(data) {
             updatedModelData[key] = data[key];
         }
     }
-    this.validate(updatedModelData);
     this.modelData = updatedModelData;
     return this;
 }

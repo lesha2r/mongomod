@@ -21,7 +21,6 @@ async function get(filter = {}) {
             });
         }
         this.modelData = found.data;
-        this.validate(this.modelData);
         this._modelDataBeforeSave = _.clone(this.modelData);
         return this;
     }

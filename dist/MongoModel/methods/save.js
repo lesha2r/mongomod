@@ -19,6 +19,7 @@ async function save() {
         }
         else {
             this.ensureModelId();
+            this.validate(this.modelData);
             const dataFrozen = this.modelData;
             dataFrozen._id = this.modelData._id;
             const result = await this.updateOne({
@@ -42,7 +43,6 @@ async function save() {
         return this;
     }
     catch (err) {
-        console.log(err);
         if (err instanceof MmOperationError || err instanceof MmValidationError) {
             throw err;
         }

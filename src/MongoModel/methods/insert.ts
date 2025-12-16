@@ -7,6 +7,7 @@ async function insert(this: MongoModel): Promise<MongoModel> {
     this.ensureModelData();
 
     try {
+        this.validate(this.modelData);
         const result = await this.insertOne(this.modelData!);
 
         if (!result.ok) {

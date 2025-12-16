@@ -26,7 +26,6 @@ async function get(this: MongoModel, filter: {[key: string]: any} = {}): Promise
         }
         
         this.modelData = found.data;
-        this.validate(this.modelData);
         this._modelDataBeforeSave = _.clone(this.modelData)
 
         return this;

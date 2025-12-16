@@ -24,7 +24,8 @@ async function save(this: MongoModel): Promise<MongoModel> {
             return this.insert();
         } else {
             this.ensureModelId();
-
+            this.validate(this.modelData);
+            
             const dataFrozen = this.modelData;
             dataFrozen!._id = this.modelData!._id;
 
@@ -53,7 +54,6 @@ async function save(this: MongoModel): Promise<MongoModel> {
 
         return this;
     } catch (err) {
-        console.log(err)
         // Re-throw our custom errors
         if (err instanceof MmOperationError || err instanceof MmValidationError) {
             throw err;
