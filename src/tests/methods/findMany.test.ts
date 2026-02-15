@@ -1,6 +1,7 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const findManyTestObj = {
     name: 'Alex',
@@ -14,16 +15,18 @@ const findManyTestObj2 = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.FindMany;
+const collectionName = 'autotests-methods-' + MmControllerOperations.FindMany;
 const ctrl = new mongomod.Controller(db, collectionName);
 await ctrl.insertMany({data: [findManyTestObj, findManyTestObj2]});
 
 describe('FindMany. Input validation: wrong cases', () => {
   test('should throw an error if options is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.findMany()).rejects.toThrow();
   });
 
   test('should throw an error if options.filter is not an object', async () => {
+    // @ts-expect-error
       await expect(ctrl.findMany({ filter: 'not an object' })).rejects.toThrow();
   });
 });
@@ -35,7 +38,7 @@ describe('FindMany. Correct filter works', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data?.length).toBeGreaterThan(1);
   });
 
   test('should find more than one document in the collection by filter', async () => {
@@ -44,7 +47,7 @@ describe('FindMany. Correct filter works', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data?.length).toBeGreaterThan(1);
   });
 
   test('should find exact one document in the collection by filter and limit', async () => {
@@ -56,7 +59,9 @@ describe('FindMany. Correct filter works', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(1);
+    expect(result.data?.length).toBe(1);
+    // TODO: 
+    // @ts-ignore
     expect(result.data[0].name).toBe(findManyTestObj.name);
   });
 
@@ -70,7 +75,9 @@ describe('FindMany. Correct filter works', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(1);
+    expect(result.data?.length).toBe(1);
+    // TODO:
+    // @ts-ignore
     expect(result.data[0].name).toBe(findManyTestObj2.name);
   });
 
@@ -82,7 +89,7 @@ describe('FindMany. Correct filter works', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 
@@ -90,16 +97,19 @@ describe('FindMany. Project parameter works', () => {
   test('should find documents with only selected fields', async () => {
     const options = {
       filter: {age: findManyTestObj.age},
-      project: {name: 1, _id: 0}
+      project: {name: 1 as const, _id: 0 as const}
     };
     const result = await ctrl.findMany(options);
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data?.length).toBeGreaterThan(1);
+    // @ts-ignore //TODO
     expect(result.data[0].name).toBeDefined();
+    // @ts-ignore
     expect(result.data[0]._id).toBeUndefined();
+    // @ts-ignore
     expect(result.data[0].age).toBeUndefined();
   });
 });
@@ -108,29 +118,33 @@ describe('FindMany. Sort parameter works', () => {
   test('should find documents sorted by name in ascending order', async () => {
     const options = {
       filter: {age: findManyTestObj.age},
-      sort: {name: 1}
+      sort: {name: 1 as const}
     };
     const result = await ctrl.findMany(options);
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data?.length).toBeGreaterThan(1);
+    // @ts-ignore // TODO
     expect(result.data[0].name).toBe(findManyTestObj.name);
+    // @ts-ignore // TODO
     expect(result.data[1].name).toBe(findManyTestObj2.name);
   });
   test('should find documents sorted by name in descending order', async () => {
     const options = {
       filter: {age: findManyTestObj.age},
-      sort: {name: -1}
+      sort: {name: -1 as const}
     };
     const result = await ctrl.findMany(options);
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBeGreaterThan(1);
+    expect(result.data?.length).toBeGreaterThan(1);
+    // @ts-ignore // TODO
     expect(result.data[0].name).toBe(findManyTestObj2.name);
+    // @ts-ignore // TODO
     expect(result.data[1].name).toBe(findManyTestObj.name);
   });
 });
@@ -144,7 +158,7 @@ describe('FindMany. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

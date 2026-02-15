@@ -1,6 +1,7 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const testObj = {
     name: 'Alex',
@@ -19,7 +20,7 @@ const testObj3 = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.UpdateMany;
+const collectionName = 'autotests-methods-' + MmControllerOperations.UpdateMany;
 const ctrl = new mongomod.Controller(db, collectionName);
 const insertTestData = async () => {
   await ctrl.insertMany({data: [testObj, testObj2, testObj3]});
@@ -29,6 +30,7 @@ await insertTestData()
 
 describe('UpdateMany. Input validation: wrong cases', () => {
   test('should throw an error if options is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.updateMany()).rejects.toThrow();
   });
 
@@ -37,11 +39,13 @@ describe('UpdateMany. Input validation: wrong cases', () => {
   });
 
   test('should throw an error if options.filter is not an object', async () => {
-      await expect(ctrl.updateMany({ filter: 'not an object', update: {} })).rejects.toThrow();
+    // @ts-expect-error
+    await expect(ctrl.updateMany({ filter: 'not an object', update: {} })).rejects.toThrow();
   });
 
   test('should throw an error if options.data is not an object', async () => {
-      await expect(ctrl.updateMany({ filter: {}, update: 'not an object' })).rejects.toThrow();
+    // @ts-expect-error
+    await expect(ctrl.updateMany({ filter: {}, update: 'not an object' })).rejects.toThrow();
   });
 });
 
@@ -54,8 +58,8 @@ describe('UpdateMany. Correct filter works', () => {
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
-    expect(result.data.acknowledged).toBe(true);
-    expect(result.data.modifiedCount).toBe(2);
+    expect((result.data as any).acknowledged).toBe(true);
+    expect((result.data as any).modifiedCount).toBe(2);
   });
 
   test('should update all documents if no filter is provided', async () => {
@@ -66,7 +70,7 @@ describe('UpdateMany. Correct filter works', () => {
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
-    expect(result.data.acknowledged).toBe(true);
+    expect((result.data as any).acknowledged).toBe(true);
     // excluded because of conflicting with other tests
     // expect(result.data.modifiedCount).toBe(3);
   });
@@ -80,8 +84,8 @@ describe('UpdateMany. Correct filter works', () => {
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
-    expect(result.data.acknowledged).toBe(true);
-    expect(result.data.upsertedCount).toBe(1);
+    expect((result.data as any).acknowledged).toBe(true);
+    expect((result.data as any).upsertedCount).toBe(1);
   });
 });
 
@@ -94,7 +98,7 @@ describe('UpdateMany. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

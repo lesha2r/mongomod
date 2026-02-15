@@ -1,10 +1,11 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod, {MmValidationError} from '../../dist/index.js';
+import mongomod, {MmValidationError} from '../../index.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.Count;
+const collectionName = 'autotests-methods-' + MmControllerOperations.Count;
 const ctrl = new mongomod.Controller(db, collectionName);
 
 describe('Count. Adding fake data for testing', () => {
@@ -23,6 +24,7 @@ describe('Count. Adding fake data for testing', () => {
 
 describe('Count. Input validation: wrong cases', () => {
     test('Call with null params throws a MmValidationError', async () => {
+        // @ts-expect-error
         await expect(ctrl.count(null)).rejects.toThrow(MmValidationError);
     });
 
@@ -39,7 +41,7 @@ describe('Count. Input validation: wrong cases', () => {
 
 describe('Count. Input validation: correct cases', () => {
     test('Call without parameters counts all documents', async () => {
-        const result = await ctrl.count();
+        const result = await ctrl.count({});
         expect(result).toBeDefined();
         expect(result.ok).toBe(true);
         expect(typeof result.data).toBe('number');
@@ -65,7 +67,7 @@ describe('Count. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

@@ -1,8 +1,11 @@
-import mongomod from "../dist/mongomod.js";
+import mongomod from "../mongomod.js";
+import { describe, test, expect, beforeEach} from '@jest/globals';
+import MongoSchema from "../MongoSchema/MongoSchema.js";
 
 describe('MongoSchema. Validation', () => {
     test('should throw if schema is not an object', () => {
         expect(() => {
+            // @ts-expect-error
             new mongomod.Schema('not an object');
         }).toThrow();
     })
@@ -40,7 +43,7 @@ describe('MongoSchema. Validation', () => {
     })
 
     describe('validate method', () => {
-        let schema;
+        let schema: MongoSchema;
         
         beforeEach(() => {
             schema = new mongomod.Schema({

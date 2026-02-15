@@ -1,6 +1,7 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const testObj = {
     name: 'Alex',
@@ -19,7 +20,7 @@ const testObj3 = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.DeleteMany;
+const collectionName = 'autotests-methods-' + MmControllerOperations.DeleteMany;
 const ctrl = new mongomod.Controller(db, collectionName);
 const insertTestData = async () => {
   await ctrl.insertMany({data: [testObj, testObj2, testObj3]});
@@ -28,14 +29,17 @@ await insertTestData()
 
 describe('DeleteMany. Input validation: wrong cases', () => {
   test('should throw an error if options is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.deleteMany()).rejects.toThrow();
   });
 
     test('should throw an error if options.filter is missing', async () => {
+    //@ts-expect-error
     await expect(ctrl.deleteMany({})).rejects.toThrow();
   });
 
   test('should throw an error if options.filter is not an object', async () => {
+    // @ts-expect-error
       await expect(ctrl.deleteMany({ filter: 'not an object' })).rejects.toThrow();
   });
 });
@@ -51,11 +55,12 @@ describe('DeleteMany. Correct filter works', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(findResult.ok).toBe(true);
-    expect(findResult.data.length).toBe(1);
+    expect(findResult.data?.length).toBe(1);
   });
 
   test('should delete all documents by filter = {}', async () => {
     await insertTestData() // Reinsert data to ensure we have multiple documents
+    // @ts-ignore
     const countResult = await ctrl.count()
     expect(countResult.data).toBeGreaterThanOrEqual(3); // Ensure we have 3 documents before
 
@@ -69,7 +74,7 @@ describe('DeleteMany. Correct filter works', () => {
     const findResult = await ctrl.findMany({ filter: {} });
 
     expect(findResult.ok).toBe(true);
-    expect(findResult.data.length).toBe(0);
+    expect(findResult.data?.length).toBe(0);
   });
 });
 
@@ -82,7 +87,7 @@ describe('DeleteMany. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

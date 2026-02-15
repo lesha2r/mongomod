@@ -1,9 +1,10 @@
-import mongomod from '../dist/mongomod.js';
+import mongomod from '../mongomod.js';
 import path from 'path';
 import dotenv from 'dotenv';
-import MongoSchema from '../dist/MongoSchema/MongoSchema.js';
-import MongoController from '../dist/MongoController/MongoController.js';
+import MongoSchema from '../MongoSchema/MongoSchema.js';
+import MongoController from '../MongoController/MongoController.js';
 import { ObjectId } from 'mongodb';
+import { describe, test, expect } from '@jest/globals';
 
 // Init dotenv module
 dotenv.config({
@@ -13,10 +14,10 @@ dotenv.config({
 const TEST_COLLECTION = 'autotests-mongomodel'
 
 const mongoCreds = {
-    link: process.env.MONGO_LINK,
-    login: process.env.MONGO_USER,
-    password: process.env.MONGO_PASSWORD,
-    dbName: process.env.MONGO_DBNAME,
+    link: process.env.MONGO_LINK as string,
+    login: process.env.MONGO_USER as string,
+    password: process.env.MONGO_PASSWORD as string,
+    dbName: process.env.MONGO_DBNAME as string,
     srv: process.env.MONGO_SRV === 'true' ? true : false
 }
 
@@ -206,6 +207,7 @@ describe('Mongomodel: working with model instance', () => {
 
 describe('MongoModel: using custom methods', () => {
     const schema = new MongoSchema({ name: {type: String}, age: {type: Number} })
+    // @ts-ignore // TODO: add typing
     const customMethods = {hello() { return `Hi, ${this.data().name}`}}
     const options = {db, collection: TEST_COLLECTION, schema, customs: customMethods}
     const User = mongomod.createModel(options)
@@ -223,7 +225,8 @@ describe('MongoModel: using subscribers', () => {
 
     test('onCreated subscriber triggers when document is inserted', async() => {
         let createdAge = 0
-        User.subscribe('created', (newV) => createdAge = newV.age)
+        // TODO: add typeing for subscriber callback
+        User.subscribe('created', (newV: any) => createdAge = newV.age)
         const user = new User().init({name: 'Tony', age: 56})
         await user.insert()
         expect(createdAge).toBe(56)
@@ -231,9 +234,10 @@ describe('MongoModel: using subscribers', () => {
 
     test('onUpdated subscriber triggers when document is save', async() => {
         const data = {name: 'Vitto', age: 57}
-        const ages = []
+        const ages: number[] = []
 
-        User.subscribe('updated', (newV, oldV) => {
+        // TODO: add typeing for subscriber callback
+        User.subscribe('updated', (newV: any, oldV: any) => {
             ages.push(newV.age)
             ages.push(oldV.age)
         })
@@ -253,7 +257,7 @@ describe('MongoModel: using subscribers', () => {
         let dataBefore
         let dataAfter
 
-        User.subscribe('deleted', (newV, oldV) => {
+        User.subscribe('deleted', (newV: any, oldV: any) => {
             dataBefore = {name: oldV.name, age: oldV.age}
             dataAfter = newV
         })

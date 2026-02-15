@@ -1,6 +1,8 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod, {MmOperationError, MmValidationError} from '../../dist/index.js';
+
+import mongomod, {MmOperationError, MmValidationError} from '../../index.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const testObj = {
     name: 'Arnold',
@@ -9,20 +11,23 @@ const testObj = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.Aggregate;
+const collectionName = 'autotests-methods-' + MmControllerOperations.Aggregate;
 const ctrl = new mongomod.Controller(db, collectionName);
 await ctrl.insertOne(testObj);
 
 describe('Aggregate. Input validation: wrong cases', () => {
     test('Call without parameters throws a MmValidationError', async () => {
+        // @ts-expect-error
         await expect(ctrl.aggregate()).rejects.toThrow(MmValidationError);
     });
 
     test('Call with empty params throws a MmValidationError', async () => {
+        // @ts-expect-error
         await expect(ctrl.aggregate()).rejects.toThrow(MmValidationError);
     });
 
     test('Call with null params throws a MmValidationError', async () => {
+        // @ts-expect-error
         await expect(ctrl.aggregate(null)).rejects.toThrow(MmValidationError);
     });
 
@@ -31,6 +36,7 @@ describe('Aggregate. Input validation: wrong cases', () => {
     });
 
     test('Call with non-array params throws a MmValidationError', async () => {
+        // @ts-expect-error
         await expect(ctrl.aggregate({})).rejects.toThrow(MmValidationError);
     });
 
@@ -38,6 +44,7 @@ describe('Aggregate. Input validation: wrong cases', () => {
         await expect(ctrl.aggregate([
             { $match: { name: 'test' } },
             { $group: { _id: '$name', count: { $sum: 1 } } },
+            // @ts-expect-error
             { $unexistingOperator: {} }
         ])).rejects.toThrow(MmOperationError)
     });
@@ -65,7 +72,7 @@ describe('FindMany. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

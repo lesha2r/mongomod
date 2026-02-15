@@ -4,6 +4,9 @@ examples
 node_modules
 TODO*.md
 
+# Tests
+coverage
+
 # VitePress
 docs
 docs/.vitepress/cache

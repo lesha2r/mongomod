@@ -1,6 +1,7 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const testObj = {
     name: 'Alex',
@@ -19,7 +20,7 @@ const testObj3 = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.UpdateOne;
+const collectionName = 'autotests-methods-' + MmControllerOperations.UpdateOne;
 const ctrl = new mongomod.Controller(db, collectionName);
 const insertTestData = async () => {
   await ctrl.insertMany({data: [testObj, testObj2, testObj3]});
@@ -29,6 +30,7 @@ await insertTestData()
 
 describe('UpdateOne. Input validation: wrong cases', () => {
   test('should throw an error if options is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.updateOne()).rejects.toThrow();
   });
 
@@ -37,11 +39,13 @@ describe('UpdateOne. Input validation: wrong cases', () => {
   });
 
   test('should throw an error if options.filter is not an object', async () => {
-      await expect(ctrl.updateOne({ filter: 'not an object', update: {} })).rejects.toThrow();
+    // @ts-expect-error
+    await expect(ctrl.updateOne({ filter: 'not an object', update: {} })).rejects.toThrow();
   });
 
   test('should throw an error if options.update is not an object', async () => {
-      await expect(ctrl.updateOne({ filter: {}, update: 'not an object' })).rejects.toThrow();
+    // @ts-expect-error
+    await expect(ctrl.updateOne({ filter: {}, update: 'not an object' })).rejects.toThrow();
   });
 });
 
@@ -54,8 +58,9 @@ describe('UpdateOne. Correct filter works', () => {
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
-    expect(result.data.name).toBe(testObj.name);
-    expect(result.data.age).toBe(testObj.age + 1);
+    expect(result.data).toBeDefined();
+    expect(result.data && !Array.isArray(result.data) ? result.data.name : undefined).toBe(testObj.name);
+    expect(result.data && !Array.isArray(result.data) ? result.data.age : undefined).toBe(testObj.age + 1);
   });
 
   test('should upsert document if no existing documents match the filter and upsert param is set to true', async () => {
@@ -67,8 +72,8 @@ describe('UpdateOne. Correct filter works', () => {
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
-    expect(result.data.name).toBe('NewName');
-    expect(result.data.age).toBe(2);
+    expect(result.data && !Array.isArray(result.data) ? result.data.name : undefined).toBe('NewName');
+    expect(result.data && !Array.isArray(result.data) ? result.data.age : undefined).toBe(2);
   });
 
   test('shouldn\'t upsert document if no existing documents match the filter and upsert is not set', async () => {
@@ -95,8 +100,8 @@ describe('UpdateOne. Correct filter works', () => {
 
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
-    expect(result.data.name).toBe(testObj3.name);
-    expect(result.data.age).toBe(newAge);
+    expect(result.data && !Array.isArray(result.data) ? result.data.name : undefined).toBe(testObj3.name);
+    expect(result.data && !Array.isArray(result.data) ? result.data.age : undefined).toBe(newAge);
   });
 });
 
@@ -109,7 +114,7 @@ describe('UpdateOne. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

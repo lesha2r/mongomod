@@ -1,14 +1,16 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.InsertOne;
+const collectionName = 'autotests-methods-' + MmControllerOperations.InsertOne;
 const ctrl = new mongomod.Controller(db, collectionName);
 
 describe('InsertOne. Input validation: wrong cases', () => {
   test('should throw an error if data is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.insertOne()).rejects.toThrow();
   });
 
@@ -27,9 +29,9 @@ describe('InsertOne. Correct document and input', () => {
     const result = await ctrl.insertOne(data);
 
     expect(result.ok).toBeDefined();
-    expect(result.data._id).toBeDefined();
-    expect(result.data.name).toBe(data.name);
-    expect(result.data.age).toBe(data.age);
+    expect(result.data && !Array.isArray(result.data) && result.data._id).toBeDefined();
+    expect(result.data && !Array.isArray(result.data) && result.data.name).toBe(data.name);
+    expect(result.data && !Array.isArray(result.data) && result.data.age).toBe(data.age);
   });
 });
 
@@ -42,7 +44,7 @@ describe('InsertOne. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

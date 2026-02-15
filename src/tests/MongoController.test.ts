@@ -1,6 +1,7 @@
-import mongomod from '../dist/index.js'
+import mongomod from '../index.js'
 import { MongoClient } from 'mongodb';
 import { mongoCreds } from './env.js';
+import { describe, test, expect } from '@jest/globals';
 
 // Docs:
 // Basic usage is tested here
@@ -15,13 +16,17 @@ const brokenCreds = {
 
 describe('MongoController constructor', () => {
     test('should throw error if db is not an instance of MongoConnection', () => {
+        // @ts-expect-error
         expect(() => new mongomod.Controller({}, 'test-collection')).toThrow(mongomod.MmControllerError);
+        // @ts-expect-error
         expect(() => new mongomod.Controller(null, 'test-collection')).toThrow(mongomod.MmControllerError);
     });
 
     test('should throw error if collection is not a string', () => {
         const db = new mongomod.Connection(brokenCreds);
+        // @ts-expect-error
         expect(() => new mongomod.Controller(db, 123)).toThrow(mongomod.MmControllerError);
+        // @ts-expect-error
         expect(() => new mongomod.Controller(db, null)).toThrow(mongomod.MmControllerError);
     })
 });
@@ -48,6 +53,7 @@ await db.connect();
 const ctrl = new mongomod.Controller(db, 'autotests-mongo-ctrl');
 await ctrl.deleteMany({filter: {}})
 const countAlias = async () => {
+    // @ts-ignore // TODO: make count works without parameters
     const result = await ctrl.count()
     return result.data
 }
@@ -55,8 +61,8 @@ const TEST_NAME = 'test'
 
 describe('MongoController methods works as expected', () => {
 
-
     test('MongoController.count works', async () => {
+        // @ts-ignore
         const result = await ctrl.count();
         expect(result.ok).toBe(true);
         expect(result.data).toBe(0);
@@ -86,7 +92,7 @@ describe('MongoController methods works as expected', () => {
         const result = await ctrl.findOne({ filter: {name: TEST_NAME + '1' }});
         expect(result.ok).toBe(true);
         expect(result.data).toHaveProperty('_id');
-        expect(result.data.name).toBe(TEST_NAME + '1');
+        expect(result.data && typeof result.data === 'object' && !Array.isArray(result.data) ? result.data.name : undefined).toBe(TEST_NAME + '1');
     });
 
     test('MongoController.deleteOne works', async () => {
@@ -99,9 +105,9 @@ describe('MongoController methods works as expected', () => {
         const result = await ctrl.findMany({ filter: {}});
         const count = await countAlias();
         expect(result.ok).toBe(true);
-        expect(result.data.length).toBe(count);
-        expect(result.data[0].name).toBe(TEST_NAME + '2');
-        expect(result.data[1].name).toBe(TEST_NAME + '3');
+        expect(result.data?.length).toBe(count);
+        expect(result.data && Array.isArray(result.data) && result.data[0] && result.data[0].name).toBe(TEST_NAME + '2');
+        expect(result.data && Array.isArray(result.data) && result.data[1] && result.data[1].name).toBe(TEST_NAME + '3');
     });
 
     test('MongoController.updateOne works', async () => {
@@ -110,7 +116,7 @@ describe('MongoController methods works as expected', () => {
         expect(await countAlias()).toBe(2);
         const findResult = await ctrl.findOne({ filter: {name: TEST_NAME + '2updated' }});
         expect(findResult.ok).toBe(true);
-        expect(findResult.data.name).toBe(TEST_NAME + '2updated');
+        expect(findResult.data && typeof findResult.data === 'object' && !Array.isArray(findResult.data) ? findResult.data.name : undefined).toBe(TEST_NAME + '2updated');
     });
 
     test('MongoController.updateMany works', async () => {
@@ -120,10 +126,13 @@ describe('MongoController methods works as expected', () => {
 
         const found = await ctrl.findMany({ filter: {} });
         expect(found.ok).toBe(true);
-        expect(found.data[0].name).toBe(TEST_NAME + 'X');
-        expect(found.data[0].updated).toBe(true);
-        expect(found.data[1].name).toBe(TEST_NAME + 'X');
-        expect(found.data[1].updated).toBe(true);
+
+        const dataToCheck = found.data as unknown as {name: string, updated: boolean}[]; 
+        expect(dataToCheck.length).toBe(2);
+        expect(dataToCheck[0].name).toBe(TEST_NAME + 'X');
+        expect(dataToCheck[0].updated).toBe(true);
+        expect(dataToCheck[1].name).toBe(TEST_NAME + 'X');
+        expect(dataToCheck[1].updated).toBe(true);
     })
 
     test('MongoController.updateMany works with upsert', async () => {
@@ -137,8 +146,8 @@ describe('MongoController methods works as expected', () => {
 
         const found = await ctrl.findMany({ filter: {} });
         expect(found.ok).toBe(true);
-        expect(found.data.length).toBe(3);
-        expect(found.data[2].name).toBe(TEST_NAME + 'unexisting');
+        expect(found.data?.length).toBe(3);
+        expect(found.data && found.data.length >= 2 ? (found.data as unknown as {name: string}[])[2].name : undefined).toBe(TEST_NAME + 'unexisting');
     })
 
     test('MongoController.deleteMany works', async () => {
@@ -148,6 +157,7 @@ describe('MongoController methods works as expected', () => {
     });
 
     test('MongoController.distinct works', async () => {
+        // @ts-ignore // TODO: ensure that filter is not needed
         const result = await ctrl.distinct({ field: 'name' });
         expect(result.ok).toBe(true);
         expect(result.data.includes(TEST_NAME + 'X')).toBe(true);
@@ -185,4 +195,3 @@ describe('MongoController disconnect works, test suite finished', () => {
         expect(ctrl.db.isConnected).toBe(false);
     });
 })
-

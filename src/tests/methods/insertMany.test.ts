@@ -1,18 +1,21 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.InsertMany;
+const collectionName = 'autotests-methods-' + MmControllerOperations.InsertMany;
 const ctrl = new mongomod.Controller(db, collectionName);
 
 describe('InsertMany. Input validation: wrong cases', () => {
   test('should throw an error if data is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.insertMany()).rejects.toThrow();
   });
 
   test('should throw an error if input is empty', async () => {
+    // @ts-expect-error
     await expect(ctrl.insertMany({})).rejects.toThrow();
   });
   
@@ -21,6 +24,7 @@ describe('InsertMany. Input validation: wrong cases', () => {
   });
 
   test('should throw an error if data is an array', async () => {
+    // @ts-expect-error
     await expect(ctrl.insertMany([])).rejects.toThrow();
   });
 });
@@ -69,7 +73,7 @@ describe('InsertMany. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 

@@ -1,6 +1,7 @@
-import { MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const testObj = {
     name: 'Sam',
@@ -19,20 +20,23 @@ const testObj3 = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.Distinct;
+const collectionName = 'autotests-methods-' + MmControllerOperations.Distinct;
 const ctrl = new mongomod.Controller(db, collectionName);
 await ctrl.insertMany({data: [testObj, testObj2, testObj3]});
 
 describe('Distinct. Input validation: wrong cases', () => {
   test('should throw an error if options is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.distinct()).rejects.toThrow();
   });
 
   test('should throw an error if options.field is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.distinct({filter: {}})).rejects.toThrow();
   });
 
   test('should throw an error if options.field is not a string', async () => {
+    // @ts-expect-error
     await expect(ctrl.distinct({field: 123})).rejects.toThrow();
   });
 });
@@ -51,6 +55,7 @@ describe('Distinct. Correct filter works', () => {
   });
 
   test('correct syntax without filter returns correct result', async () => {
+    // @ts-expect-error
     const result = await ctrl.distinct({field: 'age'});
 
     expect(result).toBeDefined();

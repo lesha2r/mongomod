@@ -9,6 +9,8 @@ jest.config.ts
 
 /*/dev.*
 
-
 examples
 docs
+
+# Tests
+coverage

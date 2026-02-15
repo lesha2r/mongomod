@@ -1,4 +1,5 @@
-import mongomod from '../dist/index.js';
+import mongomod from '../index.js';
+import { describe, it, expect } from '@jest/globals';
 
 describe('index.js returns a mongomod instance', () => {
     it('should return a mongomod instance', () => {

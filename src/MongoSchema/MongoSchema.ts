@@ -1,4 +1,4 @@
-import Schema from 'validno'
+import { Schema } from 'validno'
 
 type MongomodSchemaSettings = { strict: boolean }
 
@@ -10,7 +10,7 @@ const validateSchemaInput = (input: any) => {
 
 class MongoSchema {
     settings: MongomodSchemaSettings
-    schema: typeof Schema
+    schema: InstanceType<typeof Schema>
 
     constructor(
         schemaObj: { [key: string]: any } = {},

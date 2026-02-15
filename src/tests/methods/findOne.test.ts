@@ -1,6 +1,7 @@
-import { MmOperations, MongoOperations } from '../../dist/constants/methods.js';
-import mongomod from '../../dist/mongomod.js';
+import mongomod from '../../mongomod.js';
+import { MmControllerOperations } from '../../constants/controller.js';
 import { mongoCreds } from '../env.js';
+import { describe, test, expect } from '@jest/globals';
 
 const findOneTestObj = {
     name: 'Xenia',
@@ -9,20 +10,23 @@ const findOneTestObj = {
 
 const db = new mongomod.Connection(mongoCreds);
 await db.connect();
-const collectionName = 'autotests-methods-' + MongoOperations.FindOne;
+const collectionName = 'autotests-methods-' + MmControllerOperations.FindOne;
 const ctrl = new mongomod.Controller(db, collectionName);
 await ctrl.insertOne(findOneTestObj);
 
 describe('FindOne. Input validation: wrong cases', () => {
   test('should throw an error if options is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.findOne()).rejects.toThrow();
   });
 
   test('should throw an error if options.filter is missing', async () => {
+    // @ts-expect-error
     await expect(ctrl.findOne({})).rejects.toThrow();
   });
 
     test('should throw an error if options.filter is not an object', async () => {
+        // @ts-expect-error
         await expect(ctrl.findOne({ filter: 'not an object' })).rejects.toThrow();
     });
 });
@@ -34,7 +38,7 @@ describe('FindOne. Correct filter works', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeDefined();
-    expect(result.data.name).toBe(findOneTestObj.name);
+    expect(result.data && typeof result.data === 'object' && !Array.isArray(result.data) ? result.data.name : undefined).toBe(findOneTestObj.name);
   });
 
   test('should find one document in the collection', async () => {
@@ -57,7 +61,7 @@ describe('FindOne. Clearing collection at the end of the test', () => {
     expect(result).toBeDefined();
     expect(result.ok).toBe(true);
     expect(result.data).toBeInstanceOf(Array);
-    expect(result.data.length).toBe(0);
+    expect(result.data?.length).toBe(0);
   });
 });
 
