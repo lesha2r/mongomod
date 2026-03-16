@@ -1,10 +1,10 @@
-import Schema from 'validno';
+import { Schema } from 'validno';
 type MongomodSchemaSettings = {
     strict: boolean;
 };
 declare class MongoSchema {
     settings: MongomodSchemaSettings;
-    schema: typeof Schema;
+    schema: InstanceType<typeof Schema>;
     constructor(schemaObj?: {
         [key: string]: any;
     }, options?: MongomodSchemaSettings);

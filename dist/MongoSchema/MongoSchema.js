@@ -1,4 +1,4 @@
-import Schema from 'validno';
+import { Schema } from 'validno';
 const validateSchemaInput = (input) => {
     if (typeof input !== 'object' || input === null || Array.isArray(input)) {
         throw new Error('Schema definition must be a non-null object');

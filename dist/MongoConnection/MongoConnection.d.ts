@@ -5,6 +5,7 @@ export interface MongomodConnectionOptions {
     password: string;
     dbName: string;
     srv?: boolean;
+    authSource?: string;
 }
 declare class MongoConnection {
     link: string;
@@ -13,6 +14,7 @@ declare class MongoConnection {
     dbName: string;
     options: {
         srv: boolean;
+        authSource: string;
     };
     isConnected: boolean;
     client: null | mongo.MongoClient;

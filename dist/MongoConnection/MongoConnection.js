@@ -16,12 +16,16 @@ class MongoConnection {
         if (options.srv === undefined) {
             optionsHandled.srv = false;
         }
+        if (options.authSource === undefined) {
+            optionsHandled.authSource = 'admin';
+        }
         this.link = options.link;
         this.login = options.login;
         this.password = options.password;
         this.dbName = options?.dbName || '';
         this.options = {
-            srv: options.srv || false
+            srv: optionsHandled.srv || false,
+            authSource: optionsHandled.authSource || 'admin'
         };
         this.client = null;
         this.isConnected = false;
@@ -29,7 +33,8 @@ class MongoConnection {
     async connect(callback, timeout) {
         validateConnectCallback(callback);
         const srv = (this.options.srv === true) ? '+srv' : '';
-        const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=admin`;
+        const authSource = this.options.authSource;
+        const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=${authSource}`;
         const mongoClient = new mongo.MongoClient(mongoUrl);
         if (this.client)
             return this.client;

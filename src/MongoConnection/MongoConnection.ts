@@ -9,6 +9,7 @@ export interface MongomodConnectionOptions {
     password: string
     dbName: string
     srv?: boolean
+    authSource?: string
 }
 
 class MongoConnection {
@@ -18,6 +19,7 @@ class MongoConnection {
     dbName: string
     options: {
         srv: boolean
+        authSource: string
     }
     isConnected: boolean
     client: null | mongo.MongoClient
@@ -32,13 +34,18 @@ class MongoConnection {
             optionsHandled.srv = false;
         }
 
+        if (options.authSource === undefined) {
+            optionsHandled.authSource = 'admin'
+        }
+
         // Credentials and connection params
         this.link = options.link;
         this.login = options.login;
         this.password = options.password;
         this.dbName = options?.dbName || '';
         this.options = {
-            srv: options.srv || false
+            srv: optionsHandled.srv || false,
+            authSource: optionsHandled.authSource || 'admin'
         };
 
         this.client = null;
@@ -50,7 +57,9 @@ class MongoConnection {
         validateConnectCallback(callback)
         
         const srv = (this.options.srv === true) ? '+srv' : '';
-        const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=admin`; //&w=majority?retryWrites=true`;
+        const authSource = this.options.authSource;
+        
+        const mongoUrl = `mongodb${srv}://${this.login}:${this.password}@${this.link}/${this.dbName}?authSource=${authSource}`; //&w=majority?retryWrites=true`;
         const mongoClient = new mongo.MongoClient(mongoUrl);
 
         if (this.client) return this.client;
