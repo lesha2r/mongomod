@@ -1,7 +1,7 @@
 {
   "name": "mongomod",
   "version": "2.1.7",
-  "description": "",
+  "description": "MongoDB ODM that combines MongoDB's flexibility with schema structure, validation, and custom methods. Complete TypeScript support with model-based architecture and event system.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -12,9 +12,10 @@
     "dev": "nodemon dist/dev.js -e js,scss --delay 2",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "release:patch": "npm version patch  --message \"release: %s\" && npm publish",
+    "release:minor": "npm version minor  --message \"release: %s\" && npm publish",
+    "release:major": "npm version major  --message \"release: %s\" && npm publish",
+    "release:beta": "npm version prerelease --preid=beta --message \"release: %s\" && npm publish --tag beta"
   },
   "author": "lesha2r",
   "license": "ISC",
