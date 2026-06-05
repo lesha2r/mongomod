@@ -8,6 +8,8 @@ jest.config.ts
 .eslintrc.*
 
 /*/dev.*
+dev.ts
+dev.js
 
 examples
 docs

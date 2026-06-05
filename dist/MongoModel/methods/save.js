@@ -11,6 +11,16 @@ const getUnsetPayload = (dataFrozen) => {
     }
     return $unset;
 };
+const getSetPayload = (dataFrozen) => {
+    const $set = {};
+    for (const [key, value] of Object.entries(dataFrozen)) {
+        if (key === '_id' || value === undefined) {
+            continue;
+        }
+        $set[key] = value;
+    }
+    return $set;
+};
 async function save() {
     this.ensureModelData();
     try {
@@ -20,14 +30,18 @@ async function save() {
         else {
             this.ensureModelId();
             this.validate(this.modelData);
-            const dataFrozen = this.modelData;
-            dataFrozen._id = this.modelData._id;
+            const dataFrozen = _.clone(this.modelData);
+            const $set = getSetPayload(dataFrozen);
+            const $unset = getUnsetPayload(dataFrozen);
+            const updatePayload = {
+                $set
+            };
+            if (Object.keys($unset).length > 0) {
+                updatePayload.$unset = $unset;
+            }
             const result = await this.updateOne({
-                filter: { _id: dataFrozen._id },
-                update: {
-                    $set: dataFrozen,
-                    $unset: getUnsetPayload(dataFrozen)
-                }
+                filter: { _id: this.modelData._id },
+                update: updatePayload
             });
             if (!result.ok) {
                 throw new MmOperationError({
