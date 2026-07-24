@@ -2,14 +2,14 @@ import QueryResult from "../../QueryResult.js";
 
 import { MmOperationError } from "../../errors/operationError.js";
 import MongoController from "../MongoController.js";
-import { AggregationStage } from "../../types/aggregationStages.js";
+import { MmAggregationStage } from "../../types/aggregationStages.js";
 import { MmValidationError } from "../../errors/validationError.js";
 import { MmControllerOperations } from "../../constants/controller.js";
 import { MmOperationErrors } from "../../constants/operations.js";
 
-export type AggregationPipeline = AggregationStage[]
+export type MmAggregationPipeline = MmAggregationStage[]
 
-const validateAggregationPipeline = (pipeline: AggregationPipeline, dbName?: string): boolean => {    
+const validateAggregationPipeline = (pipeline: MmAggregationPipeline, dbName?: string): boolean => {    
     const areAllObjects = () => pipeline.every(obj => typeof obj === 'object' && obj !== null);
 
     if (!pipeline || !Array.isArray(pipeline) || pipeline.length === 0 || !areAllObjects()) {
@@ -34,7 +34,7 @@ const throwOperationError = (err: any, dbName?: string): MmOperationError => {
     });
 }
 
-async function aggregate(this: MongoController, pipeline: AggregationPipeline) {
+async function aggregate(this: MongoController, pipeline: MmAggregationPipeline) {
     try {
         validateAggregationPipeline(pipeline, this.db.dbName);
 

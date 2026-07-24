@@ -3,7 +3,7 @@ import { MethodCountOptions } from './operations/count.js';
 import { MethodDistinctOptions } from './operations/distinct.js';
 import { MethodBulkWriteOptions } from './operations/bulkWrite.js';
 import { MethodFindOneOptions } from './operations/findOne.js';
-import { AggregationPipeline } from './operations/aggregate.js';
+import { MmAggregationPipeline } from './operations/aggregate.js';
 import { MethodFindManyOptions } from './operations/findMany.js';
 import { MethodDeleteOptions } from './operations/deleteMany.js';
 import { MethodInsertOneOptions } from './operations/insertOne.js';
@@ -26,7 +26,7 @@ declare class MongoController {
     updateMany(options: MethodUpdateManyOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").UpdateResult<import("bson").Document>>>;
     deleteMany(options: MethodDeleteOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").DeleteResult>>;
     insertMany(options: MethodInsertManyOptions): Promise<import("../QueryResult.js").default<any>>;
-    aggregate(pipeline: AggregationPipeline): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("bson").Document>>;
+    aggregate(pipeline: MmAggregationPipeline): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("bson").Document>>;
     count(options: MethodCountOptions): Promise<import("../QueryResult.js").default<number> | import("../QueryResult.js").default<null>>;
     distinct(options: MethodDistinctOptions): Promise<import("../QueryResult.js").default<any>>;
     bulkWrite(operations?: MethodBulkWriteOptions): Promise<import("../QueryResult.js").default<null> | import("../QueryResult.js").default<import("mongodb").BulkWriteResult>>;

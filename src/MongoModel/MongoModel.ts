@@ -13,7 +13,7 @@ import { MethodFindManyOptions } from '../MongoController/operations/findMany.js
 import { MethodDistinctOptions } from '../MongoController/operations/distinct.js';
 import { MethodBulkWriteOptions } from '../MongoController/operations/bulkWrite.js';
 import { MethodCountOptions } from '../MongoController/operations/count.js';
-import { AggregationPipeline } from '../MongoController/operations/aggregate.js';
+import { MmAggregationPipeline } from '../MongoController/operations/aggregate.js';
 import { MethodInsertManyOptions } from '../MongoController/operations/insertMany.js';
 import { MethodDeleteOptions } from '../MongoController/operations/deleteMany.js';
 import { MethodUpdateManyOptions } from '../MongoController/operations/updateMany.js';

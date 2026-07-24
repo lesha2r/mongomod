@@ -276,7 +276,7 @@ interface StageVectorSearch {
     $vectorSearch: any
 }
 
-export type AggregationStage =
+export type MmAggregationStage =
     StageMatch |
     StageGroup |
     StageSort |

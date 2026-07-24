@@ -12,7 +12,7 @@ import updateMany, { MethodUpdateManyOptions } from './MongoController/operation
 import deleteOne, { MethodDeleteOneOptions } from './MongoController/operations/deleteOne.js';
 import deleteMany, { MethodDeleteOptions } from './MongoController/operations/deleteMany.js';
 import count, { MethodCountOptions } from './MongoController/operations/count.js';
-import aggregate, { AggregationPipeline } from './MongoController/operations/aggregate.js';
+import aggregate, { MmAggregationPipeline } from './MongoController/operations/aggregate.js';
 import distinct, { MethodDistinctOptions } from './MongoController/operations/distinct.js';
 import bulkWrite, { MethodBulkWriteOptions } from './MongoController/operations/bulkWrite.js';
 import MongoSubscriber from './MongoSubscriber/index.js';
@@ -73,7 +73,7 @@ const mongomod: {[key: string]: any} & Mongomod = {
             static deleteOne = (options: MethodDeleteOneOptions) => deleteOne.call(CustomModel.dbController, options)
             static deleteMany = (options: MethodDeleteOptions) => deleteMany.call(CustomModel.dbController, options)
             static count = (options: MethodCountOptions) => count.call(CustomModel.dbController, options)
-            static aggregate = (pipeline: AggregationPipeline) => aggregate.call(CustomModel.dbController, pipeline)
+            static aggregate = (pipeline: MmAggregationPipeline) => aggregate.call(CustomModel.dbController, pipeline)
             static distinct = (options: MethodDistinctOptions) => distinct.call(CustomModel.dbController, options)
             static bulkWrite = (options: MethodBulkWriteOptions) => bulkWrite.call(CustomModel.dbController, options)
         }

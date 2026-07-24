@@ -6,7 +6,7 @@ import count, { MethodCountOptions } from './operations/count.js';
 import distinct, { MethodDistinctOptions } from './operations/distinct.js';
 import bulkWrite, { MethodBulkWriteOptions } from './operations/bulkWrite.js';
 import findOneMethod, { MethodFindOneOptions } from './operations/findOne.js';
-import aggregateMethod, { AggregationPipeline } from './operations/aggregate.js';
+import aggregateMethod, { MmAggregationPipeline } from './operations/aggregate.js';
 import findManyMethod, { MethodFindManyOptions } from './operations/findMany.js';
 import deleteManyMethod, { MethodDeleteOptions } from './operations/deleteMany.js';
 import insertOneMethod, { MethodInsertOneOptions } from './operations/insertOne.js';
@@ -91,7 +91,7 @@ class MongoController {
     };
     
     // Returns aggregation pipeline result
-    aggregate(pipeline: AggregationPipeline) {
+    aggregate(pipeline: MmAggregationPipeline) {
         return aggregateMethod.call(this, pipeline);
     };
     
