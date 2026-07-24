@@ -1,6 +1,6 @@
 {
   "name": "mongomod",
-  "version": "2.1.10",
+  "version": "2.1.11",
   "description": "MongoDB ODM that combines MongoDB's flexibility with schema structure, validation, and custom methods. Complete TypeScript support with model-based architecture and event system.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
