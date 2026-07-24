@@ -158,17 +158,21 @@ interface StageListSessions {
 }
 
 interface StageLookupBase {
-    from: string,
-    localField: string,
-    foreignField: string,
-    as: string
+    $lookup: {
+        from: string,
+        localField: string,
+        foreignField: string,
+        as: string
+    }
 }
 
 interface StageLookupPipeline {
-    from: string,
-    let: {[key: string]: any}
-    pipeline: any[],
-    as: string
+    $lookup: {
+        from: string,
+        let: {[key: string]: any}
+        pipeline: any[],
+        as: string
+    }
 }
 
 type StageLookup = StageLookupBase | StageLookupPipeline;

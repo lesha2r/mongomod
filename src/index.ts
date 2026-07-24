@@ -15,7 +15,7 @@ import { MmConnectionError } from "./errors/connectionError.js";
 
 // Extra types
 import { MmAggregationStage } from './types/aggregationStages.js';
-import{ MmAggregationPipeline } from './MongoController/operations/aggregate.js';
+import { MmAggregationPipeline } from './MongoController/operations/aggregate.js';
 
 export { MongoSchema, MongoConnection, MongoController, MongoModel, MongoSubscriber };
 export { MmValidationError, MmOperationError, MmControllerError, MmConnectionError };
